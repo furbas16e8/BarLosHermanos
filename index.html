@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Los Hermanos</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- Variáveis de Cores (Baseado no original) --- */
+        :root {
+            --bg-color: #000000;
+            /* Fundo Escuro */
+            --accent-color: #ff3131;
+            /* Dourado */
+            --text-color: #ffffff;
+            --nav-bg: #0e0303;
+            --font-title: 'Bebas Neue', cursive;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        /* --- Reset Básico --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--nav-bg);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-family: var(--font-title);
+            font-size: 2rem;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        .btn-reserve {
+            border: 2px solid var(--accent-color);
+            padding: 0.5rem 1.5rem;
+            color: var(--accent-color);
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .btn-reserve:hover {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        /* --- Hero Section (Banner) --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .hero h4 {
+            color: var(--accent-color);
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-family: var(--font-title);
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #000;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(234, 179, 113, 0.4);
+        }
+
+        /* --- Section Geral --- */
+        section {
+            padding: 5rem 10%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-family: var(--font-title);
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title span {
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        /* --- About Section --- */
+        .about-container {
+            display: flex;
+            gap: 4rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .about-text h3 {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .about-img {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .about-img img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 10px 10px 0px var(--accent-color);
+        }
+
+        /* --- Menu Section --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .menu-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .menu-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        /* --- Reservation / Form --- */
+        .reservation {
+            background-color: #081211;
+            text-align: center;
+        }
+
+        .form-box {
+            max-width: 700px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 5px;
+            font-family: var(--font-body);
+        }
+
+        textarea {
+            grid-column: span 2;
+        }
+
+        .form-btn {
+            grid-column: span 2;
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #000;
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-info p {
+            margin-bottom: 0.5rem;
+            color: #888;
+        }
+
+        .socials {
+            margin-top: 1.5rem;
+        }
+
+        .socials a {
+            margin: 0 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                position: relative;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .form-box {
+                grid-template-columns: 1fr;
+            }
+
+            textarea,
+            .form-btn {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="#" class="logo">BAR <span>LOS HERMANOS</span></a>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#events">Eventos</a></li>
+                <li><a href="#contact">Contato</a></li>
+            </ul>
+        </nav>
+        <a href="#reservation" class="btn-reserve">Reservar Mesa</a>
+    </header>
+
+    <section class="hero" id="home">
+        <h4>BEM-VINDO AO LOS!</h4>
+        <h1>Tradição & Rock n' Roll</h1>
+        <p>15 anos de comida boa, bons drinks e cerveja gelada.</p>
+        <a href="#menu" class="btn-primary">Ver Menu</a>
+    </section>
+
+    <section id="about">
+        <div class="about-container">
+            <div class="about-img">
+                <img src="https://lh3.googleusercontent.com/gps-cs-s/AG0ilSw_EU5GkaXIjRb8gdyE08F_38qjCdYtPwpj1cIXqXp0wrdWGRO6INOF8juVMDS8Wh22F_sgrryrfv_yENgPX9nmC0vK-yWx1gG_wIIvNQ_nzas0vyOSh33rfjK2j97r3EbZ_sNA=s680-w680-h510"
+                    alt="Interior do Bar">
+            </div>
+            <div class="about-text">
+                <span>Nossa História</span>
+                <h3>TRADIÇÃO E SABOR EM GV</h3>
+                <p>Aqui a tradição se encontra com novos sabores. Nossa cozinha é famosa pela variedade que agrada a
+                    todos os gostos:
+                    desde o nosso inigualável Jiló Especial — preparado no capricho e favorito dos clientes — até o
+                    melhor da Comida Mexicana, trazendo um toque picante e vibrante para a sua noite.</p>
+                <br>
+                <p>Para completar a experiência, nossa carta de Drinks é um espetáculo à parte,
+                    com coquetéis clássicos e autorais perfeitos para harmonizar com cada petisco e brindar os bons
+                    momentos.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="menu">
+        <div class="section-title">
+            <span>Do Nosso Bar & Cozinha</span>
+            <h2>Menu Selecionado</h2>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-col">
+                <div class="menu-item">
+                    <div class="menu-header">
+                        <span>Jiló Especial</span>
+                        <span>R$ 49</span>
+                    </div>
+                    <div class="menu-desc">Jiló, cebola, calabresa e queijo.</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-header">
+                        <span>Bolinho de Bacalhau</span>
+                        <span>R$ 50</span>
+                    </div>
+                    <div class="menu-desc">Pra portuga nenhum botar defeito.</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-header">
+                        <span>Costelinha 'Outback'</span>
+                        <span>R$ 89</span>
+                    </div>
+                    <div class="menu-desc">Costela de porco ao molho barbecue com mandioca na manteiga ou batata
+                        rústica.</div>
+                </div>
+            </div>
+
+            <div class="menu-col">
+                <div class="menu-item">
+                    <div class="menu-header">
+                        <span>Caipirinha de frutas</span>
+                        <span>R$ 23</span>
+                    </div>
+                    <div class="menu-desc">Escolha sua fruta preferida e saboreia a melhor caipirinha da cidade!</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-header">
+                        <span>Sossega Leão</span>
+                        <span>R$ 35</span>
+                    </div>
+                    <div class="menu-desc">Três doses de vodka, com leite condensado para te fazer esquecer qualquer
+                        estresse!.</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-header">
+                        <span>Negroni</span>
+                        <span>R$ 35</span>
+                    </div>
+                    <div class="menu-desc">Gin, Vermouth e Campari.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="reservation" class="reservation">
+        <div class="section-title">
+            <span>Garanta seu lugar</span>
+            <h2>Faça uma Reserva</h2>
+        </div>
+
+        <form class="form-box">
+            <input type="text" placeholder="Seu Nome" required>
+            <input type="email" placeholder="Seu Email" required>
+            <input type="tel" placeholder="Telefone" required>
+            <input type="date" required>
+            <select>
+                <option>2 Pessoas</option>
+                <option>3 Pessoas</option>
+                <option>4+ Pessoas</option>
+            </select>
+            <select>
+                <option>19:00</option>
+                <option>20:00</option>
+                <option>21:00</option>
+            </select>
+            <textarea rows="4" placeholder="Algum pedido especial?"></textarea>
+            <button type="submit" class="form-btn">Confirmar Reserva</button>
+        </form>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-info">
+            <a href="#" class="logo">BAR <span>LOS HERMANOS</span></a>
+            <br><br>
+            <p>Rua Suíça, 22 - Grã-Duquesa | (33) 3083-5351</p>
+            <p>Rua Dom Pedro II, 577 - Centro | (33) 3022-1335</p>
+            <p>Aberto de Segunda a Sábado</p>
+        </div>
+        <div class="socials">
+            <a href="https://www.instagram.com/barloshermanosgv"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.facebook.com/loshermanoscentro"><i class="fab fa-facebook"></i></a>
+            <a href="https://w.app/b7srkb"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <br>
+        <p style="font-size: 0.8rem; opacity: 0.5;">© 2025 Powered by Douglas Furbino.</p>
+    </footer>
+
+</body>
+
+</html>
