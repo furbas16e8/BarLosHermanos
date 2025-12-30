@@ -1,18 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const galleryContainer = document.getElementById('about-gallery-grid');
-    
-    // CONFIGURAÇÃO: Liste aqui os nomes exatos das imagens disponíveis na pasta assets/img/sobre/
-    const allImages = [
-        'angu-baiana.jpeg', 
-        'cachaca-sabor.jpeg', 
-        'camarao.jpeg', 
-        'cestinha-file.jpeg', 
-        'jilo-especial.jpeg', 
-        'moda-nordestina.jpeg', 
-        'quesadilha.jpeg', 
-        'taco-loko.jpeg'
-    ]; 
-    // ^ Desenvolvedor: Certifique-se que estes arquivos existem ou renomeie suas imagens para este padrão.
+
+    // CONFIGURAÇÃO: Total de imagens disponíveis na pasta (nomeadas como image_1.jpeg, image_2.jpeg...)
+    const totalImages = 9;
+    // ^ Desenvolvedor: Ao adicionar fotos, salve como image_10.jpeg, image_11.jpeg e atualize este número.
 
     const imagePath = 'assets/img/sobre/';
     const maxImagesToShow = 5; // Quantidade desejada na grade
@@ -26,25 +17,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    if (galleryContainer && allImages.length > 0) {
-        // 1. Embaralha o array de nomes
-        const shuffled = shuffleArray([...allImages]);
-        
-        // 2. Pega os primeiros 5 itens
-        const selected = shuffled.slice(0, maxImagesToShow);
+    if (galleryContainer && totalImages > 0) {
+        // 1. Gera um array de números [1, 2, 3, ... totalImages]
+        const indices = Array.from({ length: totalImages }, (_, i) => i + 1);
 
-        // 3. Cria e injeta os elementos IMG
-        selected.forEach((filename, index) => {
+        // 2. Embaralha os números
+        const shuffledIndices = shuffleArray(indices);
+
+        // 3. Pega os primeiros 5 números
+        const selectedIndices = shuffledIndices.slice(0, maxImagesToShow);
+
+        // 4. Cria e injeta os elementos IMG baseados no padrão de nome
+        selectedIndices.forEach((num, index) => {
             const img = document.createElement('img');
-            img.src = `${imagePath}${filename}`;
+            // Constrói o nome do arquivo: image_1.jpeg, image_2.jpeg...
+            img.src = `${imagePath}image_${num}.jpeg`;
             img.alt = 'Ambiente Bar Los Hermanos';
-            
-            // Adiciona delay na animação para cada imagem aparecer em sequência
+
+            // Adiciona delay na animação
             img.style.animationDelay = `${index * 0.15}s`;
-            
-            // Tratamento caso a imagem não carregue (evita ícone de erro quebrado)
-            img.onerror = function() { 
-                this.style.display = 'none'; 
+
+            img.onerror = function () {
+                this.style.display = 'none';
             };
 
             galleryContainer.appendChild(img);

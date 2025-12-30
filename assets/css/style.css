@@ -259,21 +259,23 @@ section {
 
 .about-gallery img {
     width: 220px;
-    /* Largura fixa */
     height: 220px;
-    /* Altura fixa = Quadrado */
     object-fit: cover;
-    /* Corta a imagem para preencher o quadrado sem distorcer */
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Match base border of event-card */
     opacity: 0;
     animation: fadeInUp 0.6s forwards;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .about-gallery img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(255, 49, 49, 0.3);
+    transform: translateY(-5px);
+    /* Match event-card hover movement */
+    border-color: var(--accent-color);
+    /* Match event-card hover border */
+    /* Removed extra box-shadow to match smooth card feel */
 }
 
 /* Lógica do Desalinhamento (Imagens Pares vs Ímpares) */
