@@ -271,7 +271,7 @@ section {
 }
 
 .about-gallery img:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px) scale(1.5);
     /* Match event-card hover movement */
     border-color: var(--accent-color);
     /* Match event-card hover border */
@@ -537,6 +537,11 @@ footer {
     /* Responsivo e Cortado */
     border-radius: 10px;
     box-shadow: 10px 10px 0px var(--accent-color);
+    transition: transform 0.3s ease;
+}
+
+.events-image img:hover {
+    transform: translateY(-5px) scale(1.02);
 }
 
 /* Mobile Responsive */
