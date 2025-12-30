@@ -12,315 +12,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <style>
-        /* --- Variáveis de Cores (Baseado no original) --- */
-        :root {
-            --bg-color: #000000;
-            /* Fundo Escuro */
-            --accent-color: #ff3131;
-            /* Dourado */
-            --text-color: #ffffff;
-            --nav-bg: #0e0303;
-            --font-title: 'Bebas Neue', cursive;
-            --font-body: 'Poppins', sans-serif;
-        }
-
-        /* --- Reset Básico --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-body);
-            line-height: 1.6;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-            transition: 0.3s;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        /* --- Header --- */
-        header {
-            background-color: var(--nav-bg);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            font-family: var(--font-title);
-            font-size: 2rem;
-            letter-spacing: 2px;
-            color: var(--text-color);
-        }
-
-        .logo span {
-            color: var(--accent-color);
-        }
-
-        nav ul {
-            display: flex;
-            gap: 2rem;
-        }
-
-        nav a {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        nav a:hover {
-            color: var(--accent-color);
-        }
-
-        .btn-reserve {
-            border: 2px solid var(--accent-color);
-            padding: 0.5rem 1.5rem;
-            color: var(--accent-color);
-            border-radius: 5px;
-            font-weight: 600;
-        }
-
-        .btn-reserve:hover {
-            background-color: var(--accent-color);
-            color: #000;
-        }
-
-        /* --- Hero Section (Banner) --- */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding-top: 80px;
-        }
-
-        .hero h4 {
-            color: var(--accent-color);
-            letter-spacing: 4px;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .hero h1 {
-            font-family: var(--font-title);
-            font-size: 5rem;
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            max-width: 600px;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: #000;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(234, 179, 113, 0.4);
-        }
-
-        /* --- Section Geral --- */
-        section {
-            padding: 5rem 10%;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-title h2 {
-            font-family: var(--font-title);
-            font-size: 3.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-title span {
-            color: var(--accent-color);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-        }
-
-        /* --- About Section --- */
-        .about-container {
-            display: flex;
-            gap: 4rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .about-text {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .about-text h3 {
-            font-family: var(--font-title);
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent-color);
-        }
-
-        .about-img {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .about-img img {
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 10px 10px 0px var(--accent-color);
-        }
-
-        /* --- Menu Section --- */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
-        }
-
-        .menu-item {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            font-family: var(--font-title);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--accent-color);
-        }
-
-        .menu-desc {
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-
-        /* --- Reservation / Form --- */
-        .reservation {
-            background-color: #081211;
-            text-align: center;
-        }
-
-        .form-box {
-            max-width: 700px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 5px;
-            font-family: var(--font-body);
-        }
-
-        textarea {
-            grid-column: span 2;
-        }
-
-        .form-btn {
-            grid-column: span 2;
-            background-color: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* --- Footer --- */
-        footer {
-            background-color: #000;
-            padding: 3rem 5%;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-info p {
-            margin-bottom: 0.5rem;
-            color: #888;
-        }
-
-        .socials {
-            margin-top: 1.5rem;
-        }
-
-        .socials a {
-            margin: 0 10px;
-            font-size: 1.2rem;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 3.5rem;
-            }
-
-            header {
-                flex-direction: column;
-                gap: 1rem;
-                position: relative;
-            }
-
-            nav ul {
-                gap: 1rem;
-            }
-
-            .form-box {
-                grid-template-columns: 1fr;
-            }
-
-            textarea,
-            .form-btn {
-                grid-column: span 1;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
@@ -331,6 +23,7 @@
             <ul>
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">Sobre</a></li>
+                <li><a href="#history">Nossa História</a></li>
                 <li><a href="#menu">Menu</a></li>
                 <li><a href="#events">Eventos</a></li>
                 <li><a href="#contact">Contato</a></li>
@@ -339,12 +32,44 @@
         <a href="#reservation" class="btn-reserve">Reservar Mesa</a>
     </header>
 
-    <section class="hero" id="home">
-        <h4>BEM-VINDO AO LOS!</h4>
-        <h1>Tradição & Rock n' Roll</h1>
-        <p>15 anos de comida boa, bons drinks e cerveja gelada.</p>
-        <a href="#menu" class="btn-primary">Ver Menu</a>
-    </section>
+    <div class="hero-slider" id="home">
+        <!-- Slide 1: Chef/Comida -->
+        <div class="slide active">
+            <video autoplay muted loop playsinline>
+                <source src="assets/video/chef_cooking.mp4" type="video/mp4">
+            </video>
+            <div class="hero-content">
+                <h4>BEM-VINDO AO LOS!</h4>
+                <h1>Tradição & Rock n' Roll</h1>
+                <p>15 anos de comida boa, bons drinks e cerveja gelada.</p>
+                <a href="#menu" class="btn-primary">Ver Menu</a>
+            </div>
+        </div>
+        <!-- Slide 2: Ambiente/Galera -->
+        <div class="slide">
+            <video autoplay muted loop playsinline>
+                <source src="assets/video/ambient_party.mp4" type="video/mp4">
+            </video>
+            <div class="hero-content">
+                <h4>AMBIENTE ÚNICO</h4>
+                <h1>Momentos Inesquecíveis</h1>
+                <p>O melhor lugar para reunir os amigos em Governador Valadares.</p>
+                <a href="#reservation" class="btn-primary">Reservar Agora</a>
+            </div>
+        </div>
+        <!-- Slide 3: Bartender/Drinks -->
+        <div class="slide">
+            <video autoplay muted loop playsinline>
+                <source src="assets/video/bartender_drinks.mp4" type="video/mp4">
+            </video>
+            <div class="hero-content">
+                <h4>SABORES MARCANTES</h4>
+                <h1>Gastronomia de Boteco</h1>
+                <p>Do Jiló Especial a costelinha, tudo feito no capricho.</p>
+                <a href="#menu" class="btn-primary">Conhecer Pratos</a>
+            </div>
+        </div>
+    </div>
 
     <section id="about">
         <div class="about-container">
@@ -353,7 +78,7 @@
                     alt="Interior do Bar">
             </div>
             <div class="about-text">
-                <span>Nossa História</span>
+                <span>Nossa Essência</span>
                 <h3>TRADIÇÃO E SABOR EM GV</h3>
                 <p>Aqui a tradição se encontra com novos sabores. Nossa cozinha é famosa pela variedade que agrada a
                     todos os gostos:
@@ -363,6 +88,48 @@
                 <p>Para completar a experiência, nossa carta de Drinks é um espetáculo à parte,
                     com coquetéis clássicos e autorais perfeitos para harmonizar com cada petisco e brindar os bons
                     momentos.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Nossa História -->
+    <section id="history">
+        <div class="section-title">
+            <span>Uma jornada de sucesso</span>
+            <h2>Nossa História</h2>
+        </div>
+        <div class="timeline-container">
+            <!-- Item 1 -->
+            <div class="timeline-card">
+                <span class="year-badge">2010</span>
+                <h3>O Início</h3>
+                <p>Tudo começou com um pequeno espaço e um grande sonho de trazer o melhor do rock para GV.</p>
+                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop"
+                    class="timeline-img" alt="Início">
+            </div>
+            <!-- Item 2 -->
+            <div class="timeline-card">
+                <span class="year-badge">2015</span>
+                <h3>Expansão</h3>
+                <p>A casa cresceu, o cardápio aumentou e o Jiló Especial se tornou o queridinho da cidade.</p>
+                <img src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop"
+                    class="timeline-img" alt="Expansão">
+            </div>
+            <!-- Item 3 -->
+            <div class="timeline-card">
+                <span class="year-badge">2020</span>
+                <h3>Nova Unidade</h3>
+                <p>Mesmo com desafios, inauguramos nossa segunda unidade no Centro para estar mais perto de você.</p>
+                <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=1974&auto=format&fit=crop"
+                    class="timeline-img" alt="Nova Unidade">
+            </div>
+            <!-- Item 4 -->
+            <div class="timeline-card">
+                <span class="year-badge">2025</span>
+                <h3>O Legado</h3>
+                <p>15 anos de história, consolidando o Los Hermanos como referência em tradição e sabor.</p>
+                <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop"
+                    class="timeline-img" alt="Legado">
             </div>
         </div>
     </section>
@@ -426,6 +193,87 @@
         </div>
     </section>
 
+    <section id="events" class="events-section">
+        <div class="section-title">
+            <span>Música & Diversão</span>
+            <h2>Próximos Eventos</h2>
+        </div>
+
+        <div class="events-container">
+            <div class="events-grid">
+
+                <div class="event-card" data-image="assets/img/events/karak-rocha.jpeg">
+                    <div class="event-header">
+                        <span class="event-date">31 DEZ</span>
+                        <span class="event-price">Reservas</span>
+                    </div>
+                    <div class="event-body">
+                        <h3 class="event-title">Reveillon 2026</h3>
+                        <div class="event-artist">Karak Rocha</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i>Los Centro</div>
+                        <div class="event-time">
+                            <i class="fas fa-clock"></i> 19:00 - 01:00
+                        </div>
+                    </div>
+                    <a href="#reservation" class="btn-event">Reservar</a>
+                </div>
+
+                <div class="event-card" data-image="assets/img/events/debbyz.jpeg">
+                    <div class="event-header">
+                        <span class="event-date">31 DEZ</span>
+                        <span class="event-price">Reservas</span>
+                    </div>
+                    <div class="event-body">
+                        <h3 class="event-title">Reveillon 2026</h3>
+                        <div class="event-artist">Debbyz</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i>Los Grã-Duquesa</div>
+                        <div class="event-time">
+                            <i class="fas fa-clock"></i> 19:00 - 01:00
+                        </div>
+                    </div>
+                    <a href="#reservation" class="btn-event">Reservar</a>
+                </div>
+
+                <div class="event-card" data-image="assets/img/menu/costela.jpg">
+                    <div class="event-header">
+                        <span class="event-date">20 SET</span>
+                        <span class="event-price">Couvert R$ 15</span>
+                    </div>
+                    <div class="event-body">
+                        <h3 class="event-title">Tributo Queen</h3>
+                        <div class="event-artist">Freddie Mercury Tribute</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Filial Centro</div>
+                        <div class="event-time">
+                            <i class="fas fa-clock"></i> 21:00 - 00:00
+                        </div>
+                    </div>
+                    <a href="#reservation" class="btn-event">Reservar</a>
+                </div>
+
+                <div class="event-card" data-image="assets/img/menu/mexicano.jpg">
+                    <div class="event-header">
+                        <span class="event-date">28 SET</span>
+                        <span class="event-price">Couvert R$ 10</span>
+                    </div>
+                    <div class="event-body">
+                        <h3 class="event-title">Noite Sertaneja</h3>
+                        <div class="event-artist">Jorge & Mateus Cover</div>
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> Filial Ilha</div>
+                        <div class="event-time">
+                            <i class="fas fa-clock"></i> 20:00 - 23:00
+                        </div>
+                    </div>
+                    <a href="#reservation" class="btn-event">Reservar</a>
+                </div>
+
+            </div>
+
+            <div class="events-image">
+                <img src="assets/img/menu/comida_01.jpg" id="event-display-img" alt="Ambiente do Bar Los Hermanos">
+            </div>
+        </div>
+    </section>
+
     <section id="reservation" class="reservation">
         <div class="section-title">
             <span>Garanta seu lugar</span>
@@ -469,6 +317,53 @@
         <p style="font-size: 0.8rem; opacity: 0.5;">© 2025 Powered by Douglas Furbino.</p>
     </footer>
 
+    <script>
+        // Hero Slider Automation
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            const slideInterval = 5000; // 5 seconds
+
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+
+            if (slides.length > 0) {
+                setInterval(nextSlide, slideInterval);
+            }
+
+            // Events Interactions
+            const eventCards = document.querySelectorAll('.event-card');
+            const eventDisplayImg = document.getElementById('event-display-img');
+            // Definir imagem padrão como a do primeiro evento (mais próximo)
+            let defaultEventImg = "assets/img/menu/comida_01.jpg";
+            if (eventCards.length > 0) {
+                const firstCardImage = eventCards[0].getAttribute('data-image');
+                if (firstCardImage) {
+                    defaultEventImg = firstCardImage;
+                    if (eventDisplayImg) eventDisplayImg.src = defaultEventImg;
+                }
+            }
+
+            eventCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const imgPath = card.getAttribute('data-image');
+                    if (imgPath && eventDisplayImg) {
+                        eventDisplayImg.src = imgPath;
+                        eventDisplayImg.style.opacity = '0.8'; // Efeito visual de transição simples
+                        setTimeout(() => { eventDisplayImg.style.opacity = '1'; }, 100);
+                    }
+                });
+
+                // Opcional: Voltar para padrão ao sair
+                // card.addEventListener('mouseleave', () => {
+                //    if (eventDisplayImg) eventDisplayImg.src = defaultEventImg;
+                // });
+            });
+        });
+    </script>
 </body>
 
 </html>
