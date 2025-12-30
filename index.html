@@ -23,7 +23,7 @@
             <ul>
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">Sobre</a></li>
-                <li><a href="#history">Nossa História</a></li>
+                <li><a href="historia.html">Nossa História</a></li>
                 <li><a href="#menu">Menu</a></li>
                 <li><a href="#events">Eventos</a></li>
                 <li><a href="#contact">Contato</a></li>
@@ -73,66 +73,22 @@
 
     <section id="about">
         <div class="about-container">
-            <div class="about-img">
-                <img src="https://lh3.googleusercontent.com/gps-cs-s/AG0ilSw_EU5GkaXIjRb8gdyE08F_38qjCdYtPwpj1cIXqXp0wrdWGRO6INOF8juVMDS8Wh22F_sgrryrfv_yENgPX9nmC0vK-yWx1gG_wIIvNQ_nzas0vyOSh33rfjK2j97r3EbZ_sNA=s680-w680-h510"
-                    alt="Interior do Bar">
-            </div>
-            <div class="about-text">
+            <div class="about-text-center">
                 <span>Nossa Essência</span>
                 <h3>TRADIÇÃO E SABOR EM GV</h3>
                 <p>Aqui a tradição se encontra com novos sabores. Nossa cozinha é famosa pela variedade que agrada a
-                    todos os gostos:
-                    desde o nosso inigualável Jiló Especial — preparado no capricho e favorito dos clientes — até o
-                    melhor da Comida Mexicana, trazendo um toque picante e vibrante para a sua noite.</p>
+                    todos os gostos: desde o nosso inigualável Jiló Especial até o melhor da Comida Mexicana.</p>
+                <p>Drinks clássicos e autorais para brindar os bons momentos.</p>
+
                 <br>
-                <p>Para completar a experiência, nossa carta de Drinks é um espetáculo à parte,
-                    com coquetéis clássicos e autorais perfeitos para harmonizar com cada petisco e brindar os bons
-                    momentos.</p>
+                <a href="historia.html" class="btn-primary btn-history">Nossa História</a>
             </div>
+
+            <div class="about-gallery" id="about-gallery-grid"></div>
         </div>
     </section>
 
-    <!-- Seção Nossa História -->
-    <section id="history">
-        <div class="section-title">
-            <span>Uma jornada de sucesso</span>
-            <h2>Nossa História</h2>
-        </div>
-        <div class="timeline-container">
-            <!-- Item 1 -->
-            <div class="timeline-card">
-                <span class="year-badge">2010</span>
-                <h3>O Início</h3>
-                <p>Tudo começou com um pequeno espaço e um grande sonho de trazer o melhor do rock para GV.</p>
-                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop"
-                    class="timeline-img" alt="Início">
-            </div>
-            <!-- Item 2 -->
-            <div class="timeline-card">
-                <span class="year-badge">2015</span>
-                <h3>Expansão</h3>
-                <p>A casa cresceu, o cardápio aumentou e o Jiló Especial se tornou o queridinho da cidade.</p>
-                <img src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop"
-                    class="timeline-img" alt="Expansão">
-            </div>
-            <!-- Item 3 -->
-            <div class="timeline-card">
-                <span class="year-badge">2020</span>
-                <h3>Nova Unidade</h3>
-                <p>Mesmo com desafios, inauguramos nossa segunda unidade no Centro para estar mais perto de você.</p>
-                <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=1974&auto=format&fit=crop"
-                    class="timeline-img" alt="Nova Unidade">
-            </div>
-            <!-- Item 4 -->
-            <div class="timeline-card">
-                <span class="year-badge">2025</span>
-                <h3>O Legado</h3>
-                <p>15 anos de história, consolidando o Los Hermanos como referência em tradição e sabor.</p>
-                <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop"
-                    class="timeline-img" alt="Legado">
-            </div>
-        </div>
-    </section>
+
 
     <section id="menu">
         <div class="section-title">
@@ -364,6 +320,7 @@
             });
         });
     </script>
+    <script src="assets/js/gallery.js"></script>
 </body>
 
 </html>

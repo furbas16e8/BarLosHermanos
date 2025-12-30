@@ -204,111 +204,119 @@ section {
     font-size: 0.9rem;
 }
 
-/* --- Nossa História (Timeline) --- */
-#history {
-    background: linear-gradient(to bottom, #000, #081211);
-}
 
-.timeline-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 2rem;
-    padding-bottom: 2rem;
-    scroll-behavior: smooth;
-    /* Esconder barra de rolagem mas manter funcionalidade */
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) #000;
-}
 
-.timeline-container::-webkit-scrollbar {
-    height: 8px;
-}
-
-.timeline-container::-webkit-scrollbar-track {
-    background: #000;
-}
-
-.timeline-container::-webkit-scrollbar-thumb {
-    background-color: var(--accent-color);
-    border-radius: 4px;
-}
-
-.timeline-card {
-    min-width: 300px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 2rem;
-    position: relative;
-    transition: 0.3s;
-}
-
-.timeline-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-5px);
-    border-color: var(--accent-color);
-}
-
-.year-badge {
-    background-color: var(--accent-color);
-    color: #000;
-    padding: 0.2rem 0.8rem;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    display: inline-block;
-    margin-bottom: 1rem;
-}
-
-.timeline-card h3 {
-    font-family: var(--font-title);
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-}
-
-.timeline-card p {
-    font-size: 0.9rem;
-    color: #ccc;
-    margin-bottom: 1rem;
-}
-
-.timeline-img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 5px;
-    margin-top: auto;
-}
-
-/* --- About Section --- */
+/* --- Refatoração da Seção Sobre --- */
 .about-container {
     display: flex;
-    gap: 4rem;
+    flex-direction: column;
     align-items: center;
-    flex-wrap: wrap;
+    gap: 3rem;
+    width: 100%;
 }
 
-.about-text {
-    flex: 1;
-    min-width: 300px;
+.about-text-center {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.about-text h3 {
+.about-text-center h3 {
     font-family: var(--font-title);
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
+    font-size: 3rem;
+    margin-bottom: 1rem;
     color: var(--accent-color);
 }
 
-.about-img {
-    flex: 1;
-    min-width: 300px;
+.about-text-center p {
+    font-size: 1.1rem;
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
 }
 
-.about-img img {
+/* Botão Específico da Seção */
+.btn-history {
+    margin-top: 1.5rem;
+    min-width: 200px;
+    text-align: center;
+}
+
+/* --- Galeria Desalinhada (Staggered Grid) --- */
+.about-gallery {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* Essencial para o efeito de desnível */
+    gap: 1.5rem;
+    flex-wrap: wrap;
     width: 100%;
-    border-radius: 10px;
-    box-shadow: 10px 10px 0px var(--accent-color);
+    margin-top: 1rem;
+}
+
+.about-gallery img {
+    width: 220px;
+    /* Largura fixa */
+    height: 220px;
+    /* Altura fixa = Quadrado */
+    object-fit: cover;
+    /* Corta a imagem para preencher o quadrado sem distorcer */
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeInUp 0.6s forwards;
+    transition: transform 0.3s ease;
+}
+
+.about-gallery img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 49, 49, 0.3);
+}
+
+/* Lógica do Desalinhamento (Imagens Pares vs Ímpares) */
+.about-gallery img:nth-child(odd) {
+    margin-top: 0;
+}
+
+.about-gallery img:nth-child(even) {
+    margin-top: 4rem;
+    /* Empurra as imagens pares para baixo */
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsividade Mobile */
+@media (max-width: 768px) {
+    .about-gallery {
+        gap: 1rem;
+    }
+
+    .about-gallery img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .about-gallery img:nth-child(even) {
+        margin-top: 2rem;
+        /* Menor desnível no mobile */
+    }
+
+    .about-text-center h3 {
+        font-size: 2.2rem;
+    }
 }
 
 /* --- Menu Section --- */
