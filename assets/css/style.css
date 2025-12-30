@@ -436,7 +436,7 @@ footer {
 
 /* Card do Evento Individual */
 .event-card {
-    background-color: #0e0e0e;
+    background-color: #081211;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 1.5rem;
@@ -588,5 +588,180 @@ footer {
 
     .timeline-container {
         padding-bottom: 1rem;
+    }
+}
+
+/* --- REDESIGN DO MENU (LAYOUT REFERENCE) --- */
+
+/* Container Principal */
+.menu-redesign {
+    padding: 5rem 5%;
+    background-color: #081211;
+    /* Match Reservation Background */
+    color: #fff;
+}
+
+.menu-layout-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    /* Sidebar Fixa | Resto do conteúdo */
+    gap: 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- Barra Lateral (Esquerda) --- */
+.menu-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.menu-kicker {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: var(--accent-color);
+    /* Usa o vermelho/laranja do site */
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.menu-big-title {
+    font-family: var(--font-title);
+    /* Bebas Neue */
+    font-size: 4rem;
+    /* Reduced from 5rem */
+    line-height: 0.9;
+    margin-bottom: 2rem;
+    color: #fff;
+    text-align: left;
+}
+
+.btn-menu-highlight {
+    background-color: var(--accent-color);
+    /* Match Site Accent (Red) */
+    color: #fff;
+    /* White text for contrast on red */
+    padding: 0.8rem 1.8rem;
+    /* Slightly smaller padding */
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    margin-bottom: 3rem;
+    display: inline-block;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.btn-menu-highlight:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Lista de Bebidas na Lateral */
+.menu-drinks-list {
+    margin-top: auto;
+    width: 100%;
+}
+
+.drink-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    /* Reduced margin */
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    /* Reduced font size */
+    letter-spacing: 1px;
+}
+
+.drink-row .price {
+    color: var(--accent-color);
+    /* Accent color for price */
+}
+
+.drink-meta {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+/* --- Conteúdo Principal (Direita) --- */
+.menu-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Duas colunas de comida */
+    gap: 3rem;
+    /* Reduced gap */
+}
+
+.menu-item-clean {
+    margin-bottom: 1.8rem;
+    /* Reduced margin */
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.3rem;
+    /* Reduced margin */
+    border-bottom: none;
+}
+
+.item-name {
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    /* Reduced from 1.5rem */
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+.item-price {
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    /* Reduced from 1.5rem */
+    color: var(--accent-color);
+    /* Accent color for price */
+}
+
+.item-desc {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    /* Reduced from 0.85rem */
+    color: #bbb;
+    line-height: 1.4;
+    max-width: 95%;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 900px) {
+    .menu-layout-grid {
+        grid-template-columns: 1fr;
+        /* Vira coluna única */
+        gap: 2rem;
+    }
+
+    .menu-sidebar {
+        align-items: center;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .menu-big-title {
+        text-align: center;
+        font-size: 3.5rem;
+    }
+
+    .menu-drinks-list {
+        display: none;
+        /* Ocultar lista lateral de bebidas no mobile para economizar espaço, ou mover para baixo */
+    }
+
+    .menu-content {
+        grid-template-columns: 1fr;
+        /* Comida em uma coluna só no mobile */
+        gap: 1rem;
     }
 }
