@@ -193,8 +193,11 @@ section {
 
 .section-title h2 {
     font-family: var(--font-title);
-    font-size: 3.5rem;
+    font-size: 4rem;
+    /* Standardized to 4rem */
     margin-bottom: 0.5rem;
+    color: #fff;
+    /* Ensure White */
 }
 
 .section-title span {
@@ -226,9 +229,21 @@ section {
 
 .about-text-center h3 {
     font-family: var(--font-title);
-    font-size: 3rem;
+    font-size: 4rem;
+    /* Standardized to 4rem */
     margin-bottom: 1rem;
+    color: #fff;
+    /* Changed from Accent to White */
+}
+
+.about-text-center span {
     color: var(--accent-color);
+    /* Added explicit Kicker style */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
 }
 
 .about-text-center p {
