@@ -4,7 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bar Los Hermanos</title>
+    <title>Bar Los Hermanos - Tradição & Rock n' Roll em Governador Valadares</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bar Los Hermanos - 15 anos de tradição em Governador Valadares. Comida de boteco, drinks autorais, cerveja gelada e música ao vivo. Venha conhecer o Jiló Especial!">
+    <meta name="keywords" content="bar, boteco, governador valadares, jiló especial, drinks, cerveja, música ao vivo, rock, los hermanos">
+    <meta name="author" content="Bar Los Hermanos">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://barloshermanos.com.br/">
+    <meta property="og:title" content="Bar Los Hermanos - Tradição & Rock n' Roll">
+    <meta property="og:description" content="15 anos de comida boa, bons drinks e cerveja gelada em Governador Valadares.">
+    <meta property="og:image" content="assets/img/sobre/image_1.jpeg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Bar Los Hermanos - Tradição & Rock n' Roll">
+    <meta property="twitter:description" content="15 anos de comida boa, bons drinks e cerveja gelada em Governador Valadares.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -314,7 +334,7 @@
             </div>
 
             <div class="events-image">
-                <img src="assets/img/menu/comida_01.jpg" id="event-display-img" alt="Ambiente do Bar Los Hermanos">
+            <img src="assets/img/menu/comida_01.jpg" id="event-display-img" alt="Ambiente do Bar Los Hermanos" loading="lazy">
             </div>
         </div>
     </section>
@@ -325,22 +345,36 @@
             <h2>Faça uma Reserva</h2>
         </div>
 
-        <form class="form-box">
-            <input type="text" placeholder="Seu Nome" required>
-            <input type="email" placeholder="Seu Email" required>
-            <input type="tel" placeholder="Telefone" required>
-            <input type="date" required>
-            <select>
+        <form class="form-box" action="#" method="POST">
+            <label for="nome" class="sr-only">Seu Nome</label>
+            <input type="text" id="nome" name="nome" placeholder="Seu Nome" required aria-label="Seu Nome">
+            
+            <label for="email" class="sr-only">Seu Email</label>
+            <input type="email" id="email" name="email" placeholder="Seu Email" required aria-label="Seu Email">
+            
+            <label for="telefone" class="sr-only">Telefone</label>
+            <input type="tel" id="telefone" name="telefone" placeholder="Telefone" required aria-label="Telefone">
+            
+            <label for="data" class="sr-only">Data da Reserva</label>
+            <input type="date" id="data" name="data" required aria-label="Data da Reserva">
+            
+            <label for="pessoas" class="sr-only">Quantidade de Pessoas</label>
+            <select id="pessoas" name="pessoas" aria-label="Quantidade de Pessoas">
                 <option>2 Pessoas</option>
                 <option>3 Pessoas</option>
                 <option>4+ Pessoas</option>
             </select>
-            <select>
+            
+            <label for="horario" class="sr-only">Horário</label>
+            <select id="horario" name="horario" aria-label="Horário">
                 <option>19:00</option>
                 <option>20:00</option>
                 <option>21:00</option>
             </select>
-            <textarea rows="4" placeholder="Algum pedido especial?"></textarea>
+            
+            <label for="pedido" class="sr-only">Pedido Especial</label>
+            <textarea id="pedido" name="pedido" rows="4" placeholder="Algum pedido especial?" aria-label="Pedido Especial"></textarea>
+            
             <button type="submit" class="form-btn">Confirmar Reserva</button>
         </form>
     </section>
