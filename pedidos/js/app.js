@@ -1,0 +1,536 @@
+/**
+ * Sistema de Pedidos Online - Bar Los Hermanos
+ * Lógica de navegação, carrinho e interações
+ */
+
+// ===== ESTADO DA APLICAÇÃO =====
+let estadoApp = {
+    usuario: {
+        nome: '',
+        celular: ''
+    },
+    carrinho: [],
+    filialSelecionada: 'los-bairro',
+    bairroSelecionado: null,
+    taxaEntrega: 0,
+    endereco: {
+        rua: '',
+        numero: '',
+        referencia: ''
+    },
+    pratoAtual: null,
+    tamanhoSelecionado: 'meia',
+    quantidade: 1,
+    adicionaisSelecionados: [],
+    categoriaAtual: 'porcoes'
+};
+
+// ===== INICIALIZAÇÃO =====
+document.addEventListener('DOMContentLoaded', () => {
+    // Máscara de celular
+    const celularInput = document.getElementById('loginCelular');
+    if (celularInput) {
+        celularInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 0) {
+                value = '(' + value;
+            }
+            if (value.length > 3) {
+                value = value.slice(0, 3) + ') ' + value.slice(3);
+            }
+            if (value.length > 10) {
+                value = value.slice(0, 10) + '-' + value.slice(10);
+            }
+            
+            e.target.value = value;
+        });
+    }
+    
+    // Carregar carrinho do localStorage
+    const carrinhoSalvo = localStorage.getItem('losHermanosCarrinho');
+    if (carrinhoSalvo) {
+        estadoApp.carrinho = JSON.parse(carrinhoSalvo);
+        atualizarHeaderCarrinho();
+    }
+});
+
+// ===== NAVEGAÇÃO ENTRE TELAS =====
+function mostrarTela(telaId) {
+    // Esconde todas as telas
+    document.querySelectorAll('.tela').forEach(tela => {
+        tela.classList.remove('active');
+    });
+    
+    // Mostra a tela solicitada
+    document.getElementById(telaId).classList.add('active');
+    
+    // Controla visibilidade do header e categorias
+    const isCardapio = telaId === 'telaCardapio';
+    const isLogado = estadoApp.usuario.nome !== '';
+    
+    document.getElementById('mainHeader').style.display = (isLogado && telaId !== 'telaLogin') ? 'block' : 'none';
+    document.getElementById('searchBar').style.display = isCardapio ? 'block' : 'none';
+    document.getElementById('categoriesBar').style.display = isCardapio ? 'flex' : 'none';
+    
+    // Scroll para o topo
+    window.scrollTo(0, 0);
+}
+
+// ===== LOGIN =====
+function fazerLogin(event) {
+    event.preventDefault();
+    
+    const nome = document.getElementById('loginNome').value.trim();
+    const celular = document.getElementById('loginCelular').value.trim();
+    
+    if (nome && celular) {
+        estadoApp.usuario.nome = nome;
+        estadoApp.usuario.celular = celular;
+        
+        // Atualiza o header
+        document.getElementById('headerNome').textContent = nome.split(' ')[0];
+        
+        // Carrega o cardápio e mostra
+        carregarCardapio();
+        mostrarTela('telaCardapio');
+    }
+}
+
+// ===== CARDÁPIO =====
+function carregarCardapio() {
+    const grid = document.getElementById('pratosGrid');
+    grid.innerHTML = '';
+    
+    // Filtra por categoria
+    let itens = [];
+    if (estadoApp.categoriaAtual === 'porcoes') {
+        itens = PRATOS;
+    } else if (estadoApp.categoriaAtual === 'bebidas') {
+        itens = BEBIDAS;
+    }
+    
+    // Filtra por busca
+    const busca = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    if (busca) {
+        itens = itens.filter(item => 
+            item.nome.toLowerCase().includes(busca) || 
+            item.descricao.toLowerCase().includes(busca)
+        );
+    }
+    
+    // Renderiza os cards
+    itens.forEach(item => {
+        const card = criarCardPrato(item);
+        grid.appendChild(card);
+    });
+}
+
+function criarCardPrato(prato) {
+    const card = document.createElement('div');
+    card.className = `prato-card ${prato.categoria === 'bebidas' ? 'bebida' : ''}`;
+    card.onclick = () => abrirDetalhePrato(prato);
+    
+    const preco = prato.precoMeia ? prato.precoMeia : prato.preco;
+    const precoTexto = prato.precoMeia ? 'a partir de ' : '';
+    
+    // Gera as estrelas
+    const stars = gerarEstrelas(prato.avaliacao);
+    
+    if (prato.imagem) {
+        card.innerHTML = `
+            <img src="${prato.imagem}" alt="${prato.nome}" class="prato-imagem">
+            <div class="prato-info">
+                <h3 class="prato-nome">${prato.nome}</h3>
+                <div class="prato-avaliacao">
+                    <span class="stars">${stars}</span>
+                    <span>${prato.avaliacao}</span>
+                </div>
+                <div class="prato-preco">${precoTexto}<span>R$ ${preco.toFixed(2).replace('.', ',')}</span></div>
+            </div>
+        `;
+    } else {
+        // Card para bebidas sem imagem
+        const icones = {
+            'Refrigerante Lata': '🥤',
+            'Água Mineral': '💧',
+            'Suco Natural': '🍊'
+        };
+        const icone = icones[prato.nome] || '🍹';
+        
+        card.innerHTML = `
+            <div class="prato-imagem-placeholder">${icone}</div>
+            <div class="prato-info">
+                <h3 class="prato-nome">${prato.nome}</h3>
+                <div class="prato-avaliacao">
+                    <span class="stars">${stars}</span>
+                    <span>${prato.avaliacao}</span>
+                </div>
+                <div class="prato-preco"><span>R$ ${preco.toFixed(2).replace('.', ',')}</span></div>
+            </div>
+        `;
+    }
+    
+    return card;
+}
+
+function gerarEstrelas(nota) {
+    const cheias = Math.floor(nota);
+    const meia = nota % 1 >= 0.5 ? 1 : 0;
+    const vazias = 5 - cheias - meia;
+    
+    return '★'.repeat(cheias) + (meia ? '★' : '') + '☆'.repeat(vazias);
+}
+
+function filtrarCategoria(categoria) {
+    estadoApp.categoriaAtual = categoria;
+    
+    // Atualiza pills ativas
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.remove('active');
+        if (pill.dataset.categoria === categoria) {
+            pill.classList.add('active');
+        }
+    });
+    
+    carregarCardapio();
+}
+
+function filtrarPratos() {
+    carregarCardapio();
+}
+
+// ===== DETALHE DO PRATO =====
+function abrirDetalhePrato(prato) {
+    estadoApp.pratoAtual = prato;
+    estadoApp.tamanhoSelecionado = 'meia';
+    estadoApp.quantidade = 1;
+    estadoApp.adicionaisSelecionados = [];
+    
+    // Atualiza a tela de detalhe
+    const img = document.getElementById('detalheImagem');
+    if (prato.imagem) {
+        img.src = prato.imagem;
+        img.alt = prato.nome;
+        img.style.display = 'block';
+    } else {
+        // Placeholder para bebidas
+        img.style.display = 'none';
+    }
+    
+    document.getElementById('detalheNome').textContent = prato.nome;
+    document.getElementById('detalheStars').textContent = gerarEstrelas(prato.avaliacao);
+    document.getElementById('detalheAvaliacao').textContent = prato.avaliacao;
+    document.getElementById('detalheNumAvaliacoes').textContent = `${prato.numAvaliacoes} avaliações`;
+    document.getElementById('detalheDescricao').textContent = prato.descricao;
+    
+    // Seletor de tamanho (só para porções)
+    const tamanhoSelector = document.getElementById('tamanhoSelector');
+    const infoGrid = document.getElementById('infoGrid');
+    
+    if (prato.precoMeia) {
+        tamanhoSelector.style.display = 'block';
+        infoGrid.style.display = 'flex';
+        
+        document.getElementById('precoMeia').textContent = `R$ ${prato.precoMeia.toFixed(2).replace('.', ',')}`;
+        document.getElementById('precoInteira').textContent = `R$ ${prato.precoInteira.toFixed(2).replace('.', ',')}`;
+        document.getElementById('infoPeso').textContent = prato.peso;
+        document.getElementById('infoServe').textContent = prato.serveMeia;
+        document.getElementById('infoTempo').textContent = prato.tempoPreparo;
+        
+        // Reset seleção de tamanho
+        document.querySelectorAll('.tamanho-option').forEach(opt => {
+            opt.classList.remove('active');
+            if (opt.dataset.tamanho === 'meia') opt.classList.add('active');
+        });
+    } else {
+        tamanhoSelector.style.display = 'none';
+        infoGrid.style.display = 'none';
+    }
+    
+    // Adicionais (só para porções)
+    const adicionaisSection = document.getElementById('adicionaisSection');
+    if (prato.categoria === 'porcoes') {
+        adicionaisSection.style.display = 'block';
+        carregarAdicionais();
+    } else {
+        adicionaisSection.style.display = 'none';
+    }
+    
+    // Quantidade
+    document.getElementById('quantidadeValor').textContent = 1;
+    
+    // Atualiza total
+    atualizarTotalItem();
+    
+    mostrarTela('telaDetalhe');
+}
+
+function carregarAdicionais() {
+    const container = document.getElementById('adicionaisList');
+    container.innerHTML = '';
+    
+    ADICIONAIS.forEach(adicional => {
+        const div = document.createElement('div');
+        div.className = 'adicional-item';
+        div.innerHTML = `
+            <div class="adicional-info">
+                <input type="checkbox" id="adicional-${adicional.id}" onchange="toggleAdicional(${adicional.id})">
+                <label for="adicional-${adicional.id}">${adicional.nome}</label>
+            </div>
+            <span class="adicional-preco">+ R$ ${adicional.preco.toFixed(2).replace('.', ',')}</span>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function selecionarTamanho(tamanho) {
+    estadoApp.tamanhoSelecionado = tamanho;
+    
+    document.querySelectorAll('.tamanho-option').forEach(opt => {
+        opt.classList.remove('active');
+        if (opt.dataset.tamanho === tamanho) {
+            opt.classList.add('active');
+        }
+    });
+    
+    // Atualiza info de "serve"
+    if (estadoApp.pratoAtual) {
+        const serve = tamanho === 'meia' ? estadoApp.pratoAtual.serveMeia : estadoApp.pratoAtual.serveInteira;
+        document.getElementById('infoServe').textContent = serve;
+    }
+    
+    atualizarTotalItem();
+}
+
+function alterarQuantidade(delta) {
+    estadoApp.quantidade = Math.max(1, estadoApp.quantidade + delta);
+    document.getElementById('quantidadeValor').textContent = estadoApp.quantidade;
+    atualizarTotalItem();
+}
+
+function toggleAdicional(id) {
+    const index = estadoApp.adicionaisSelecionados.indexOf(id);
+    if (index === -1) {
+        estadoApp.adicionaisSelecionados.push(id);
+    } else {
+        estadoApp.adicionaisSelecionados.splice(index, 1);
+    }
+    atualizarTotalItem();
+}
+
+function atualizarTotalItem() {
+    const prato = estadoApp.pratoAtual;
+    if (!prato) return;
+    
+    let preco = 0;
+    
+    if (prato.precoMeia) {
+        preco = estadoApp.tamanhoSelecionado === 'meia' ? prato.precoMeia : prato.precoInteira;
+    } else {
+        preco = prato.preco;
+    }
+    
+    // Adiciona os adicionais
+    estadoApp.adicionaisSelecionados.forEach(id => {
+        const adicional = ADICIONAIS.find(a => a.id === id);
+        if (adicional) preco += adicional.preco;
+    });
+    
+    // Multiplica pela quantidade
+    const total = preco * estadoApp.quantidade;
+    
+    document.getElementById('totalItem').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+// ===== CARRINHO =====
+function adicionarAoCarrinho() {
+    const prato = estadoApp.pratoAtual;
+    if (!prato) return;
+    
+    let preco = 0;
+    let nome = prato.nome;
+    
+    if (prato.precoMeia) {
+        preco = estadoApp.tamanhoSelecionado === 'meia' ? prato.precoMeia : prato.precoInteira;
+        nome += estadoApp.tamanhoSelecionado === 'meia' ? ' (Meia)' : ' (Inteira)';
+    } else {
+        preco = prato.preco;
+    }
+    
+    // Adicionais
+    const adicionaisNomes = [];
+    estadoApp.adicionaisSelecionados.forEach(id => {
+        const adicional = ADICIONAIS.find(a => a.id === id);
+        if (adicional) {
+            preco += adicional.preco;
+            adicionaisNomes.push(adicional.nome);
+        }
+    });
+    
+    const item = {
+        id: Date.now(),
+        pratoId: prato.id,
+        nome: nome,
+        preco: preco,
+        quantidade: estadoApp.quantidade,
+        adicionais: adicionaisNomes
+    };
+    
+    estadoApp.carrinho.push(item);
+    salvarCarrinho();
+    atualizarHeaderCarrinho();
+    
+    // Mostra modal de decisão
+    document.getElementById('modalDecisao').classList.add('active');
+}
+
+function salvarCarrinho() {
+    localStorage.setItem('losHermanosCarrinho', JSON.stringify(estadoApp.carrinho));
+}
+
+function atualizarHeaderCarrinho() {
+    const total = estadoApp.carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+    document.getElementById('headerCartTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+function continuarComprando() {
+    document.getElementById('modalDecisao').classList.remove('active');
+    voltarParaCardapio();
+}
+
+function voltarParaCardapio() {
+    mostrarTela('telaCardapio');
+}
+
+function abrirCarrinho() {
+    irParaEndereco();
+}
+
+// ===== ENDEREÇO =====
+function irParaEndereco() {
+    document.getElementById('modalDecisao').classList.remove('active');
+    
+    // Carrega bairros da filial selecionada
+    carregarBairros();
+    
+    // Carrega resumo do pedido
+    carregarResumoPedido();
+    
+    mostrarTela('telaEndereco');
+}
+
+function selecionarFilial(filial) {
+    estadoApp.filialSelecionada = filial;
+    estadoApp.bairroSelecionado = null;
+    estadoApp.taxaEntrega = 0;
+    
+    // Atualiza visual das opções
+    document.querySelectorAll('.filial-option').forEach(opt => {
+        opt.classList.remove('active');
+        if (opt.dataset.filial === filial) {
+            opt.classList.add('active');
+        }
+    });
+    
+    carregarBairros();
+    carregarResumoPedido();
+}
+
+function carregarBairros() {
+    const select = document.getElementById('bairroSelect');
+    const filial = FILIAIS[estadoApp.filialSelecionada];
+    
+    select.innerHTML = '<option value="">Escolha um bairro...</option>';
+    
+    filial.bairros.forEach((bairro, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${bairro.nome} - R$ ${bairro.taxa.toFixed(2).replace('.', ',')}`;
+        select.appendChild(option);
+    });
+}
+
+function selecionarBairro() {
+    const select = document.getElementById('bairroSelect');
+    const index = select.value;
+    
+    if (index !== '') {
+        const filial = FILIAIS[estadoApp.filialSelecionada];
+        const bairro = filial.bairros[index];
+        
+        estadoApp.bairroSelecionado = bairro.nome;
+        estadoApp.taxaEntrega = bairro.taxa;
+        
+        // Atualiza header
+        document.getElementById('headerBairro').textContent = bairro.nome;
+    } else {
+        estadoApp.bairroSelecionado = null;
+        estadoApp.taxaEntrega = 0;
+    }
+    
+    carregarResumoPedido();
+}
+
+function carregarResumoPedido() {
+    const container = document.getElementById('resumoItens');
+    container.innerHTML = '';
+    
+    let subtotal = 0;
+    
+    estadoApp.carrinho.forEach(item => {
+        const itemTotal = item.preco * item.quantidade;
+        subtotal += itemTotal;
+        
+        const div = document.createElement('div');
+        div.className = 'resumo-item';
+        div.innerHTML = `
+            <span>${item.quantidade}x ${item.nome}</span>
+            <span>R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+        `;
+        container.appendChild(div);
+    });
+    
+    document.getElementById('resumoSubtotal').textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    document.getElementById('resumoTaxa').textContent = `R$ ${estadoApp.taxaEntrega.toFixed(2).replace('.', ',')}`;
+    
+    const total = subtotal + estadoApp.taxaEntrega;
+    document.getElementById('resumoTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+// ===== CONFIRMAÇÃO =====
+function confirmarPedido() {
+    // Validações básicas
+    if (estadoApp.carrinho.length === 0) {
+        alert('Seu carrinho está vazio!');
+        return;
+    }
+    
+    if (!estadoApp.bairroSelecionado) {
+        alert('Por favor, selecione um bairro.');
+        return;
+    }
+    
+    // Gera número do pedido aleatório
+    const numeroPedido = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('numeroPedido').textContent = `#${numeroPedido}`;
+    
+    // Limpa o carrinho
+    estadoApp.carrinho = [];
+    salvarCarrinho();
+    atualizarHeaderCarrinho();
+    
+    mostrarTela('telaConfirmacao');
+}
+
+function novoPedido() {
+    // Reseta estado
+    estadoApp.bairroSelecionado = null;
+    estadoApp.taxaEntrega = 0;
+    estadoApp.endereco = { rua: '', numero: '', referencia: '' };
+    
+    document.getElementById('headerBairro').textContent = 'Selecione seu endereço';
+    
+    mostrarTela('telaCardapio');
+}
