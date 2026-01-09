@@ -1,0 +1,93 @@
+# Projeto: BarLosHermanos
+
+**4 sessoes encontradas**
+
+---
+
+# 2026-01-09 14:46 - Reorganizacao de Arquivos e Navegacao do Sistema de Pedidos
+
+**Sessao mais recente**
+
+## Contexto
+
+Apos implementacao inicial do prototipo de pedidos, realizamos ajustes: trocamos botao Reservar Mesa para Faca um Pedido, adicionamos navegacao bidirecional entre site e area de pedidos, e reorganizamos estrutura de arquivos para seguir padrao do projeto (CSS e JS em assets/, HTMLs na raiz).
+
+## Decisoes
+
+- Botao principal trocado para Faca um Pedido
+  - *Razao:* Direcionar usuarios para sistema de delivery em vez de reservas
+- Arquivo pedidos.html movido para raiz
+  - *Razao:* Manter todos os HTMLs no mesmo nivel, evitar listagem de diretorio
+- CSS e JS movidos para assets/css e assets/js
+  - *Razao:* Padronizacao com estrutura existente do projeto
+- Renomeacao dos arquivos JS para pedidos-data.js e pedidos-app.js
+  - *Razao:* Evitar conflito de nomes e identificar claramente a funcionalidade
+
+## Proximos Passos
+
+- [ALTA] Adicionar mais categorias: Batatas, Mexicanos, Jantinha do Los
+- [ALTA] Atualizar nomes, valores e descricoes conforme cardapio-completo.pdf
+- [MEDIA] Implementar banner deslizante horizontal com promocoes
+- [MEDIA] Implementar backend FastAPI com autenticacao real
+- [BAIXA] Criar script de sincronizacao VPS para ClickAtende local
+
+## Tags
+
+`pedidos-online, reorganizacao, navegacao, estrutura-arquivos, frontend`
+
+## Arquivos
+
+`index.html, pedidos.html, assets/css/pedidos.css, assets/js/pedidos-data.js, assets/js/pedidos-app.js`
+
+---
+
+# 2026-01-09 14:29 - Implementacao do Prototipo de Pedidos Online
+
+**Segunda sessao mais recente**
+
+## Contexto
+
+Realizamos brainstorm completo e implementamos prototipo funcional da area de pedidos online em HTML/CSS/JS puro como SPA. Sistema inclui 5 telas: login, cardapio, detalhe do prato, endereco e confirmacao. Taxas de entrega variaveis por bairro para as filiais Los Centro e Los Bairro.
+
+## Decisoes
+
+- Tema light para area de pedidos
+  - *Razao:* Apps de delivery como iFood/Rappi usam tema claro, melhor UX
+- SPA em HTML/CSS/JS puro
+  - *Razao:* Velocidade de implementacao para demonstracao, sem dependencias
+- Header dark com valor do carrinho
+  - *Razao:* Destaque visual e feedback imediato do valor do pedido
+- Taxas de entrega variaveis R a R
+  - *Razao:* Reflete distancia real das filiais Los Centro e Los Bairro
+- Opcoes meia/inteira com info de pessoas
+  - *Razao:* Padrao do bar fisico, ajuda cliente a decidir quantidade
+
+## Proximos Passos
+
+- [ALTA] Trocar botao Faca sua Reserva para Faca um Pedido na pagina inicial
+- [ALTA] Substituir secao Faca sua Reserva por tela de cadastro (nome, email, celular)
+- [ALTA] Adicionar botao Voltar para pagina principal na area de pedidos
+- [ALTA] Adicionar categorias: Batatas, Mexicanos, Jantinha do Los
+- [ALTA] Atualizar nomes, valores e descricoes conforme cardapio-completo.pdf
+- [MEDIA] Implementar banner deslizante horizontal com promocoes
+- [MEDIA] Implementar backend FastAPI com autenticacao real
+- [MEDIA] Criar script de sincronizacao VPS para ClickAtende local
+
+## Tags
+
+`pedidos-online, prototipo, spa, delivery, frontend, brainstorm`
+
+## Arquivos
+
+`pedidos/index.html, pedidos/css/pedidos.css, pedidos/js/data.js, pedidos/js/app.js`
+
+---
+
+## Historico (sessoes anteriores)
+
+- **2026-01-08 13:53** - Realizamos um brainstorm completo para definir a arquitetura do sistema de pedidos online do Bar Los Hermanos. O sistema permitira que clientes facam pedidos via site para delivery ou retirada,
+- **2026-01-08 13:15** - Realizamos um brainstorm completo para definir a arquitetura de um dashboard administrativo para o site do Bar Los Hermanos. O sistema tera login exclusivo para gestores, com dados vindos do ClickAtende (SQLite) via ETL Python,
+
+---
+
+> Quer continuar de onde parou?

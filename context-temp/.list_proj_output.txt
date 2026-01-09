@@ -1,0 +1,24 @@
+# Seus Projetos (6 projetos)
+
+---
+
+- **BarLosHermanos**
+  - Ultima sessao: 2026-01-09
+
+- **thought-keeper**
+  - Ultima sessao: 2026-01-09
+
+- **context-keeper**
+  - Ultima sessao: 2026-01-09
+
+- **smartview-relatorios**
+  - Ultima sessao: 2026-01-08
+
+- **estagio-chua**
+  - Ultima sessao: 2026-01-08
+
+- **dashboard-logistica**
+  - Ultima sessao: 2026-01-07
+
+
+> Use `/start [nome do projeto]` para continuar um projeto

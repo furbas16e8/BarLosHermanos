@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         celularInput.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 11) value = value.slice(0, 11);
-            
+
             if (value.length > 0) {
                 value = '(' + value;
             }
@@ -43,11 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (value.length > 10) {
                 value = value.slice(0, 10) + '-' + value.slice(10);
             }
-            
+
             e.target.value = value;
         });
     }
-    
+
     // Carregar carrinho do localStorage
     const carrinhoSalvo = localStorage.getItem('losHermanosCarrinho');
     if (carrinhoSalvo) {
@@ -62,18 +62,18 @@ function mostrarTela(telaId) {
     document.querySelectorAll('.tela').forEach(tela => {
         tela.classList.remove('active');
     });
-    
+
     // Mostra a tela solicitada
     document.getElementById(telaId).classList.add('active');
-    
+
     // Controla visibilidade do header e categorias
     const isCardapio = telaId === 'telaCardapio';
     const isLogado = estadoApp.usuario.nome !== '';
-    
+
     document.getElementById('mainHeader').style.display = (isLogado && telaId !== 'telaLogin') ? 'block' : 'none';
     document.getElementById('searchBar').style.display = isCardapio ? 'block' : 'none';
     document.getElementById('categoriesBar').style.display = isCardapio ? 'flex' : 'none';
-    
+
     // Scroll para o topo
     window.scrollTo(0, 0);
 }
@@ -81,17 +81,17 @@ function mostrarTela(telaId) {
 // ===== LOGIN =====
 function fazerLogin(event) {
     event.preventDefault();
-    
+
     const nome = document.getElementById('loginNome').value.trim();
     const celular = document.getElementById('loginCelular').value.trim();
-    
+
     if (nome && celular) {
         estadoApp.usuario.nome = nome;
         estadoApp.usuario.celular = celular;
-        
+
         // Atualiza o header
         document.getElementById('headerNome').textContent = nome.split(' ')[0];
-        
+
         // Carrega o cardápio e mostra
         carregarCardapio();
         mostrarTela('telaCardapio');
@@ -102,24 +102,20 @@ function fazerLogin(event) {
 function carregarCardapio() {
     const grid = document.getElementById('pratosGrid');
     grid.innerHTML = '';
-    
-    // Filtra por categoria
-    let itens = [];
-    if (estadoApp.categoriaAtual === 'porcoes') {
-        itens = PRATOS;
-    } else if (estadoApp.categoriaAtual === 'bebidas') {
-        itens = BEBIDAS;
-    }
-    
+
+    // Gera os pills de categoria dinamicamente
+    gerarCategoriasPills();
+
+    // Filtra por categoria usando a função getPratosByCategoria
+    let itens = getPratosByCategoria(estadoApp.categoriaAtual);
+
     // Filtra por busca
     const busca = document.getElementById('searchInput')?.value.toLowerCase() || '';
     if (busca) {
-        itens = itens.filter(item => 
-            item.nome.toLowerCase().includes(busca) || 
-            item.descricao.toLowerCase().includes(busca)
-        );
+        // Se houver busca, procura em todas as categorias
+        itens = buscarPratos(busca);
     }
-    
+
     // Renderiza os cards
     itens.forEach(item => {
         const card = criarCardPrato(item);
@@ -127,17 +123,67 @@ function carregarCardapio() {
     });
 }
 
+/**
+ * Gera os pills de categoria dinamicamente a partir do array CATEGORIAS
+ */
+function gerarCategoriasPills() {
+    const container = document.getElementById('categoriesBar');
+    if (!container || container.dataset.gerado === 'true') return;
+
+    container.innerHTML = '';
+
+    CATEGORIAS.forEach(cat => {
+        const pill = document.createElement('button');
+        pill.className = `category-pill${cat.id === estadoApp.categoriaAtual ? ' active' : ''}`;
+        pill.dataset.categoria = cat.id;
+        pill.onclick = () => filtrarCategoria(cat.id);
+        pill.innerHTML = `${cat.icone} ${cat.nome}`;
+        container.appendChild(pill);
+    });
+
+    container.dataset.gerado = 'true';
+}
+
 function criarCardPrato(prato) {
     const card = document.createElement('div');
     card.className = `prato-card ${prato.categoria === 'bebidas' ? 'bebida' : ''}`;
     card.onclick = () => abrirDetalhePrato(prato);
-    
-    const preco = prato.precoMeia ? prato.precoMeia : prato.preco;
-    const precoTexto = prato.precoMeia ? 'a partir de ' : '';
-    
+
+    // Determina o preço a exibir (suporta múltiplos formatos)
+    let preco = 0;
+    let precoTexto = '';
+
+    if (prato.precoMeia) {
+        // Porções com meia/inteira
+        preco = prato.precoMeia;
+        precoTexto = 'a partir de ';
+    } else if (prato.preco1un) {
+        // Mexicanos com 1un/2un
+        preco = prato.preco1un;
+        precoTexto = 'a partir de ';
+    } else {
+        // Preço único
+        preco = prato.preco;
+    }
+
     // Gera as estrelas
     const stars = gerarEstrelas(prato.avaliacao);
-    
+
+    // Ícone para itens sem imagem baseado na categoria
+    const iconesPorCategoria = {
+        'porcoes': '🍖',
+        'churrasquinhos': '🥩',
+        'batatas': '🥔',
+        'carne-boi': '🥩',
+        'frango': '🍗',
+        'frutos-mar': '🦐',
+        'especiais': '⭐',
+        'mexicanos': '🌮',
+        'caldos': '🍲',
+        'hamburguer': '🍔',
+        'bebidas': '🥤'
+    };
+
     if (prato.imagem) {
         card.innerHTML = `
             <img src="${prato.imagem}" alt="${prato.nome}" class="prato-imagem">
@@ -147,18 +193,12 @@ function criarCardPrato(prato) {
                     <span class="stars">${stars}</span>
                     <span>${prato.avaliacao}</span>
                 </div>
-                <div class="prato-preco">${precoTexto}<span>R$ ${preco.toFixed(2).replace('.', ',')}</span></div>
+                <div class="prato-preco">${precoTexto}<span>${formatarPreco(preco)}</span></div>
             </div>
         `;
     } else {
-        // Card para bebidas sem imagem
-        const icones = {
-            'Refrigerante Lata': '🥤',
-            'Água Mineral': '💧',
-            'Suco Natural': '🍊'
-        };
-        const icone = icones[prato.nome] || '🍹';
-        
+        const icone = iconesPorCategoria[prato.categoria] || '🍽️';
+
         card.innerHTML = `
             <div class="prato-imagem-placeholder">${icone}</div>
             <div class="prato-info">
@@ -167,11 +207,11 @@ function criarCardPrato(prato) {
                     <span class="stars">${stars}</span>
                     <span>${prato.avaliacao}</span>
                 </div>
-                <div class="prato-preco"><span>R$ ${preco.toFixed(2).replace('.', ',')}</span></div>
+                <div class="prato-preco">${precoTexto}<span>${formatarPreco(preco)}</span></div>
             </div>
         `;
     }
-    
+
     return card;
 }
 
@@ -179,13 +219,13 @@ function gerarEstrelas(nota) {
     const cheias = Math.floor(nota);
     const meia = nota % 1 >= 0.5 ? 1 : 0;
     const vazias = 5 - cheias - meia;
-    
+
     return '★'.repeat(cheias) + (meia ? '★' : '') + '☆'.repeat(vazias);
 }
 
 function filtrarCategoria(categoria) {
     estadoApp.categoriaAtual = categoria;
-    
+
     // Atualiza pills ativas
     document.querySelectorAll('.category-pill').forEach(pill => {
         pill.classList.remove('active');
@@ -193,7 +233,7 @@ function filtrarCategoria(categoria) {
             pill.classList.add('active');
         }
     });
-    
+
     carregarCardapio();
 }
 
@@ -207,7 +247,7 @@ function abrirDetalhePrato(prato) {
     estadoApp.tamanhoSelecionado = 'meia';
     estadoApp.quantidade = 1;
     estadoApp.adicionaisSelecionados = [];
-    
+
     // Atualiza a tela de detalhe
     const img = document.getElementById('detalheImagem');
     if (prato.imagem) {
@@ -218,37 +258,65 @@ function abrirDetalhePrato(prato) {
         // Placeholder para bebidas
         img.style.display = 'none';
     }
-    
+
     document.getElementById('detalheNome').textContent = prato.nome;
     document.getElementById('detalheStars').textContent = gerarEstrelas(prato.avaliacao);
     document.getElementById('detalheAvaliacao').textContent = prato.avaliacao;
     document.getElementById('detalheNumAvaliacoes').textContent = `${prato.numAvaliacoes} avaliações`;
     document.getElementById('detalheDescricao').textContent = prato.descricao;
-    
-    // Seletor de tamanho (só para porções)
+
+    // Seletor de tamanho (só para porções com meia/inteira)
     const tamanhoSelector = document.getElementById('tamanhoSelector');
     const infoGrid = document.getElementById('infoGrid');
-    
+
     if (prato.precoMeia) {
+        // Porções com meia/inteira
         tamanhoSelector.style.display = 'block';
         infoGrid.style.display = 'flex';
-        
-        document.getElementById('precoMeia').textContent = `R$ ${prato.precoMeia.toFixed(2).replace('.', ',')}`;
-        document.getElementById('precoInteira').textContent = `R$ ${prato.precoInteira.toFixed(2).replace('.', ',')}`;
-        document.getElementById('infoPeso').textContent = prato.peso;
-        document.getElementById('infoServe').textContent = prato.serveMeia;
-        document.getElementById('infoTempo').textContent = prato.tempoPreparo;
-        
+
+        // Atualiza labels para meia/inteira
+        const optMeia = document.querySelector('.tamanho-option[data-tamanho="meia"]');
+        const optInteira = document.querySelector('.tamanho-option[data-tamanho="inteira"]');
+        if (optMeia) optMeia.querySelector('.tamanho-nome').textContent = 'Meia';
+        if (optInteira) optInteira.querySelector('.tamanho-nome').textContent = 'Inteira';
+
+        document.getElementById('precoMeia').textContent = formatarPreco(prato.precoMeia);
+        document.getElementById('precoInteira').textContent = formatarPreco(prato.precoInteira);
+        document.getElementById('infoPeso').textContent = prato.peso || '-';
+        document.getElementById('infoServe').textContent = prato.serveMeia || '-';
+        document.getElementById('infoTempo').textContent = prato.tempoPreparo || '~20min';
+
         // Reset seleção de tamanho
         document.querySelectorAll('.tamanho-option').forEach(opt => {
             opt.classList.remove('active');
             if (opt.dataset.tamanho === 'meia') opt.classList.add('active');
         });
+        estadoApp.tamanhoSelecionado = 'meia';
+    } else if (prato.preco1un) {
+        // Mexicanos com 1 unidade / 2 unidades
+        tamanhoSelector.style.display = 'block';
+        infoGrid.style.display = 'none';
+
+        // Atualiza labels para 1un/2un
+        const optMeia = document.querySelector('.tamanho-option[data-tamanho="meia"]');
+        const optInteira = document.querySelector('.tamanho-option[data-tamanho="inteira"]');
+        if (optMeia) optMeia.querySelector('.tamanho-nome').textContent = '1 Unidade';
+        if (optInteira) optInteira.querySelector('.tamanho-nome').textContent = '2 Unidades';
+
+        document.getElementById('precoMeia').textContent = formatarPreco(prato.preco1un);
+        document.getElementById('precoInteira').textContent = formatarPreco(prato.preco2un);
+
+        // Reset seleção
+        document.querySelectorAll('.tamanho-option').forEach(opt => {
+            opt.classList.remove('active');
+            if (opt.dataset.tamanho === 'meia') opt.classList.add('active');
+        });
+        estadoApp.tamanhoSelecionado = 'meia';
     } else {
         tamanhoSelector.style.display = 'none';
         infoGrid.style.display = 'none';
     }
-    
+
     // Adicionais (só para porções)
     const adicionaisSection = document.getElementById('adicionaisSection');
     if (prato.categoria === 'porcoes') {
@@ -257,20 +325,20 @@ function abrirDetalhePrato(prato) {
     } else {
         adicionaisSection.style.display = 'none';
     }
-    
+
     // Quantidade
     document.getElementById('quantidadeValor').textContent = 1;
-    
+
     // Atualiza total
     atualizarTotalItem();
-    
+
     mostrarTela('telaDetalhe');
 }
 
 function carregarAdicionais() {
     const container = document.getElementById('adicionaisList');
     container.innerHTML = '';
-    
+
     ADICIONAIS.forEach(adicional => {
         const div = document.createElement('div');
         div.className = 'adicional-item';
@@ -287,20 +355,20 @@ function carregarAdicionais() {
 
 function selecionarTamanho(tamanho) {
     estadoApp.tamanhoSelecionado = tamanho;
-    
+
     document.querySelectorAll('.tamanho-option').forEach(opt => {
         opt.classList.remove('active');
         if (opt.dataset.tamanho === tamanho) {
             opt.classList.add('active');
         }
     });
-    
+
     // Atualiza info de "serve"
     if (estadoApp.pratoAtual) {
         const serve = tamanho === 'meia' ? estadoApp.pratoAtual.serveMeia : estadoApp.pratoAtual.serveInteira;
         document.getElementById('infoServe').textContent = serve;
     }
-    
+
     atualizarTotalItem();
 }
 
@@ -323,42 +391,51 @@ function toggleAdicional(id) {
 function atualizarTotalItem() {
     const prato = estadoApp.pratoAtual;
     if (!prato) return;
-    
+
     let preco = 0;
-    
+
     if (prato.precoMeia) {
+        // Porções meia/inteira
         preco = estadoApp.tamanhoSelecionado === 'meia' ? prato.precoMeia : prato.precoInteira;
+    } else if (prato.preco1un) {
+        // Mexicanos 1un/2un
+        preco = estadoApp.tamanhoSelecionado === 'meia' ? prato.preco1un : prato.preco2un;
     } else {
         preco = prato.preco;
     }
-    
+
     // Adiciona os adicionais
     estadoApp.adicionaisSelecionados.forEach(id => {
         const adicional = ADICIONAIS.find(a => a.id === id);
         if (adicional) preco += adicional.preco;
     });
-    
+
     // Multiplica pela quantidade
     const total = preco * estadoApp.quantidade;
-    
-    document.getElementById('totalItem').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+    document.getElementById('totalItem').textContent = formatarPreco(total);
 }
 
 // ===== CARRINHO =====
 function adicionarAoCarrinho() {
     const prato = estadoApp.pratoAtual;
     if (!prato) return;
-    
+
     let preco = 0;
     let nome = prato.nome;
-    
+
     if (prato.precoMeia) {
+        // Porções meia/inteira
         preco = estadoApp.tamanhoSelecionado === 'meia' ? prato.precoMeia : prato.precoInteira;
         nome += estadoApp.tamanhoSelecionado === 'meia' ? ' (Meia)' : ' (Inteira)';
+    } else if (prato.preco1un) {
+        // Mexicanos 1un/2un
+        preco = estadoApp.tamanhoSelecionado === 'meia' ? prato.preco1un : prato.preco2un;
+        nome += estadoApp.tamanhoSelecionado === 'meia' ? ' (1 Un)' : ' (2 Un)';
     } else {
         preco = prato.preco;
     }
-    
+
     // Adicionais
     const adicionaisNomes = [];
     estadoApp.adicionaisSelecionados.forEach(id => {
@@ -368,7 +445,7 @@ function adicionarAoCarrinho() {
             adicionaisNomes.push(adicional.nome);
         }
     });
-    
+
     const item = {
         id: Date.now(),
         pratoId: prato.id,
@@ -377,11 +454,11 @@ function adicionarAoCarrinho() {
         quantidade: estadoApp.quantidade,
         adicionais: adicionaisNomes
     };
-    
+
     estadoApp.carrinho.push(item);
     salvarCarrinho();
     atualizarHeaderCarrinho();
-    
+
     // Mostra modal de decisão
     document.getElementById('modalDecisao').classList.add('active');
 }
@@ -411,13 +488,13 @@ function abrirCarrinho() {
 // ===== ENDEREÇO =====
 function irParaEndereco() {
     document.getElementById('modalDecisao').classList.remove('active');
-    
+
     // Carrega bairros da filial selecionada
     carregarBairros();
-    
+
     // Carrega resumo do pedido
     carregarResumoPedido();
-    
+
     mostrarTela('telaEndereco');
 }
 
@@ -425,7 +502,7 @@ function selecionarFilial(filial) {
     estadoApp.filialSelecionada = filial;
     estadoApp.bairroSelecionado = null;
     estadoApp.taxaEntrega = 0;
-    
+
     // Atualiza visual das opções
     document.querySelectorAll('.filial-option').forEach(opt => {
         opt.classList.remove('active');
@@ -433,7 +510,7 @@ function selecionarFilial(filial) {
             opt.classList.add('active');
         }
     });
-    
+
     carregarBairros();
     carregarResumoPedido();
 }
@@ -441,9 +518,9 @@ function selecionarFilial(filial) {
 function carregarBairros() {
     const select = document.getElementById('bairroSelect');
     const filial = FILIAIS[estadoApp.filialSelecionada];
-    
+
     select.innerHTML = '<option value="">Escolha um bairro...</option>';
-    
+
     filial.bairros.forEach((bairro, index) => {
         const option = document.createElement('option');
         option.value = index;
@@ -455,34 +532,34 @@ function carregarBairros() {
 function selecionarBairro() {
     const select = document.getElementById('bairroSelect');
     const index = select.value;
-    
+
     if (index !== '') {
         const filial = FILIAIS[estadoApp.filialSelecionada];
         const bairro = filial.bairros[index];
-        
+
         estadoApp.bairroSelecionado = bairro.nome;
         estadoApp.taxaEntrega = bairro.taxa;
-        
+
         // Atualiza header
         document.getElementById('headerBairro').textContent = bairro.nome;
     } else {
         estadoApp.bairroSelecionado = null;
         estadoApp.taxaEntrega = 0;
     }
-    
+
     carregarResumoPedido();
 }
 
 function carregarResumoPedido() {
     const container = document.getElementById('resumoItens');
     container.innerHTML = '';
-    
+
     let subtotal = 0;
-    
+
     estadoApp.carrinho.forEach(item => {
         const itemTotal = item.preco * item.quantidade;
         subtotal += itemTotal;
-        
+
         const div = document.createElement('div');
         div.className = 'resumo-item';
         div.innerHTML = `
@@ -491,10 +568,10 @@ function carregarResumoPedido() {
         `;
         container.appendChild(div);
     });
-    
+
     document.getElementById('resumoSubtotal').textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
     document.getElementById('resumoTaxa').textContent = `R$ ${estadoApp.taxaEntrega.toFixed(2).replace('.', ',')}`;
-    
+
     const total = subtotal + estadoApp.taxaEntrega;
     document.getElementById('resumoTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
@@ -506,21 +583,21 @@ function confirmarPedido() {
         alert('Seu carrinho está vazio!');
         return;
     }
-    
+
     if (!estadoApp.bairroSelecionado) {
         alert('Por favor, selecione um bairro.');
         return;
     }
-    
+
     // Gera número do pedido aleatório
     const numeroPedido = Math.floor(1000 + Math.random() * 9000);
     document.getElementById('numeroPedido').textContent = `#${numeroPedido}`;
-    
+
     // Limpa o carrinho
     estadoApp.carrinho = [];
     salvarCarrinho();
     atualizarHeaderCarrinho();
-    
+
     mostrarTela('telaConfirmacao');
 }
 
@@ -529,8 +606,8 @@ function novoPedido() {
     estadoApp.bairroSelecionado = null;
     estadoApp.taxaEntrega = 0;
     estadoApp.endereco = { rua: '', numero: '', referencia: '' };
-    
+
     document.getElementById('headerBairro').textContent = 'Selecione seu endereço';
-    
+
     mostrarTela('telaCardapio');
 }
