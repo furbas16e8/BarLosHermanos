@@ -95,6 +95,25 @@ body.pedidos-page {
   font-weight: 600;
 }
 
+.header-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.header-back:hover {
+  background: var(--pedidos-accent);
+  transform: scale(1.1);
+}
+
 .header-address {
   display: flex;
   align-items: center;
@@ -282,6 +301,19 @@ body.pedidos-page {
 .form-group input:focus {
   outline: none;
   border-color: var(--pedidos-accent);
+}
+
+.btn-voltar-site {
+  display: inline-block;
+  margin-top: var(--spacing-lg);
+  color: var(--pedidos-text-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+
+.btn-voltar-site:hover {
+  color: var(--pedidos-accent);
 }
 
 /* ===== GRID DE PRATOS ===== */

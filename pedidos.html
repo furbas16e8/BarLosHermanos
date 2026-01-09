@@ -12,10 +12,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/pedidos.css">
+    <link rel="stylesheet" href="assets/css/pedidos.css">
 </head>
 <body class="pedidos-page">
     <div class="pedidos-app">
@@ -24,6 +24,7 @@
         <header class="pedidos-header" id="mainHeader" style="display: none;">
             <div class="header-content">
                 <div class="header-user">
+                    <a href="index.html" class="header-back" title="Voltar ao site">←</a>
                     <h2>Olá, <span id="headerNome">Cliente</span>!</h2>
                 </div>
                 <div class="header-address" id="headerAddress" onclick="irParaEndereco()">
@@ -79,6 +80,8 @@
                             Entrar
                         </button>
                     </form>
+                    
+                    <a href="index.html" class="btn-voltar-site">← Voltar ao site principal</a>
                 </div>
             </section>
 
@@ -291,7 +294,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/data.js"></script>
-    <script src="js/app.js"></script>
+    <script src="assets/js/pedidos-data.js"></script>
+    <script src="assets/js/pedidos-app.js"></script>
 </body>
 </html>
