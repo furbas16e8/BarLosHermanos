@@ -59,21 +59,42 @@
         <!-- ===== CONTEÚDO PRINCIPAL ===== -->
         <main class="pedidos-content">
             
+            <!-- TELA 0: TELA INICIAL (BOAS-VINDAS) -->
+            <section class="tela active" id="telaInicial">
+                <div class="inicial-container">
+                    <div class="inicial-imagem">
+                        <img src="assets/img/menu/comida_01.jpg" alt="Prato delicioso do Bar Los Hermanos">
+                    </div>
+                    
+                    <h1 class="inicial-titulo">Los Hermanos</h1>
+                    <p class="inicial-descricao">Peça seu prato favorito e receba em casa com todo o sabor do nosso bar.</p>
+                    
+                    <div class="inicial-buttons">
+                        <button class="btn btn-login" onclick="mostrarTela('telaLogin')">
+                            Login
+                        </button>
+                        <button class="btn btn-cadastro" onclick="mostrarTela('telaCadastro')">
+                            Cadastre-se
+                        </button>
+                    </div>
+                </div>
+            </section>
+
             <!-- TELA 1: LOGIN -->
-            <section class="tela active" id="telaLogin">
+            <section class="tela" id="telaLogin">
                 <div class="login-container">
                     <h1 class="login-logo">LOS HERMANOS</h1>
-                    <p class="login-subtitle">Faça seu pedido online e receba em casa!</p>
+                    <p class="login-subtitle">Acesse sua conta</p>
                     
                     <form id="loginForm" onsubmit="fazerLogin(event)">
                         <div class="form-group">
-                            <label for="loginNome">Seu nome</label>
-                            <input type="text" id="loginNome" placeholder="Como podemos te chamar?" required>
+                            <label for="loginEmail">E-mail</label>
+                            <input type="email" id="loginEmail" placeholder="seuemail@exemplo.com" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="loginCelular">Celular</label>
-                            <input type="tel" id="loginCelular" placeholder="(00) 00000-0000" required>
+                            <label for="loginSenha">Senha</label>
+                            <input type="password" id="loginSenha" placeholder="Digite sua senha" required>
                         </div>
                         
                         <button type="submit" class="btn btn-primary">
@@ -81,7 +102,56 @@
                         </button>
                     </form>
                     
-                    <a href="index.html" class="btn-voltar-site">← Voltar ao site principal</a>
+                    <p class="login-switch">
+                        Não tem conta? <a href="#" onclick="mostrarTela('telaCadastro'); return false;">Cadastre-se</a>
+                    </p>
+                    
+                    <a href="#" class="btn-voltar-site" onclick="mostrarTela('telaInicial'); return false;">← Voltar</a>
+                </div>
+            </section>
+
+            <!-- TELA 1.5: CADASTRO -->
+            <section class="tela" id="telaCadastro">
+                <div class="login-container">
+                    <h1 class="login-logo">LOS HERMANOS</h1>
+                    <p class="login-subtitle">Crie sua conta</p>
+                    
+                    <form id="cadastroForm" onsubmit="fazerCadastro(event)">
+                        <div class="form-group">
+                            <label for="cadastroNome">Nome</label>
+                            <input type="text" id="cadastroNome" placeholder="Seu nome completo" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cadastroTelefone">Telefone</label>
+                            <input type="tel" id="cadastroTelefone" placeholder="(00) 00000-0000" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cadastroEmail">E-mail</label>
+                            <input type="email" id="cadastroEmail" placeholder="seuemail@exemplo.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cadastroSenha">Senha</label>
+                            <input type="password" id="cadastroSenha" placeholder="Crie uma senha" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cadastroSenhaConfirma">Repita sua senha</label>
+                            <input type="password" id="cadastroSenhaConfirma" placeholder="Confirme sua senha" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            Criar conta
+                        </button>
+                    </form>
+                    
+                    <p class="login-switch">
+                        Já tem conta? <a href="#" onclick="mostrarTela('telaLogin'); return false;">Faça login</a>
+                    </p>
+                    
+                    <a href="#" class="btn-voltar-site" onclick="mostrarTela('telaInicial'); return false;">← Voltar</a>
                 </div>
             </section>
 
