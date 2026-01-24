@@ -1,0 +1,65 @@
+{
+  "project_name": "BarLosHermanos",
+  "status": "context_retrieved",
+  "retrieved_at": "2026-01-24T13:54:02.277614",
+  "last_session": {
+    "id": 51,
+    "session_title": "Redesign Mobile da Tela de Login/Cadastro do Sistema de Pedidos",
+    "date": "2026-01-17",
+    "context_summary": "Redesenhamos completamente a tela inicial do sistema de pedidos online para mobile. Criamos 3 telas: Inicial (com imagem de prato + 2 botoes), Login (email/senha) e Cadastro (nome, telefone, email, senha, confirmar senha). Seguimos referencia visual de apps de delivery premium, usando design limpo com fundo branco e botoes semanticos.",
+    "tags": [
+      "mobile",
+      "login",
+      "cadastro",
+      "redesign",
+      "frontend",
+      "css"
+    ],
+    "decisions_made": [
+      {
+        "decision": "Design neutro e simples (sem animacoes)",
+        "reasoning": "Usuario preferiu layout limpo inspirado em apps como iFood, sem efeitos visuais complexos"
+      },
+      {
+        "decision": "Tela inicial com imagem PNG + 2 botoes",
+        "reasoning": "Seguir referencia visual fornecida pelo usuario"
+      },
+      {
+        "decision": "Login com email/senha, Cadastro com 5 campos",
+        "reasoning": "Preparacao para autenticacao real com backend futuro"
+      },
+      {
+        "decision": "Classes CSS semanticas (.btn-login, .btn-cadastro)",
+        "reasoning": "Boas praticas - nomear por funcao, nao por aparencia visual"
+      },
+      {
+        "decision": "Remover cards das telas de autenticacao",
+        "reasoning": "Layout mais clean e moderno para mobile"
+      }
+    ],
+    "next_steps": [
+      {
+        "step": "Continuar otimizacao e personalizacao de pedidos.html e pedidos.css",
+        "priority": "high"
+      },
+      {
+        "step": "Verificar e ajustar espacamento/margens em todas as partes",
+        "priority": "high"
+      },
+      {
+        "step": "Corrigir layout estreito que ainda persiste",
+        "priority": "high"
+      },
+      {
+        "step": "Aplicar mesmo estilo limpo as outras telas (cardapio, checkout)",
+        "priority": "medium"
+      }
+    ],
+    "problems_faced": [],
+    "files_modified": [
+      "pedidos.html",
+      "assets/css/pedidos.css",
+      "assets/js/pedidos-app.js"
+    ]
+  }
+}

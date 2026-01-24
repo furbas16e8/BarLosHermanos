@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bar Los Hermanos | Carrinho</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script src="assets/js/orders.js"></script>
+<!-- Custom Styles -->
+<link rel="stylesheet" href="assets/css/orders.css">
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white h-screen flex flex-col overflow-hidden">
+<!-- Top App Bar -->
+<header class="shrink-0 flex items-center justify-between px-4 py-3 bg-background-light dark:bg-background-dark z-10">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors" onclick="window.location.href='orders.html'">
+<span class="material-symbols-outlined text-gray-900 dark:text-white" style="font-size: 24px;">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Meu Pedido</h1>
+<div class="w-10"></div> <!-- Spacer para centralizar -->
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar pb-32">
+<!-- Cart Items List -->
+<div class="flex flex-col gap-1" id="cart-items-container">
+    <!-- Itens serão inseridos via JS -->
+    <div class="flex flex-col items-center justify-center py-20 text-secondary-text" id="empty-cart-msg">
+        <span class="material-symbols-outlined text-6xl mb-4">shopping_basket</span>
+        <p class="text-lg font-medium">Seu carrinho está vazio</p>
+        <button class="mt-4 text-primary font-bold" onclick="window.location.href='orders.html'">Adicionar Itens</button>
+    </div>
+</div>
+
+<div class="h-4"></div>
+<!-- Promo Code -->
+<div class="px-4">
+<div class="flex w-full items-center rounded-xl bg-gray-100 dark:bg-[#342618] border border-gray-200 dark:border-[#493622] overflow-hidden">
+<div class="pl-4 text-gray-400 dark:text-[#cbad90] flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 20px;">local_offer</span>
+</div>
+<input class="w-full bg-transparent border-none text-base text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#cbad90] focus:ring-0 py-3.5 px-3" placeholder="Cupom de Desconto" value=""/>
+<button class="pr-4 text-primary font-bold text-sm uppercase">Aplicar</button>
+</div>
+</div>
+<div class="h-6"></div>
+<!-- Order Summary -->
+<div class="px-4 space-y-3">
+<h4 class="text-lg font-bold mb-2">Resumo do Pedido</h4>
+<div class="flex justify-between items-center text-sm">
+<span class="text-gray-500 dark:text-[#cbad90]">Subtotal</span>
+<span class="font-medium" id="cart-subtotal">R$ 0,00</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-gray-500 dark:text-[#cbad90]">Taxa de Entrega</span>
+<span class="font-medium" id="cart-delivery">R$ 5,00</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-gray-500 dark:text-[#cbad90]">Desconto</span>
+<span class="font-medium text-primary">R$ 0,00</span>
+</div>
+<div class="h-[1px] w-full bg-gray-200 dark:bg-white/10 my-2"></div>
+<div class="flex justify-between items-center text-xl font-bold">
+<span>Total</span>
+<span class="text-primary" id="cart-total">R$ 5,00</span>
+</div>
+</div>
+<div class="h-24"></div>
+</main>
+<!-- Fixed Footer Container (CTA + Nav) -->
+<div class="fixed bottom-0 left-0 right-0 z-50">
+<!-- Floating Checkout Button -->
+<div class="px-4 pb-4 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light dark:via-background-dark to-transparent pt-6">
+<button class="w-full bg-primary hover:bg-orange-600 active:scale-[0.98] transition-all text-white font-bold rounded-xl py-4 shadow-lg shadow-orange-900/20 flex justify-between px-6 items-center" onclick="alert('Pedido finalizado com sucesso!')">
+<span>Finalizar Pedido</span>
+<span class="bg-white/20 rounded px-2 py-0.5 text-sm font-semibold" id="checkout-total">R$ 0,00</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="bg-white dark:bg-[#1a130c] border-t border-gray-200 dark:border-white/5 pb-safe pt-2 px-2 flex justify-around items-center h-[80px]">
+<a class="flex flex-col items-center justify-center w-16 gap-1 text-gray-400 dark:text-[#8e7a65] hover:text-primary transition-colors" href="index.html">
+<span class="material-symbols-outlined filled-icon">home</span>
+<span class="text-[10px] font-medium">Início</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 gap-1 text-gray-400 dark:text-[#8e7a65] hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium">Busca</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 gap-1 text-primary" href="#">
+<div class="relative">
+<span class="material-symbols-outlined fill-1">shopping_cart</span>
+<span class="absolute -top-1 -right-1 bg-white text-primary text-[9px] font-bold h-3.5 w-3.5 flex items-center justify-center rounded-full border border-primary dark:border-[#1a130c]" id="cart-badge">0</span>
+</div>
+<span class="text-[10px] font-medium">Carrinho</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 gap-1 text-gray-400 dark:text-[#8e7a65] hover:text-primary transition-colors" href="login.html">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</nav>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', updateCartUI);
+</script>
+</body></html>
+
