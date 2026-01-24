@@ -45,7 +45,8 @@ function addToCart(name, price, image) {
         cart.push({ name, price, image, quantity: 1 });
     }
     saveCart(cart);
-    alert(`${name} adicionado ao carrinho!`);
+    // Substituído alert por feedback silencioso/visual
+    console.log(`${name} adicionado ao carrinho!`);
 }
 
 function updateCartBadge() {
@@ -114,7 +115,7 @@ function updateCartUI() {
         container.innerHTML += itemHtml;
     });
 
-    const delivery = 5.00;
+    const delivery = subtotal > 0 ? 5.00 : 0.00;
     const total = subtotal + delivery;
 
     if (subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
@@ -143,4 +144,5 @@ function removeFromCart(index) {
 
 document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
+    updateCartUI(); // Inicializa interface do carrinho se estiver na página dele
 });

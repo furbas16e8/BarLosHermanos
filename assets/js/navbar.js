@@ -39,7 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'perfil.html': 'nav-profile',
         'address.html': 'nav-profile',
         'login.html': 'nav-profile',
-        'pagina_pedido.html': 'nav-home'
+        'cadastro.html': 'nav-profile',
+        'pagina_pedido.html': 'nav-home',
+        'historia.html': 'nav-home'
     };
 
     const activeId = activeMapping[currentPath];

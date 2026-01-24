@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bar Los Hermanos | Nossa História</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff3131",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "title": ["Bebas Neue", "cursive"],
+                        "body": ["Poppins", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-dark text-white min-h-screen">
+    <header class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
+        <div class="flex items-center p-4 justify-between max-w-2xl mx-auto">
+            <button class="flex size-10 items-center justify-center" onclick="window.location.href='index.html'">
+                <span class="material-symbols-outlined">home</span>
+            </button>
+            <h2 class="text-xl font-bold font-title tracking-[0.1em]">NOSSA HISTÓRIA</h2>
+            <div class="w-10"></div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto p-6 pb-24 space-y-8">
+        <section class="space-y-4">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnWdzeBM8n7grZP1A7hHvjXqk2vMWoZipIYpwhDE_Jvh0H2ON5jbxISFJ60B2GMJ9bDKaHY3jbhwKmuEPIPwuCCDlBLqHh2axvmkDTGwRJJ43Xk6f1BZtMsOBm_ByICVqc6r2G__xfxidZqN0gHHCgkSM5qa-1wwlgTf-CM7QSC7Kz9gI1OaOe_umW-P4yzc9irsO_YFLqeZBUavZ8VUZd3J3os6zAk3MhN23lKdDf9J7XvwmFHlgrQUm-dVWl6rzmWSx-iqDvctAx" class="w-full h-64 object-cover rounded-2xl shadow-xl border border-white/10" alt="Sobre o Bar">
+            <h3 class="text-3xl font-bold text-primary font-title tracking-tight">15 ANOS DE TRADIÇÃO</h3>
+            <p class="text-white/80 leading-relaxed font-body">
+                Fundado em Governador Valadares, o Bar Los Hermanos nasceu da paixão pela boa gastronomia de boteco e pelo autêntico Rock n' Roll. Ao longo de 15 anos, nos tornamos um ponto de encontro icônico na cidade.
+            </p>
+            <p class="text-white/80 leading-relaxed font-body">
+                Nossa essência é simples: cerveja gelada, ambiente acolhedor e pratos que contam histórias, como o nosso famoso Jiló Especial.
+            </p>
+        </section>
+
+        <section class="bg-white/5 p-8 rounded-3xl border border-white/10 italic text-center">
+            <p class="text-xl text-white/90">"Aqui a tradição se encontra com novos sabores, e cada brinde celebra uma amizade."</p>
+        </section>
+
+        <button class="w-full py-4 bg-primary text-white font-bold rounded-full shadow-lg shadow-red-900/30 active:scale-95 transition-transform" onclick="window.location.href='index.html#menu'">
+            CONHECER O MENU
+        </button>
+    </main>
+
+    <!-- Global Navigation -->
+    <script src="assets/js/navbar.js"></script>
+</body>
+</html>

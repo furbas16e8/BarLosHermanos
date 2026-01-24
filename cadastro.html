@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bar Los Hermanos | Cadastro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff3131",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#000000",
+                        "surface-dark": "#1a130c",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "title": ["Bebas Neue", "cursive"],
+                        "body": ["Poppins", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-dark min-h-screen relative flex flex-col overflow-x-hidden">
+    <!-- Background Layer -->
+    <div class="fixed inset-0 z-0">
+        <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCnWdzeBM8n7grZP1A7hHvjXqk2vMWoZipIYpwhDE_Jvh0H2ON5jbxISFJ60B2GMJ9bDKaHY3jbhwKmuEPIPwuCCDlBLqHh2axvmkDTGwRJJ43Xk6f1BZtMsOBm_ByICVqc6r2G__xfxidZqN0gHHCgkSM5qa-1wwlgTf-CM7QSC7Kz9gI1OaOe_umW-P4yzc9irsO_YFLqeZBUavZ8VUZd3J3os6zAk3MhN23lKdDf9J7XvwmFHlgrQUm-dVWl6rzmWSx-iqDvctAx');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/95 to-background-dark/40"></div>
+    </div>
+
+    <main class="relative z-10 flex-1 flex flex-col w-full max-w-[480px] mx-auto px-6 py-12">
+        <div class="mb-10">
+            <button class="mb-6 flex items-center text-white/60 hover:text-primary transition-colors" onclick="history.back()">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+                <span class="text-sm font-semibold">Voltar</span>
+            </button>
+            <h1 class="text-white tracking-tight text-4xl font-extrabold leading-[1.1] mb-2 font-display">
+                Entre para a<br/><span class="text-primary font-title text-5xl">Família.</span>
+            </h1>
+            <p class="text-white/60 text-lg font-medium">
+                Crie sua conta para começar a pedir.
+            </p>
+        </div>
+
+        <form action="#" class="space-y-6 w-full" onsubmit="event.preventDefault(); window.location.href='orders.html'">
+            <div class="space-y-4">
+                <div class="flex flex-col gap-2">
+                    <label class="text-white/90 text-sm font-semibold ml-1">Nome Completo</label>
+                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Ex: João Silva" type="text" required/>
+                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors">
+                            <span class="material-symbols-outlined">person</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-white/90 text-sm font-semibold ml-1">Celular</label>
+                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="(00) 00000-0000" type="tel" required/>
+                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors">
+                            <span class="material-symbols-outlined">phone_iphone</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-white/90 text-sm font-semibold ml-1">E-mail</label>
+                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="email@exemplo.com" type="email" required/>
+                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors">
+                            <span class="material-symbols-outlined">mail</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-white/90 text-sm font-semibold ml-1">Senha</label>
+                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Crie uma senha" type="password" required/>
+                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors cursor-pointer">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 py-4">
+                <span class="text-primary text-xs font-bold uppercase tracking-widest whitespace-nowrap">Endereço de Entrega</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex flex-col gap-2">
+                    <label class="text-white/90 text-sm font-semibold ml-1">Bairro</label>
+                    <div class="relative w-full rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                        <select class="w-full bg-transparent border-none text-white px-5 h-14 focus:ring-0 text-base appearance-none" required>
+                            <option disabled selected value="" class="bg-surface-dark">Selecione o bairro</option>
+                            <option value="centro" class="bg-surface-dark">Centro</option>
+                            <option value="gra-duquesa" class="bg-surface-dark">Grã-Duquesa</option>
+                            <option value="vila-isabel" class="bg-surface-dark">Vila Isabel</option>
+                            <option value="lourdes" class="bg-surface-dark">Lourdes</option>
+                        </select>
+                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-white/90 text-sm font-semibold ml-1">Rua</label>
+                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                        <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Nome da rua" type="text" required/>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="flex flex-col gap-2 col-span-1">
+                        <label class="text-white/90 text-sm font-semibold ml-1">Número</label>
+                        <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                            <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="123" type="text" required/>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 col-span-2">
+                        <label class="text-white/90 text-sm font-semibold ml-1">Complemento</label>
+                        <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
+                            <input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Apto, Bloco..." type="text"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="w-full h-16 rounded-2xl bg-primary hover:bg-red-700 active:scale-[0.98] transition-all text-white text-lg font-bold shadow-xl shadow-red-900/20 mt-8 flex items-center justify-center gap-3">
+                CRIAR CONTA
+                <span class="material-symbols-outlined text-[24px]">person_add</span>
+            </button>
+        </form>
+
+        <div class="mt-10 text-center">
+            <p class="text-white/60 text-base">
+                Já tem uma conta? <a class="text-primary font-bold hover:underline ml-1" href="login.html">Entrar</a>
+            </p>
+        </div>
+        <div class="h-10"></div>
+    </main>
+</body>
+</html>
