@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bar Los Hermanos - Meu Perfil</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff3131",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#000000",
+                        "card-dark": "#1a130c",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "title": ["Bebas Neue", "cursive"],
+                        "body": ["Poppins", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-dark text-white min-h-screen">
+    <header class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
+        <div class="flex items-center p-4 justify-between max-w-md mx-auto">
+            <div class="flex size-10 shrink-0 items-center justify-center cursor-pointer" onclick="history.back()">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </div>
+            <h2 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display">Meu Perfil</h2>
+            <div class="flex w-10 items-center justify-end">
+                <button class="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent text-white">
+                    <span class="material-symbols-outlined font-light">settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto pb-24">
+        <section class="flex flex-col p-8 items-center text-center">
+            <div class="flex flex-col gap-1">
+                <h1 class="text-3xl font-bold leading-tight tracking-tight font-display">Santiago Garcia</h1>
+                <p class="text-slate-400 text-sm">Membro desde Outubro de 2023</p>
+                <div class="flex items-center justify-center gap-2 mt-4 text-primary">
+                    <span class="material-symbols-outlined text-lg">location_on</span>
+                    <span class="text-sm font-medium text-slate-300">Rua Suíça, 22, São Paulo</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="px-6 py-4">
+            <div class="bg-card-dark rounded-2xl p-6 border border-white/5 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-lg">Progresso para 10% de Desconto</h3>
+                    <span class="text-primary font-bold">3/5</span>
+                </div>
+                <div class="flex gap-3 mb-4">
+                    <div class="h-2 flex-1 rounded-full bg-primary shadow-[0_0_12px_rgba(255,49,49,0.4)]"></div>
+                    <div class="h-2 flex-1 rounded-full bg-primary shadow-[0_0_12px_rgba(255,49,49,0.4)]"></div>
+                    <div class="h-2 flex-1 rounded-full bg-primary shadow-[0_0_12px_rgba(255,49,49,0.4)]"></div>
+                    <div class="h-2 flex-1 rounded-full bg-slate-800"></div>
+                    <div class="h-2 flex-1 rounded-full bg-slate-800"></div>
+                </div>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Faltam apenas 2 pedidos para desbloquear sua próxima recompensa. Cada pedido conta!
+                </p>
+            </div>
+        </section>
+
+        <section class="mt-8 px-6">
+            <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between p-5 bg-card-dark rounded-2xl border border-white/5 cursor-pointer active:bg-slate-800 transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-primary/10 p-2.5 rounded-xl">
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+                        </div>
+                        <span class="font-semibold text-[16px]">Histórico de Pedidos</span>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-500">chevron_right</span>
+                </div>
+                <div class="flex items-center justify-between p-5 bg-card-dark rounded-2xl border border-white/5 cursor-pointer active:bg-slate-800 transition-colors" onclick="window.location.href='address.html'">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-primary/10 p-2.5 rounded-xl">
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                        </div>
+                        <span class="font-semibold text-[16px]">Endereços Salvos</span>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-500">chevron_right</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-12 px-6 flex flex-col gap-4">
+            <button class="flex w-full items-center justify-center gap-2 p-4 text-red-500 font-bold border border-red-500/20 rounded-2xl hover:bg-red-500/5 transition-colors active:scale-[0.98]">
+                <span class="material-symbols-outlined">logout</span>
+                Sair
+            </button>
+            <p class="text-center text-slate-600 text-[10px] uppercase tracking-[0.2em] font-medium">Versão 2.4.0</p>
+        </section>
+    </main>
+
+    <!-- Global Navigation -->
+    <script src="assets/js/navbar.js"></script>
+</body>
+</html>

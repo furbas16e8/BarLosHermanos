@@ -33,6 +33,7 @@ function getCart() {
 function saveCart(cart) {
     localStorage.setItem('bar-los-hermanos-cart', JSON.stringify(cart));
     updateCartBadge();
+    if (typeof updateNavbarCartCount === 'function') updateNavbarCartCount();
 }
 
 function addToCart(name, price, image) {

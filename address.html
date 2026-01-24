@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bar Los Hermanos - Meus Endereços</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff3131",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#000000",
+                        "card-dark": "#1a130c",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "title": ["Bebas Neue", "cursive"],
+                        "body": ["Poppins", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-dark text-white min-h-screen">
+    <header class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
+        <div class="flex items-center p-4 justify-between max-w-md mx-auto">
+            <div class="flex size-10 shrink-0 items-center justify-center cursor-pointer" onclick="history.back()">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </div>
+            <h2 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display">Meus Endereços</h2>
+            <div class="flex w-10 items-center justify-end">
+                <button class="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent">
+                    <span class="material-symbols-outlined text-white">more_vert</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto pb-32 px-6 pt-6">
+        <section class="mb-8">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4 px-1">Endereço Atual</h3>
+            <div class="bg-primary/5 border-2 border-primary rounded-2xl p-5 shadow-[0_0_15px_rgba(255,49,49,0.1)] relative">
+                <div class="absolute top-4 right-4 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                    Selecionado
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="bg-primary p-3 rounded-xl shadow-lg">
+                        <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">home</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-lg">Casa</span>
+                        <p class="text-slate-400 text-sm mt-0.5">Rua das Flores, 123</p>
+                        <p class="text-slate-500 text-xs mt-1 leading-snug">São Paulo, Brasil</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4 px-1">Seus Endereços</h3>
+            <div class="flex flex-col gap-3">
+                <div class="bg-card-dark rounded-2xl p-5 border border-white/5 cursor-pointer active:scale-[0.98] transition-all">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-slate-800 p-3 rounded-xl">
+                                <span class="material-symbols-outlined text-slate-400">work</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-base">Trabalho</span>
+                                <p class="text-slate-400 text-sm mt-0.5">Av. Paulista, 1000</p>
+                                <p class="text-slate-500 text-xs mt-1">Bela Vista, São Paulo</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-500">edit</span>
+                    </div>
+                </div>
+                
+                <div class="bg-card-dark rounded-2xl p-5 border border-white/5 cursor-pointer active:scale-[0.98] transition-all">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-slate-800 p-3 rounded-xl">
+                                <span class="material-symbols-outlined text-slate-400">apartment</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-base">Apartamento Praia</span>
+                                <p class="text-slate-400 text-sm mt-0.5">Av. Atlântica, 500</p>
+                                <p class="text-slate-500 text-xs mt-1">Santos, SP</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-500">edit</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <button class="fixed bottom-28 left-6 right-6 max-w-md mx-auto bg-primary text-white font-bold py-5 rounded-2xl shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-transform z-40">
+            <span class="material-symbols-outlined">add_location_alt</span>
+            NOVO ENDEREÇO
+        </button>
+    </main>
+
+    <!-- Global Navigation -->
+    <script src="assets/js/navbar.js"></script>
+</body>
+</html>
