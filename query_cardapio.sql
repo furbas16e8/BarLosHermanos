@@ -30,6 +30,14 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Coxinha Gourmet Costelinha', 'Sem massa, costelinha defumada e catupiry', 44.00, 'coxinhas', NULL, true),
 ('Coxinha Gourmet Frango', 'Sem massa, frango com catupiry', 44.00, 'coxinhas', NULL, true),
 
+-- Jantinhas
+('Jantinha de Filé Mingon', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_file.png', true),
+('Jantinha de Alcatra', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', NULL, true),
+('Jantinha de Frango', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_frango.png', true),
+('Jantinha de Frango Arrepiado', 'Com iscas de frango empanado, arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_frango_arrepiado.png', true),
+('Jantinha de Carne de Sol', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_carne_sol.png', true),
+
+
 -- Batatas Rosti (Vegetarianas)
 ('Batata Rosti Vegetariana (Espinafre)', 'Espinafre, palmito, alho e cheiro verde', 44.00, 'batatas', NULL, true),
 ('Batata Rosti Vegetariana (Completa)', 'Espinafre, palmito, alho, tomate, cebola, azeitona, champion', 44.00, 'batatas', NULL, true),
@@ -153,9 +161,9 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Suco Natural de Morango c/ Maracujá', NULL, 16.00, 'bebidas', NULL, true),
 ('Suco Natural de Laranja c/ Morango', NULL, 16.00, 'bebidas', NULL, true),
 
--- àgua e Refrigerantes
-('Água Mineral sem gás - 500ml', NULL, 4.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_sem_gas.jpg', true),
-('Água Mineral com gás - 500ml', NULL, 4.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_com_gas.jpg', true),
+-- Bebidas
+('Água Mineral sem gás - 500ml', NULL, 4,50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_sem_gas.jpg', true),
+('Água Mineral com gás' - 500ml, NULL, 4,50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_com_gas.jpg', true),
 ('Água Tônica - Lata 350ml', NULL, 8.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_tonica.jpg', true),
 ('Água Tônica Zero - Lata 350ml', NULL, 8.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_tonica_zero.jpg', true),
 ('Coca-Cola - Lata 350ml', NULL, 7.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_lata.jpg', true),
@@ -169,6 +177,6 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Guaraná Antártica - Lata 600ml', NULL, 16.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/guarana_antartica_600.jpg', true),
 ('Guaraná Antártica - Pet 2 litros', NULL, 16.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/guarana_antartica_2_litros.jpg', true),
 ('H20', NULL, 8.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/h2o.jpg', true),
-('Energético RedBull', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/redbull.jpg', true),
-('Energético RedBull Tropical', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/redbull_tropical.jpg', true),
+('Energético RedBull', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/redbull.jpg', true);
+('Energético RedBull Tropical', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/redbull_tropical.jpg', true);
 ('Energético Monster', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/monster.jpg', true);

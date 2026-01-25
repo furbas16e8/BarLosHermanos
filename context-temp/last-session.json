@@ -1,64 +1,52 @@
 {
   "project_name": "BarLosHermanos",
   "status": "context_retrieved",
-  "retrieved_at": "2026-01-25T12:27:41.678195",
+  "retrieved_at": "2026-01-25T20:14:12.355326",
   "last_session": {
-    "id": 95,
-    "session_title": "Integração Supabase e Renderização Dinâmica de Pedidos",
+    "id": 96,
+    "session_title": "Implementação de ordenação por categoria e adição de categoria Fritas",
     "date": "2026-01-25",
-    "context_summary": "Refatoramos o frontend para consumir dados reais do Supabase. Implementamos filtragem por categorias e detalhes dinâmicos.",
+    "context_summary": "Foi implementada a lógica de ordenação personalizada dos produtos na visualização Todas da página de pedidos, tornando-a também a visualização padrão. A nova categoria Fritas foi adicionada à interface e à lógica de ordenação.",
     "tags": [
-      "supabase",
+      "frontend",
       "javascript",
-      "dynamic-ui",
-      "refactoring",
-      "frontend"
+      "ordenação",
+      "ui-ux",
+      "filtro-categorias"
     ],
     "decisions_made": [
       {
-        "decision": "Arquitetura em Camadas (Service/View)",
-        "reasoning": "Separar lógica de dados da apresentação para facilitar manutenção."
+        "decision": "Ordenação via JavaScript",
+        "reasoning": "Para garantir que os produtos apareçam na ordem específica solicitada (Entradas, Jantinhas, etc.) quando a categoria Todas estiver ativa, foi criada uma constante CATEGORY_ORDER no orders-view.js."
       },
       {
-        "decision": "Uso de URL Parameters para Detalhes",
-        "reasoning": "Permitir links diretos e reuso do template de página."
+        "decision": "Todas como padrão",
+        "reasoning": "Alteração do comportamento inicial da página para exibir todo o cardápio por padrão, em vez de apenas os itens populares."
       },
       {
-        "decision": "Função getAllItems dedicada",
-        "reasoning": "Otimizar a busca da categoria Todas sem filtros complexos no front."
+        "decision": "Adição da categoria Fritas",
+        "reasoning": "Solicitação do usuário para incluir uma nova categoria específica para compor o cardápio, posicionada após Porções."
       }
     ],
     "next_steps": [
       {
-        "step": "Integrar Checkout com Backend",
-        "priority": "high"
-      },
-      {
-        "step": "Validar Favoritos no Banco",
+        "step": "Verificar no banco de dados se existem produtos cadastrados com a categoria fritas para garantir a exibição correta",
         "priority": "medium"
       },
       {
-        "step": "Implementar Autenticação Real",
+        "step": "Considerar mover a ordem das categorias para o banco de dados se houver muitas alterações futuras",
         "priority": "low"
       }
     ],
     "problems_faced": [
       {
-        "problem": "Importação de script não-módulo",
-        "solution": "Uso de escopo global window para compatibilidade."
-      },
-      {
-        "problem": "Discrepância nome categoria (burguers vs hamburguers)",
-        "solution": "Correção do HTML e diagnóstico via script de debug."
+        "problem": "Duplicação de chamada",
+        "solution": "Identificada e removida uma chamada duplicada de loadFeatured() na função de inicialização."
       }
     ],
     "files_modified": [
-      "assets/js/supabase-client.js",
-      "assets/js/menu-service.js",
-      "assets/js/orders-view.js",
-      "assets/js/details-view.js",
       "orders.html",
-      "pagina_pedido.html"
+      "assets/js/orders-view.js"
     ]
   }
 }
