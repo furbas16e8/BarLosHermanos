@@ -15,8 +15,23 @@ const CATEGORY_ICONS = {
     'caldos': 'soup_kitchen',
     'escondidinhos': 'rice_bowl',
     'bebidas': 'local_bar',
-    'combos': 'fastfood' // Mantendo combos caso exista
+    'combos': 'fastfood', // Mantendo combos caso exista
+    'fritas': 'fastfood'
 };
+
+const CATEGORY_ORDER = [
+    'entradas',
+    'jantinhas',
+    'porcoes',
+    'fritas',
+    'burguers',
+    'coxinhas',
+    'mexicano',
+    'especiais',
+    'caldos',
+    'escondidinhos',
+    'bebidas'
+];
 
 /* 
  * Helper para formatar moeda 
@@ -169,6 +184,19 @@ async function filterByCategory(category, element) {
     let items;
     if (category === 'todas') {
         items = await getAllItems();
+        
+        // Ordenação personalizada por categoria
+        items.sort((a, b) => {
+            const indexA = CATEGORY_ORDER.indexOf(a.categoria?.toLowerCase());
+            const indexB = CATEGORY_ORDER.indexOf(b.categoria?.toLowerCase());
+            
+            // Se não encontrar, joga pro final
+            const posA = indexA === -1 ? 999 : indexA;
+            const posB = indexB === -1 ? 999 : indexB;
+            
+            return posA - posB;
+        });
+
     } else {
         items = await getItemsByCategory(category);
     }
@@ -179,7 +207,13 @@ async function filterByCategory(category, element) {
 // Inicialização
 function init() {
     loadFeatured();
-    loadPopular();
+    // Default para 'Todas'
+    const btnTodas = document.getElementById('btn-cat-todas');
+    if (btnTodas) {
+        filterByCategory('todas', btnTodas);
+    } else {
+        loadPopular();
+    }
     window.filterMenuByCategory = filterByCategory;
 }
 

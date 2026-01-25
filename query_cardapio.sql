@@ -152,7 +152,23 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Suco Natural de Morango', NULL, 14.00, 'bebidas', NULL, true),
 ('Suco Natural de Morango c/ Maracujá', NULL, 16.00, 'bebidas', NULL, true),
 ('Suco Natural de Laranja c/ Morango', NULL, 16.00, 'bebidas', NULL, true),
-('Refrigerante Lata', 'Coca, Fanta, Guaraná, etc.', 7.50, 'bebidas', NULL, true),
-('H20 / Citrus / Tônica', NULL, 8.50, 'bebidas', NULL, true),
-('Água Mineral', 'Com ou sem gás', 6.00, 'bebidas', NULL, true),
-('Energético RedBull', 'Tradicional ou Tropical', 14.00, 'bebidas', NULL, true);
+
+-- àgua e Refrigerantes
+('Água Mineral sem gás - 500ml', NULL, 4.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_sem_gas.jpg', true),
+('Água Mineral com gás - 500ml', NULL, 4.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_com_gas.jpg', true),
+('Água Tônica - Lata 350ml', NULL, 8.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_tonica.jpg', true),
+('Água Tônica Zero - Lata 350ml', NULL, 8.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_tonica_zero.jpg', true),
+('Coca-Cola - Lata 350ml', NULL, 7.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_lata.jpg', true),
+('Coca-Cola Zero - Lata 350ml', NULL, 7.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_lata_zero.jpg', true),
+('Coca-Cola - Pet 600ml', NULL, 9.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_600.jpg', true),
+('Coca-Cola Zero - Pet 600ml', NULL, 9.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_600_zero.jpg', true),
+('Coca-Cola - Pet 2 litros', NULL, 16.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_2_litros.jpg', true),
+('Coca-Cola Zero - Pet 2 litros', NULL, 16.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/coca_2_litros_zero.jpg', true),
+('Guaraná Antártica - Lata 350ml', NULL, 7.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/guara_antartica_lata.jpg', true),
+('Guaraná Antártica Zero - Lata 350ml', NULL, 7.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/guarana_antartica_lata_zero.jpg', true),
+('Guaraná Antártica - Lata 600ml', NULL, 16.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/guarana_antartica_600.jpg', true),
+('Guaraná Antártica - Pet 2 litros', NULL, 16.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/guarana_antartica_2_litros.jpg', true),
+('H20', NULL, 8.50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/h2o.jpg', true),
+('Energético RedBull', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/redbull.jpg', true),
+('Energético RedBull Tropical', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/redbull_tropical.jpg', true),
+('Energético Monster', NULL, 14.00, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/monster.jpg', true);

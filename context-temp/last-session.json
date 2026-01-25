@@ -1,59 +1,64 @@
 {
   "project_name": "BarLosHermanos",
   "status": "context_retrieved",
-  "retrieved_at": "2026-01-25T01:28:38.757072",
+  "retrieved_at": "2026-01-25T12:27:41.678195",
   "last_session": {
-    "id": 94,
-    "session_title": "Implementação de Favoritos Dinâmicos e Refatoração da Navegação de Pedidos",
+    "id": 95,
+    "session_title": "Integração Supabase e Renderização Dinâmica de Pedidos",
     "date": "2026-01-25",
-    "context_summary": "Transformamos a experiência de pedidos e favoritos. Simplificamos os cards de produtos na página principal para priorizar a visualização de detalhes e implementamos um sistema robusto de favoritos dinâmicos via localStorage. Também preparamos a carga inicial de dados via SQL.",
+    "context_summary": "Refatoramos o frontend para consumir dados reais do Supabase. Implementamos filtragem por categorias e detalhes dinâmicos.",
     "tags": [
-      "frontend",
-      "UX",
+      "supabase",
       "javascript",
-      "localStorage",
-      "SQL"
+      "dynamic-ui",
+      "refactoring",
+      "frontend"
     ],
     "decisions_made": [
       {
-        "decision": "Redirecionamento para Detalhes nos Cards",
-        "reasoning": "Garante que o usuário veja opções de personalização antes da compra."
+        "decision": "Arquitetura em Camadas (Service/View)",
+        "reasoning": "Separar lógica de dados da apresentação para facilitar manutenção."
       },
       {
-        "decision": "Persistência via LocalStorage",
-        "reasoning": "Funcionalidade imediata sem dependência de autenticação/DB para MVP."
+        "decision": "Uso de URL Parameters para Detalhes",
+        "reasoning": "Permitir links diretos e reuso do template de página."
       },
       {
-        "decision": "Favoritos Dinâmicos",
-        "reasoning": "Personalização real da experiência do usuário."
+        "decision": "Função getAllItems dedicada",
+        "reasoning": "Otimizar a busca da categoria Todas sem filtros complexos no front."
       }
     ],
     "next_steps": [
       {
-        "step": "Integrar favoritos com backend Supabase",
+        "step": "Integrar Checkout com Backend",
         "priority": "high"
       },
       {
-        "step": "Carregar Itens Populares dinamicamente",
+        "step": "Validar Favoritos no Banco",
         "priority": "medium"
       },
       {
-        "step": "Adicionar animações de feedback ao favoritar",
+        "step": "Implementar Autenticação Real",
         "priority": "low"
       }
     ],
     "problems_faced": [
       {
-        "problem": "Caminho de arquivo incorreto para favoritos.html",
-        "solution": "Corrigido o caminho absoluto durante a edição."
+        "problem": "Importação de script não-módulo",
+        "solution": "Uso de escopo global window para compatibilidade."
+      },
+      {
+        "problem": "Discrepância nome categoria (burguers vs hamburguers)",
+        "solution": "Correção do HTML e diagnóstico via script de debug."
       }
     ],
     "files_modified": [
+      "assets/js/supabase-client.js",
+      "assets/js/menu-service.js",
+      "assets/js/orders-view.js",
+      "assets/js/details-view.js",
       "orders.html",
-      "favoritos.html",
-      "assets/js/orders.js",
-      "pagina_pedido.html",
-      "query_cardapio.sql"
+      "pagina_pedido.html"
     ]
   }
 }
