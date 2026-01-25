@@ -50,160 +50,93 @@
 <h2 class="text-white tracking-tight text-xl font-bold leading-tight">Combos em Destaque</h2>
 <a class="text-primary text-sm font-bold" href="#">Ver tudo</a>
 </div>
-<div class="flex overflow-x-auto no-scrollbar pb-4 pl-5 pr-5 gap-5">
-<!-- Card 1 -->
-<div class="relative flex-none w-72 h-48 rounded-2xl overflow-hidden group">
-<!-- Image -->
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Combo de pizza e cerveja" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB1mmwmTnpQvZzh1K15exKiPSXH9Jd3QJI1Xj8ekMrLsCmo4cMSB_ee9WnDLrmrDZ-Xz5SX-W55DyanpB4zvIi0uDBSa2ZbR4aalFfyheeeG8wQGS0ODWwwNeToW7A71w_tTxegNUAPWiVQGWkofu2My8j5nFa2pPk1uBOD263b99OOwA8r7yIFtxG6npdMnsrgh7avrIY5S2v1hBHWHRGEt98ZGzLkGoR3qRroXjkcBmDbO3WZZdCFIeuN0907dLFYYFp7bva3gmLb');">
-<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-</div>
-<!-- Content -->
-<div class="absolute inset-0 flex flex-col justify-end p-4 border-2 border-primary/60 rounded-2xl shadow-[0_0_20px_rgba(242,127,13,0.3)] cursor-pointer" onclick="addToCart('Combo Hermano', 45.90, 'https://lh3.googleusercontent.com/aida-public/AB6AXuB1mmwmTnpQvZzh1K15exKiPSXH9Jd3QJI1Xj8ekMrLsCmo4cMSB_ee9WnDLrmrDZ-Xz5SX-W55DyanpB4zvIi0uDBSa2ZbR4aalFfyheeeG8wQGS0ODWwwNeToW7A71w_tTxegNUAPWiVQGWkofu2My8j5nFa2pPk1uBOD263b99OOwA8r7yIFtxG6npdMnsrgh7avrIY5S2v1hBHWHRGEt98ZGzLkGoR3qRroXjkcBmDbO3WZZdCFIeuN0907dLFYYFp7bva3gmLb')">
-<div class="flex justify-between items-end">
-<div>
-<span class="px-2 py-0.5 rounded-md bg-primary text-white text-[10px] font-bold uppercase tracking-wider mb-1 inline-block">Oferta Imperdível</span>
-<h3 class="text-white text-lg font-bold leading-tight">Combo Hermano</h3>
-<p class="text-secondary-text text-xs mt-0.5">Burguer + Batata + Chopp</p>
-</div>
-<p class="text-primary text-xl font-extrabold">R$ 45,90</p>
-</div>
-</div>
-</div>
-<!-- Card 2 -->
-<div class="relative flex-none w-72 h-48 rounded-2xl overflow-hidden group">
-<!-- Image -->
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Prato grande com hambúrgueres e asas" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD9asV56hjXyrU6x3HjV-bmciTpugGf9TeEYzgNyKaCApYn5wuiqNgUdS8lJMjDYHxfibXmR4jV9bCLjacTw8DgckwwdSlqiT9nxz5EDwVfRt01G7nMXA566yGUfQxm-SuPIVjfaoeOdqzcOAjSlkb1Paexmk_S2XwImRGPN_Oa8fiHtSTShvS_snUsYZX5o5acbi5J_90K7MMVte36hlses6ZSd0HLXTv4NBO6VmVlg826-ecZN87KTbicP71eidqHXhC2D-XzYaBy');">
-<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-</div>
-<!-- Content -->
-<div class="absolute inset-0 flex flex-col justify-end p-4 border-2 border-white/10 rounded-2xl cursor-pointer" onclick="addToCart('Banquete de Sexta', 82.50, 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9asV56hjXyrU6x3HjV-bmciTpugGf9TeEYzgNyKaCApYn5wuiqNgUdS8lJMjDYHxfibXmR4jV9bCLjacTw8DgckwwdSlqiT9nxz5EDwVfRt01G7nMXA566yGUfQxm-SuPIVjfaoeOdqzcOAjSlkb1Paexmk_S2XwImRGPN_Oa8fiHtSTShvS_snUsYZX5o5acbi5J_90K7MMVte36hlses6ZSd0HLXTv4NBO6VmVlg826-ecZN87KTbicP71eidqHXhC2D-XzYaBy')">
-<div class="flex justify-between items-end">
-<div>
-<h3 class="text-white text-lg font-bold leading-tight">Banquete de Sexta</h3>
-<p class="text-secondary-text text-xs mt-0.5">Asas + Nachos + Jarra</p>
-</div>
-<p class="text-white text-xl font-extrabold">R$ 82,50</p>
-</div>
-</div>
-</div>
+<div id="featured-container" class="flex overflow-x-auto no-scrollbar pb-4 pl-5 pr-5 gap-5 min-h-[12rem]">
+    <!-- Carregando destaques... -->
 </div>
 </div>
 <!-- Categories -->
 <div class="flex flex-col w-full mt-2">
 <h2 class="text-white tracking-tight text-xl font-bold leading-tight px-5 pb-4 pt-2">Categorias</h2>
 <div class="flex overflow-x-auto no-scrollbar px-5 gap-6">
-<!-- Category Item: Burgers -->
-<div class="flex flex-col items-center gap-2 shrink-0">
-<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-<span class="material-symbols-outlined text-3xl">lunch_dining</span>
-</div>
-<span class="text-white text-xs font-semibold">Hambúrgueres</span>
-</div>
-<!-- Category Item: Drinks -->
-<div class="flex flex-col items-center gap-2 shrink-0">
-<div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text">
-<span class="material-symbols-outlined text-3xl">local_bar</span>
-</div>
-<span class="text-secondary-text text-xs font-medium">Bebidas</span>
-</div>
-<!-- Category Item: Portions -->
-<div class="flex flex-col items-center gap-2 shrink-0">
-<div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text">
-<span class="material-symbols-outlined text-3xl">tapas</span>
-</div>
-<span class="text-secondary-text text-xs font-medium">Porções</span>
-</div>
-<!-- Category Item: Desserts -->
-<div class="flex flex-col items-center gap-2 shrink-0">
-<div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text">
-<span class="material-symbols-outlined text-3xl">cake</span>
-</div>
-<span class="text-secondary-text text-xs font-medium">Sobremesas</span>
-</div>
-<!-- Category Item: Vegan -->
-<div class="flex flex-col items-center gap-2 shrink-0">
-<div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text">
-<span class="material-symbols-outlined text-3xl">eco</span>
-</div>
-<span class="text-secondary-text text-xs font-medium">Vegano</span>
-</div>
+    <!-- Todas -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('todas', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">menu_book</span>
+        </div>
+        <span class="text-white text-xs font-semibold">Todas</span>
+    </div>
+    <!-- Entradas -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('entradas', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">restaurant</span>
+        </div>
+        <span class="text-white text-xs font-semibold">Entradas</span>
+    </div>
+    <!-- Coxinhas -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('coxinhas', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">bakery_dining</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Coxinhas</span>
+    </div>
+    <!-- Hamburguers -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('burguers', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">lunch_dining</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Burguers</span>
+    </div>
+    <!-- Porções -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('porcoes', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">tapas</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Porções</span>
+    </div>
+    <!-- Jantinhas -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('jantinhas', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">dinner_dining</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Jantinhas</span>
+    </div>
+    <!-- Especiais -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('especiais', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">star</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Especiais</span>
+    </div>
+    <!-- Caldos -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('caldos', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">soup_kitchen</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Caldos</span>
+    </div>
+    <!-- Escondidinhos -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('escondidinhos', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">rice_bowl</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Escondidinhos</span>
+    </div>
+    <!-- Bebidas -->
+    <div class="flex flex-col items-center gap-2 shrink-0 cursor-pointer active:scale-95 transition-transform" onclick="filterMenuByCategory('bebidas', this)">
+        <div class="w-16 h-16 rounded-full bg-surface-dark border border-white/5 flex items-center justify-center text-secondary-text hover:bg-primary/20 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-3xl">local_bar</span>
+        </div>
+        <span class="text-secondary-text text-xs font-medium">Bebidas</span>
+    </div>
 </div>
 </div>
 <!-- Popular Items Grid -->
 <div class="flex flex-col w-full mt-6 px-5">
-<h2 class="text-white tracking-tight text-xl font-bold leading-tight pb-4">Itens Populares</h2>
-<div class="grid grid-cols-2 gap-4">
-<!-- Product Card 1 -->
-<div class="bg-surface-dark rounded-2xl p-3 flex flex-col gap-3 group">
-<div class="w-full aspect-square rounded-xl bg-cover bg-center relative overflow-hidden" data-alt="Hambúrguer com jalapeños" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrfDEovJbwRkQdlovHYo9mBn0Gb9XBpJwUsHiQ_H0F3cyU1QtLz3Cev8CTaMLa-3_26Ba653HJc8h2zdZg_SWTC6eOf8lx6gV3xGwP32iJqMbMjIaG5ej-TyOWNIhOkAbawhC2HdfClxp8Ey_bPZDD9DLcesZ8Cx0u3AbjcO1QK2aw-u75yeHYf0U0XsBw7eXe4IpjMUy_eHQnrfn3lR-f9UGmfMJhR1WM6p9oIu-2c6_I2z3RwtvXYLKIictejHIYDnTshgfcLGTp');">
-<button class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1 z-10 hover:scale-110 transition-transform" data-favorite-name="Spicy Jalapeño" onclick="event.stopPropagation(); toggleFavorite('Spicy Jalapeño', 38.00, 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrfDEovJbwRkQdlovHYo9mBn0Gb9XBpJwUsHiQ_H0F3cyU1QtLz3Cev8CTaMLa-3_26Ba653HJc8h2zdZg_SWTC6eOf8lx6gV3xGwP32iJqMbMjIaG5ej-TyOWNIhOkAbawhC2HdfClxp8Ey_bPZDD9DLcesZ8Cx0u3AbjcO1QK2aw-u75yeHYf0U0XsBw7eXe4IpjMUy_eHQnrfn3lR-f9UGmfMJhR1WM6p9oIu-2c6_I2z3RwtvXYLKIictejHIYDnTshgfcLGTp')">
-<span class="material-symbols-outlined text-white text-[16px]">favorite</span>
-</button>
+<h2 id="section-title" class="text-white tracking-tight text-xl font-bold leading-tight pb-4">Itens Populares</h2>
+<div id="popular-container" class="grid grid-cols-2 gap-4">
+    <!-- Carregando cardápio... -->
 </div>
-<div>
-<h3 class="text-white font-bold text-sm leading-tight mb-1">Spicy Jalapeño</h3>
-<div class="flex items-center justify-between">
-<span class="text-secondary-text text-sm font-semibold">R$ 38,00</span>
-<button class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white hover:bg-white hover:text-primary transition-colors" onclick="addToCart('Spicy Jalapeño', 38.00, 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrfDEovJbwRkQdlovHYo9mBn0Gb9XBpJwUsHiQ_H0F3cyU1QtLz3Cev8CTaMLa-3_26Ba653HJc8h2zdZg_SWTC6eOf8lx6gV3xGwP32iJqMbMjIaG5ej-TyOWNIhOkAbawhC2HdfClxp8Ey_bPZDD9DLcesZ8Cx0u3AbjcO1QK2aw-u75yeHYf0U0XsBw7eXe4IpjMUy_eHQnrfn3lR-f9UGmfMJhR1WM6p9oIu-2c6_I2z3RwtvXYLKIictejHIYDnTshgfcLGTp')">
-<span class="material-symbols-outlined text-[20px]">add</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Product Card 2 -->
-<div class="bg-surface-dark rounded-2xl p-3 flex flex-col gap-3 group">
-<div class="w-full aspect-square rounded-xl bg-cover bg-center relative overflow-hidden" data-alt="Plato de nachos" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDswxsIaZZOHCbdNPhP2wE4wI8CDppmiRaIUVDg2zBRIG1-rMAJETp4RPsUrh8ItxI87irfH74ej-GC70d_mWZpDmSfWUY1rPad2VYbGEXQhLa4WiktzGecB7x_LI7GCVzdfReilPK4X9ZjtWYPdM1ZPwjROVm5WCWrM0NULuqPmXuRhqduiDYAojLsyDXZ268gYv3nMCfuj138na1NMxD5Sd0qYB2Rk8Q0SxTqsxTRdxcmV0KBuWacWsTeiAfry8dDEP7lDUoXtKr5');">
-<button class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1 z-10 hover:scale-110 transition-transform" data-favorite-name="Loaded Nachos" onclick="event.stopPropagation(); toggleFavorite('Loaded Nachos', 32.50, 'https://lh3.googleusercontent.com/aida-public/AB6AXuDswxsIaZZOHCbdNPhP2wE4wI8CDppmiRaIUVDg2zBRIG1-rMAJETp4RPsUrh8ItxI87irfH74ej-GC70d_mWZpDmSfWUY1rPad2VYbGEXQhLa4WiktzGecB7x_LI7GCVzdfReilPK4X9ZjtWYPdM1ZPwjROVm5WCWrM0NULuqPmXuRhqduiDYAojLsyDXZ268gYv3nMCfuj138na1NMxD5Sd0qYB2Rk8Q0SxTqsxTRdxcmV0KBuWacWsTeiAfry8dDEP7lDUoXtKr5')">
-<span class="material-symbols-outlined text-white text-[16px]">favorite</span>
-</button>
-</div>
-<div>
-<h3 class="text-white font-bold text-sm leading-tight mb-1">Loaded Nachos</h3>
-<div class="flex items-center justify-between">
-<span class="text-secondary-text text-sm font-semibold">R$ 32,50</span>
-<button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-primary transition-colors" onclick="addToCart('Loaded Nachos', 32.50, 'https://lh3.googleusercontent.com/aida-public/AB6AXuDswxsIaZZOHCbdNPhP2wE4wI8CDppmiRaIUVDg2zBRIG1-rMAJETp4RPsUrh8ItxI87irfH74ej-GC70d_mWZpDmSfWUY1rPad2VYbGEXQhLa4WiktzGecB7x_LI7GCVzdfReilPK4X9ZjtWYPdM1ZPwjROVm5WCWrM0NULuqPmXuRhqduiDYAojLsyDXZ268gYv3nMCfuj138na1NMxD5Sd0qYB2Rk8Q0SxTqsxTRdxcmV0KBuWacWsTeiAfry8dDEP7lDUoXtKr5')">
-<span class="material-symbols-outlined text-[20px]">add</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Product Card 3 -->
-<div class="bg-surface-dark rounded-2xl p-3 flex flex-col gap-3 group">
-<div class="w-full aspect-square rounded-xl bg-cover bg-center relative overflow-hidden" data-alt="Cerveja artesanal" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBE0a2pbcjm0lrRyKf9A1dP9uSRkAjnCweLj-45lTkDJ_KSs2D-SLojjFlCat77vHhr985GpGtXcM3kaijXsK46HX94S2bJQm-di1UW96lfuSi9SLS4vFdBiUDO6wHkgJr9RsQVi9pEDRHmSzgnHqEhcA_CwIqdI6HOogbK0OC9Njz6etpepQ_6ovQb8EL9kxqcCItQ-Ds8ZkPiJPHV_gsk_x_o6BvY0IvJLLLWrqYvXb-tb8NO6Ch1X0IgkYZrcmLlWO_ZgFpiAvki');">
-<button class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1 z-10 hover:scale-110 transition-transform" data-favorite-name="Craft IPA" onclick="event.stopPropagation(); toggleFavorite('Craft IPA', 18.00, 'https://lh3.googleusercontent.com/aida-public/AB6AXuBE0a2pbcjm0lrRyKf9A1dP9uSRkAjnCweLj-45lTkDJ_KSs2D-SLojjFlCat77vHhr985GpGtXcM3kaijXsK46HX94S2bJQm-di1UW96lfuSi9SLS4vFdBiUDO6wHkgJr9RsQVi9pEDRHmSzgnHqEhcA_CwIqdI6HOogbK0OC9Njz6etpepQ_6ovQb8EL9kxqcCItQ-Ds8ZkPiJPHV_gsk_x_o6BvY0IvJLLLWrqYvXb-tb8NO6Ch1X0IgkYZrcmLlWO_ZgFpiAvki')">
-<span class="material-symbols-outlined text-white text-[16px]">favorite</span>
-</button>
-</div>
-<div>
-<h3 class="text-white font-bold text-sm leading-tight mb-1">Craft IPA</h3>
-<div class="flex items-center justify-between">
-<span class="text-secondary-text text-sm font-semibold">R$ 18,00</span>
-<button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-primary transition-colors" onclick="addToCart('Craft IPA', 18.00, 'https://lh3.googleusercontent.com/aida-public/AB6AXuBE0a2pbcjm0lrRyKf9A1dP9uSRkAjnCweLj-45lTkDJ_KSs2D-SLojjFlCat77vHhr985GpGtXcM3kaijXsK46HX94S2bJQm-di1UW96lfuSi9SLS4vFdBiUDO6wHkgJr9RsQVi9pEDRHmSzgnHqEhcA_CwIqdI6HOogbK0OC9Njz6etpepQ_6ovQb8EL9kxqcCItQ-Ds8ZkPiJPHV_gsk_x_o6BvY0IvJLLLWrqYvXb-tb8NO6Ch1X0IgkYZrcmLlWO_ZgFpiAvki')">
-<span class="material-symbols-outlined text-[20px]">add</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Product Card 4 -->
-<div class="bg-surface-dark rounded-2xl p-3 flex flex-col gap-3 group">
-<div class="w-full aspect-square rounded-xl bg-cover bg-center relative overflow-hidden" data-alt="Churros com chocolate" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-PvdCIAmzQEEebD_YFr5ueQT8oyTZaQvwKHP89u2eZzEhgeH6YO6EexV55qlZkE_1KQCo-ejNkbX699ErT2FUQt75gnJC2trQxUc8ui_uf7BSsQV6FRQYcbw0XkUGuQjk3ecWSOnZt5SLnv27wB-0QgG9F1SCjCrFy-AFYamot3whN9jhjHYNE4XPfmL0cGwJREKx4MmZE1qUxGckFuazeXpbax9GJeiSjn3cggZNwAZl9Za3hreRwRiDMD5noX64_2Lsv-Hd_Aew');">
-<button class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1 z-10 hover:scale-110 transition-transform" data-favorite-name="Churros" onclick="event.stopPropagation(); toggleFavorite('Churros', 22.00, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-PvdCIAmzQEEebD_YFr5ueQT8oyTZaQvwKHP89u2eZzEhgeH6YO6EexV55qlZkE_1KQCo-ejNkbX699ErT2FUQt75gnJC2trQxUc8ui_uf7BSsQV6FRQYcbw0XkUGuQjk3ecWSOnZt5SLnv27wB-0QgG9F1SCjCrFy-AFYamot3whN9jhjHYNE4XPfmL0cGwJREKx4MmZE1qUxGckFuazeXpbax9GJeiSjn3cggZNwAZl9Za3hreRwRiDMD5noX64_2Lsv-Hd_Aew')">
-<span class="material-symbols-outlined text-white text-[16px]">favorite</span>
-</button>
-</div>
-<div>
-<h3 class="text-white font-bold text-sm leading-tight mb-1">Churros</h3>
-<div class="flex items-center justify-between">
-<span class="text-secondary-text text-sm font-semibold">R$ 22,00</span>
-<button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-primary transition-colors" onclick="addToCart('Churros', 22.00, 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-PvdCIAmzQEEebD_YFr5ueQT8oyTZaQvwKHP89u2eZzEhgeH6YO6EexV55qlZkE_1KQCo-ejNkbX699ErT2FUQt75gnJC2trQxUc8ui_uf7BSsQV6FRQYcbw0XkUGuQjk3ecWSOnZt5SLnv27wB-0QgG9F1SCjCrFy-AFYamot3whN9jhjHYNE4XPfmL0cGwJREKx4MmZE1qUxGckFuazeXpbax9GJeiSjn3cggZNwAZl9Za3hreRwRiDMD5noX64_2Lsv-Hd_Aew')">
-<span class="material-symbols-outlined text-[20px]">add</span>
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+<script type="module" src="assets/js/orders-view.js"></script>
     <!-- Global Navigation -->
     <script src="assets/js/navbar.js"></script>
 </body></html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Supabase</title>
+    <style>
+        body { background: #111; color: #fff; font-family: monospace; padding: 2rem; }
+        .success { color: #4ade80; }
+        .error { color: #ef4444; }
+        .warning { color: #facc15; }
+        pre { background: #222; padding: 1rem; border-radius: 0.5rem; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Supabase Connection Debugger</h1>
+    <div id="status">Testando conexão...</div>
+    <div id="output"></div>
+
+    <script type="module">
+        import { supabase } from './assets/js/supabase-client.js';
+
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            if (type) div.className = type;
+            output.appendChild(div);
+        }
+
+        async function runDiagnostics() {
+            try {
+                log("Iniciando diagnóstico...", "warning");
+                
+                // 1. Check URL/Key
+                log("Verificando credenciais...");
+                if (!supabase) {
+                    throw new Error("Cliente Supabase não inicializado.");
+                }
+                log("Cliente Supabase instanciado.");
+
+                // 2. Simple Fetch
+                log("Tentando buscar 5 itens da tabela 'cardapio'...");
+                const { data, error } = await supabase
+                    .from('cardapio')
+                    .select('*')
+                    .eq('categoria', 'burguers')
+                    .limit(10);
+
+                if (error) {
+                    log(`ERRO NA CONSULTA: ${error.message} (Code: ${error.code})`, "error");
+                    if (error.code === '42501' || error.message.includes("policy")) {
+                        log("⚠️ DICA: Verifique as Policies (RLS) no Supabase. Habilite acesso público para SELECT.", "warning");
+                    }
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    log("Consulta retornou SUCESSO mas lista VAZIA [].", "warning");
+                    log("Possíveis causas:", "warning");
+                    log("1. Tabela 'cardapio' está vazia.", "warning");
+                    log("2. RLS (Row Level Security) está ativado mas sem policy de SELECT pública.", "warning");
+                    
+                    // Tentar insert de teste se nada veio (somente leitura aqui, mas ok)
+                } else {
+                    log(`SUCESSO! ${data.length} itens encontrados.`, "success");
+                    log("Amostra de dados:", "info");
+                    
+                    const el = document.createElement('pre');
+                    el.textContent = JSON.stringify(data, null, 2);
+                    output.appendChild(el);
+
+                    // Verificar Categorias
+                    const categorias = [...new Set(data.map(d => d.categoria))];
+                    log(`Categorias encontradas: ${categorias.join(', ')}`, "success");
+                    
+                    // Verificar Ativo/Img
+                    const ativos = data.filter(d => d.ativo);
+                    log(`Itens ativos: ${ativos.length}/${data.length}`);
+                    
+                    const comImg = data.filter(d => d.img_url);
+                    log(`Itens com imagem: ${comImg.length}/${data.length}`);
+                }
+
+            } catch (err) {
+                log(`ERRO CRÍTICO: ${err.message}`, "error");
+            }
+        }
+
+        runDiagnostics();
+    </script>
+</body>
+</html>

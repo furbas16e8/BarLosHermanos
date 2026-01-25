@@ -48,6 +48,9 @@ function addToCart(name, price, image) {
     // Substituído alert por feedback silencioso/visual
     console.log(`${name} adicionado ao carrinho!`);
 }
+// Exposing globally for module access
+window.addToCart = addToCart;
+
 
 function updateCartBadge() {
     const badge = document.getElementById('cart-badge');
@@ -170,6 +173,9 @@ function toggleFavorite(name, price, image) {
     // Atualiza ícones na página se necessário
     updateFavoriteIcons();
 }
+window.toggleFavorite = toggleFavorite;
+window.updateFavoriteIcons = updateFavoriteIcons; // Exposing updateFavoriteIcons too
+
 
 function isFavorite(name) {
     const favs = getFavorites();
