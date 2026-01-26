@@ -14,6 +14,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Theme Configuration -->
 <script src="assets/js/orders.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-client.js"></script>
 <!-- Custom Styles -->
 <link rel="stylesheet" href="assets/css/orders.css">
 </head>
@@ -23,11 +25,11 @@
 <div class="flex items-center px-5 pt-6 pb-2 justify-between sticky top-0 z-20 bg-background-light/90 dark:bg-background-dark/95 backdrop-blur-md">
 <div class="flex flex-col">
 <p class="text-secondary-text text-sm font-semibold tracking-wide uppercase">Bem-vindo de volta</p>
-<h2 class="text-white text-xl font-bold leading-tight tracking-tight">João Augusto</h2>
+<h2 id="header-name" class="text-white text-xl font-bold leading-tight tracking-tight">Carregando...</h2>
 </div>
 <div class="flex items-center gap-2 bg-surface-dark py-1.5 px-3 rounded-full border border-white/5">
 <span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
-<p class="text-secondary-text text-xs font-bold shrink-0">Rua Suíça, 22</p>
+<p id="header-address" class="text-secondary-text text-xs font-bold shrink-0">Carregando...</p>
 </div>
 </div>
 <!-- SearchBar -->
@@ -143,7 +145,7 @@
 <div id="popular-container" class="grid grid-cols-3 gap-4">
     <!-- Carregando cardápio... -->
 </div>
-<script type="module" src="assets/js/orders-view.js"></script>
+<script src="assets/js/orders-view.js"></script>
     <!-- Global Navigation -->
     <script src="assets/js/navbar.js"></script>
 </body></html>

@@ -44,7 +44,12 @@ async function signUpUser(email, password, userData) {
                 email: email,
                 nome: userData.nome,
                 telefone: userData.telefone,
-                cpf: userData.cpf
+                cpf: userData.cpf,
+                endereco_rua: userData.endereco_rua,
+                endereco_numero: userData.endereco_numero,
+                endereco_bairro: userData.endereco_bairro,
+                // Assumindo que complemento também venha no objeto userData se disponível
+                endereco_complemento: userData.endereco_complemento
             }]);
         
         if (profileError) {
