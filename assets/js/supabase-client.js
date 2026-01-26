@@ -95,7 +95,6 @@ async function getFavorites(userId) {
 
 async function getDeliveryZone(bairro) {
     // Busca exata primeiro (case insensitive via ILIKE se fosse SQL puro, aqui usamos filtro texto)
-    // O ideal é normalizar, mas vamos tentar match direto
     let { data, error } = await _supabase
         .from('zonas_entrega')
         .select('*')
@@ -103,6 +102,15 @@ async function getDeliveryZone(bairro) {
         .eq('ativo', true)
         .single();
     
+    return { data, error };
+}
+
+async function getDeliveryZones() {
+    let { data, error } = await _supabase
+        .from('zonas_entrega')
+        .select('*')
+        .eq('ativo', true)
+        .order('bairro');
     return { data, error };
 }
 
