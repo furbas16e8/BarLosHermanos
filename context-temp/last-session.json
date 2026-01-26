@@ -1,52 +1,88 @@
 {
   "project_name": "BarLosHermanos",
   "status": "context_retrieved",
-  "retrieved_at": "2026-01-25T20:14:12.355326",
+  "retrieved_at": "2026-01-26T10:16:44.438329",
   "last_session": {
-    "id": 96,
-    "session_title": "Implementação de ordenação por categoria e adição de categoria Fritas",
-    "date": "2026-01-25",
-    "context_summary": "Foi implementada a lógica de ordenação personalizada dos produtos na visualização Todas da página de pedidos, tornando-a também a visualização padrão. A nova categoria Fritas foi adicionada à interface e à lógica de ordenação.",
+    "id": 97,
+    "session_title": "Implementação completa do fluxo de Delivery, Dashboard Dinâmico e Sistema de Favoritos no Supabase",
+    "date": "2026-01-26",
+    "context_summary": "Focamos em tornar o frontend funcional conectando-o ao Supabase. Implementamos o fluxo completo de checkout (cálculo de frete e envio de pedido), tornamos o dashboard (orders.html) e a página de detalhes dinâmicos, e migramos o sistema de favoritos do LocalStorage para o Banco de Dados. Também corrigimos bugs críticos de autenticação, salvamento de endereço e persistência de dados.",
     "tags": [
-      "frontend",
+      "supabase",
+      "auth",
+      "delivery",
+      "checkout",
       "javascript",
-      "ordenação",
-      "ui-ux",
-      "filtro-categorias"
+      "frontend",
+      "bugfix"
     ],
     "decisions_made": [
       {
-        "decision": "Ordenação via JavaScript",
-        "reasoning": "Para garantir que os produtos apareçam na ordem específica solicitada (Entradas, Jantinhas, etc.) quando a categoria Todas estiver ativa, foi criada uma constante CATEGORY_ORDER no orders-view.js."
+        "decision": "Migração de Favoritos para Supabase",
+        "reasoning": "Garantir que os itens favoritos persistam entre diferentes dispositivos e sessões, algo impossível apenas com LocalStorage."
       },
       {
-        "decision": "Todas como padrão",
-        "reasoning": "Alteração do comportamento inicial da página para exibir todo o cardápio por padrão, em vez de apenas os itens populares."
+        "decision": "Auto-login após Cadastro",
+        "reasoning": "Simplificar a experiência do usuário (UX), removendo a necessidade de fazer login logo após criar a conta."
       },
       {
-        "decision": "Adição da categoria Fritas",
-        "reasoning": "Solicitação do usuário para incluir uma nova categoria específica para compor o cardápio, posicionada após Porções."
+        "decision": "Remoção de Limite no Dashboard",
+        "reasoning": "Solicitação para exibir todos os produtos na tela inicial, facilitando a visualização completa do cardápio de imediato."
+      },
+      {
+        "decision": "Limpeza Local no Logout",
+        "reasoning": "Segurança e privacidade, garantindo que o carrinho e dados de sessão não persistam para o próximo usuário no mesmo dispositivo."
       }
     ],
     "next_steps": [
       {
-        "step": "Verificar no banco de dados se existem produtos cadastrados com a categoria fritas para garantir a exibição correta",
+        "step": "Isolar carrinho entre sessões de cadastro (persistência indevida)",
+        "priority": "high"
+      },
+      {
+        "step": "Corrigir botão Todas nas categorias (loop infinito/carregando)",
         "priority": "medium"
       },
       {
-        "step": "Considerar mover a ordem das categorias para o banco de dados se houver muitas alterações futuras",
-        "priority": "low"
+        "step": "Implementar sistema de fidelidade automático (10% a cada 5 pedidos)",
+        "priority": "medium"
+      },
+      {
+        "step": "Configurar cadastro de múltiplos endereços no perfil",
+        "priority": "medium"
+      },
+      {
+        "step": "Corrigir query de destaques (trazendo 1 ao invés de 3)",
+        "priority": "medium"
+      },
+      {
+        "step": "Testar cadastro de usuário",
+        "priority": "medium"
       }
     ],
     "problems_faced": [
       {
-        "problem": "Duplicação de chamada",
-        "solution": "Identificada e removida uma chamada duplicada de loadFeatured() na função de inicialização."
+        "problem": "Bug Endereço não salvava em novos cadastros",
+        "solution": "Corrigido schema do insert no supabase-client.js"
+      },
+      {
+        "problem": "Carrinho persistia entre contas",
+        "solution": "Implementada limpeza de localStorage no logout"
       }
     ],
     "files_modified": [
+      "assets/js/checkout.js",
+      "assets/js/supabase-client.js",
+      "assets/js/orders.js",
+      "assets/js/orders-view.js",
+      "assets/js/details-view.js",
+      "assets/js/navbar.js",
+      "shopping.html",
+      "login.html",
+      "cadastro.html",
       "orders.html",
-      "assets/js/orders-view.js"
+      "address.html",
+      "pagina_pedido.html"
     ]
   }
 }

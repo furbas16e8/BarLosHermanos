@@ -6,6 +6,21 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
+// Global Category Order
+const CATEGORY_ORDER = [
+    'entradas', 
+    'jantinhas', 
+    'porcoes', 
+    'especiais', 
+    'burguers', 
+    'fritas', 
+    'batatas', 
+    'caldos', 
+    'coxinhas', 
+    'escondidinhos', 
+    'bebidas'
+];
+
 // --- SERVIÇOS DE DADOS (Substituindo menu-service.js) ---
 
 async function getFeaturedItems() {
@@ -14,7 +29,7 @@ async function getFeaturedItems() {
         .from('cardapio')
         .select('*')
         .eq('ativo', true)
-        .eq('categoria', 'especiais') 
+        .eq('destaque', true) 
         .limit(5);
     
     if (error) console.error('Erro featured:', error);
