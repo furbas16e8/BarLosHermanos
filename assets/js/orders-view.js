@@ -121,7 +121,7 @@ async function loadPopular() {
     if (!container) return;
     
     container.innerHTML = '<div class="text-white/50 col-span-3 text-center text-sm py-8">Carregando cardápio...</div>';
-    const items = await getPopularItems();
+    const items = await getAllItems();
     renderGridItems(items, container);
 }
 
@@ -186,7 +186,19 @@ async function filterByCategory(category, element) {
     
     let items;
     if (category === 'todas') {
-        items = await getPopularItems(); // Alterado para populares em vez de *tudo* para não pesar tela inicial
+        items = await getAllItems(); // Busca tudo ao filtrar por 'todas'
+        
+        // Ordenação personalizada por categoria
+        items.sort((a, b) => {
+            const indexA = CATEGORY_ORDER.indexOf(a.categoria?.toLowerCase());
+            const indexB = CATEGORY_ORDER.indexOf(b.categoria?.toLowerCase());
+            
+            // Se não encontrar, joga pro final
+            const posA = indexA === -1 ? 999 : indexA;
+            const posB = indexB === -1 ? 999 : indexB;
+            
+            return posA - posB;
+        });
     } else {
         items = await getItemsByCategory(category);
     }

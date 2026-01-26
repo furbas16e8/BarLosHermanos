@@ -5,7 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const navbarHTML = `
         <nav class="fixed bottom-0 w-full bg-[#000000] border-t border-white/5 h-[84px] pb-4 z-50 flex justify-around items-center px-2">
-            <a class="flex flex-col items-center justify-center w-16 gap-1 group" href="index.html" id="nav-home">
+            <a class="flex flex-col items-center justify-center w-16 gap-1 group" href="orders.html" id="nav-home">
                 <span class="material-symbols-outlined text-white/50 group-hover:text-primary transition-colors text-[28px]">home</span>
                 <span class="text-[10px] font-semibold text-white/40 group-hover:text-primary">Início</span>
             </a>
