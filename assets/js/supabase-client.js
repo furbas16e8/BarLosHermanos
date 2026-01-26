@@ -65,6 +65,9 @@ async function signUpUser(email, password, userData) {
 async function logoutUser() {
     const { error } = await _supabase.auth.signOut();
     if (!error) {
+        // Limpar dados locais sensíveis e carrinho
+        localStorage.removeItem('bar-los-hermanos-cart');
+        localStorage.removeItem('bar-los-hermanos-favs'); // Limpar cache de favs também
         window.location.href = 'login.html';
     }
     return { error };

@@ -24,7 +24,7 @@ async function loadProductDetails() {
     const descEl = document.querySelector('p.text-white\\/70');
     const ratingEl = document.querySelector('.text-white.font-semibold'); // Mock Rating
     const favBtn = document.querySelector('[data-favorite-name]');
-    const cartBtn = document.querySelector('.fixed.bottom-\\[90px\\] button');
+    const cartBtn = document.getElementById('btn-add-cart');
 
     // Fetch Data
     const { data: item, error } = await window.supabaseClient
@@ -75,7 +75,7 @@ async function loadProductDetails() {
     // Update Cart Button Logic
     if (cartBtn) {
         // Atualiza UI do botão
-        const spanPrice = cartBtn.querySelectorAll('span')[1];
+        const spanPrice = document.getElementById('btn-price-display');
         if (spanPrice) spanPrice.innerText = formatCurrency(item.valor);
 
         cartBtn.onclick = () => {
