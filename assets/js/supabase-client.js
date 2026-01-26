@@ -2,8 +2,8 @@
 // Configuração do Cliente Supabase
 // Substitua pelas suas chaves reais do painel do Supabase
 
-const SUPABASE_URL = 'SUA_URL_SUPABASE_AQUI';
-const SUPABASE_KEY = 'SUA_CHAVE_ANON_AQUI';
+const SUPABASE_URL = 'https://bdkqoyalqrypfzwijosd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJka3FveWFscXJ5cGZ6d2lqb3NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTI4ODgsImV4cCI6MjA4NDg2ODg4OH0.u_czXqDvTDDu_iI7tD3Loc4Z3xde63gcrY-7xm2AHMc';
 
 // Verifica se a biblioteca foi carregada via CDN
 if (typeof supabase === 'undefined') {
