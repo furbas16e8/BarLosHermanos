@@ -145,41 +145,86 @@ function removeFromCart(index) {
     updateCartUI();
 }
 
-// --- Favorite Logic ---
+// --- Favorite Logic (Supabase Integration) ---
 
-function getFavorites() {
-    return JSON.parse(localStorage.getItem('bar-los-hermanos-favs')) || [];
-}
+let currentUserFavs = []; // Cache local
 
-function saveFavorites(favs) {
-    localStorage.setItem('bar-los-hermanos-favs', JSON.stringify(favs));
-    updateFavoritesUI();
-}
-
-function toggleFavorite(name, price, image) {
-    let favs = getFavorites();
-    let index = favs.findIndex(f => f.name === name);
+async function loadFavorites() {
+    const session = await checkSession();
+    if (!session) return;
     
-    if (index > -1) {
-        favs.splice(index, 1);
-        console.log(`${name} removido dos favoritos`);
-    } else {
-        favs.push({ name, price, image });
-        console.log(`${name} adicionado aos favoritos`);
+    // Buscar Favoritos do banco
+    const { data, error } = await getFavorites(session.user.id);
+    if (data) {
+        currentUserFavs = data.map(f => ({
+            id: f.id,
+            item_id: f.item_id,
+            name: f.cardapio.nome,
+            price: f.cardapio.valor,
+            image: f.cardapio.img_url
+        }));
+        updateFavoriteIcons();
+        updateFavoritesUI();
+    }
+}
+
+async function toggleFavorite(name, price, image) {
+    const session = await checkSession();
+    if (!session) {
+        window.location.href = 'login.html';
+        return;
     }
     
-    saveFavorites(favs);
+    // Verificar se já é favorito
+    const existingIndex = currentUserFavs.findIndex(f => f.name === name);
+    const btn = document.querySelector(`button[data-favorite-name="${name.replace(/"/g, '\\"')}"]`);
     
-    // Atualiza ícones na página se necessário
-    updateFavoriteIcons();
-}
-window.toggleFavorite = toggleFavorite;
-window.updateFavoriteIcons = updateFavoriteIcons; // Exposing updateFavoriteIcons too
+    // Feedback visual imediato (Optimistic UI)
+    if (btn) {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (existingIndex > -1) {
+             icon.style.fontVariationSettings = "'FILL' 0";
+             icon.classList.remove('text-primary');
+        } else {
+             icon.style.fontVariationSettings = "'FILL' 1";
+             icon.classList.add('text-primary');
+        }
+    }
 
+    try {
+        if (existingIndex > -1) {
+            // Remover
+            const itemId = currentUserFavs[existingIndex].item_id;
+            await removeFavorite(session.user.id, itemId);
+            currentUserFavs.splice(existingIndex, 1);
+            console.log(`${name} removido dos favoritos`);
+        } else {
+            // Adicionar
+            // Precisamos do ID do item. Se não tivermos, buscamos pelo nome.
+            const { data: itemData } = await getItemIdByName(name);
+            if (itemData) {
+                await addFavorite(session.user.id, itemData.id);
+                // Atualizar cache local com dados frescos ou mock
+                currentUserFavs.push({
+                    item_id: itemData.id,
+                    name, price, image
+                });
+                console.log(`${name} adicionado aos favoritos`);
+            } else {
+                console.error('Item não encontrado no banco para favoritar:', name);
+            }
+        }
+        // Sincronizar UI final
+        updateFavoritesUI();
+        updateFavoriteIcons(); // Garante consistência
+    } catch (e) {
+        console.error('Erro ao atualizar favorito:', e);
+        // Reverter UI em caso de erro (TBD)
+    }
+}
 
 function isFavorite(name) {
-    const favs = getFavorites();
-    return favs.some(f => f.name === name);
+    return currentUserFavs.some(f => f.name === name);
 }
 
 function updateFavoriteIcons() {
@@ -190,10 +235,10 @@ function updateFavoriteIcons() {
         if (icon) {
             if (isFavorite(name)) {
                 icon.style.fontVariationSettings = "'FILL' 1";
-                icon.classList.add('text-primary');
+                icon.classList.add('text-primary', 'fill-1'); 
             } else {
                 icon.style.fontVariationSettings = "'FILL' 0";
-                icon.classList.remove('text-primary');
+                icon.classList.remove('text-primary', 'fill-1');
             }
         }
     });
@@ -203,9 +248,7 @@ function updateFavoritesUI() {
     const container = document.getElementById('favorites-container');
     if (!container) return;
 
-    let favs = getFavorites();
-
-    if (favs.length === 0) {
+    if (currentUserFavs.length === 0) {
         container.innerHTML = `
             <div class="flex flex-col items-center justify-center py-20 text-center opacity-50">
                 <span class="material-symbols-outlined text-6xl mb-4">favorite_border</span>
@@ -219,11 +262,11 @@ function updateFavoritesUI() {
 
     container.innerHTML = '';
 
-    favs.forEach((item, index) => {
+    currentUserFavs.forEach((item) => {
         const itemHtml = `
             <div class="bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl flex gap-4 p-3 relative mb-4">
                 <div class="relative w-32 h-32 shrink-0">
-                    <img alt="${item.name}" class="w-full h-full object-cover rounded-xl" src="${item.image}"/>
+                    <img alt="${item.name}" class="w-full h-full object-cover rounded-xl" src="${item.image || 'assets/img/placeholder_food.png'}"/>
                 </div>
                 <div class="flex flex-col justify-between flex-1 py-1">
                     <div class="pr-8">
@@ -231,7 +274,7 @@ function updateFavoritesUI() {
                         <p class="text-slate-400 text-xs line-clamp-2">Item favorito do Bar Los Hermanos.</p>
                     </div>
                     <div class="flex items-center justify-between mt-2">
-                        <span class="text-primary font-bold text-lg">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+                        <span class="text-primary font-bold text-lg">R$ ${parseFloat(item.price).toFixed(2).replace('.', ',')}</span>
                         <button class="bg-primary text-white p-2 rounded-xl flex items-center justify-center hover:scale-95 transition-all" onclick="addToCart('${item.name}', ${item.price}, '${item.image}')">
                             <span class="material-symbols-outlined">add_shopping_cart</span>
                         </button>
@@ -249,6 +292,8 @@ function updateFavoritesUI() {
 document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
     updateCartUI(); 
-    updateFavoritesUI();
-    updateFavoriteIcons();
+    // Load favorites from DB instead of local storage
+    if(window.supabaseClient) {
+        loadFavorites();
+    }
 });

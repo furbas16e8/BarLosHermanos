@@ -217,8 +217,18 @@
                 btn.disabled = false;
                 btn.classList.remove('opacity-70', 'cursor-not-allowed');
             } else {
-                alert('Conta criada com sucesso! Redirecionando...');
-                window.location.href = 'index.html';
+                // Tentar login automático ou redirecionar se já vier com sessão
+                // Se o settings do Supabase tiver "Enable Email Confirm" OFF, signUp já loga.
+                // Se tiver ON, não loga. Vamos assumir OFF pelo pedido do usuário de "simplificar".
+                
+                if (data.session) {
+                    alert('Cadastro realizado com sucesso! Entrando...');
+                    window.location.href = 'orders.html';
+                } else {
+                    // Caso fallback onde email confirm é obrigatório
+                    alert('Cadastro realizado! Se necessário, verifique seu email. Direcionando...');
+                    window.location.href = 'orders.html';
+                }
             }
         } catch (e) {
             console.error(e);

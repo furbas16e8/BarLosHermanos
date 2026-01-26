@@ -98,6 +98,32 @@ async function getFavorites(userId) {
     return { data, error };
 }
 
+async function addFavorite(userId, itemId) {
+    const { data, error } = await _supabase
+        .from('favoritos')
+        .insert([{ cliente_id: userId, item_id: itemId }])
+        .select();
+    return { data, error };
+}
+
+async function removeFavorite(userId, itemId) {
+    const { data, error } = await _supabase
+        .from('favoritos')
+        .delete()
+        .eq('cliente_id', userId)
+        .eq('item_id', itemId);
+    return { data, error };
+}
+
+async function getItemIdByName(name) {
+    const { data, error } = await _supabase
+        .from('cardapio')
+        .select('id')
+        .eq('nome', name)
+        .single();
+    return { data, error };
+}
+
 async function getDeliveryZone(bairro) {
     // Busca exata primeiro (case insensitive via ILIKE se fosse SQL puro, aqui usamos filtro texto)
     let { data, error } = await _supabase

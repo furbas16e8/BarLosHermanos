@@ -1,89 +1,95 @@
 
-import { getItemById } from "./menu-service.js";
-// orders.js logic is global 
+// details-view.js - Lógica da Página de Detalhes
 
-// Assumes orders.js logic is global
+// Helper de Formatação
+function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+}
 
+// Carregar Detalhes
 async function loadProductDetails() {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    const productId = params.get('id');
 
-    if (!id) {
-        alert("Produto não encontrado.");
+    if (!productId) {
+        alert('Produto não encontrado!');
         window.location.href = 'orders.html';
         return;
     }
 
-    const item = await getItemById(id);
+    // Elements
+    const imgEl = document.querySelector('.bg-cover'); 
+    const titleEl = document.querySelector('h1');
+    const priceEl = document.querySelector('.text-3xl.font-bold.text-primary');
+    const descEl = document.querySelector('p.text-white\\/70');
+    const ratingEl = document.querySelector('.text-white.font-semibold'); // Mock Rating
+    const favBtn = document.querySelector('[data-favorite-name]');
+    const cartBtn = document.querySelector('.fixed.bottom-\\[90px\\] button');
 
-    if (!item) {
-        alert("Erro ao carregar produto.");
-        window.location.href = 'orders.html';
+    // Fetch Data
+    const { data: item, error } = await window.supabaseClient
+        .from('cardapio')
+        .select('*')
+        .eq('id', productId)
+        .single();
+    
+    if (error || !item) {
+        console.error('Erro ao carregar produto:', error);
+        titleEl.innerText = 'Item Indisponível';
         return;
     }
 
-    // Render Data
-    document.title = `Bar Los Hermanos | ${item.nome}`;
+    // Update UI
+    document.title = `Bar Los Hermanos - ${item.nome}`;
     
     // Background Image
-    const bgContainer = document.querySelector('.bg-cover');
-    if (bgContainer && item.img_url) {
-        bgContainer.style.backgroundImage = `url('${item.img_url}')`;
+    if(imgEl) {
+        imgEl.style.backgroundImage = `url('${item.img_url || 'assets/img/placeholder_food.png'}')`;
     }
 
-    // Header Info
-    const titleEl = document.querySelector('h1');
-    if (titleEl) titleEl.innerText = item.nome; // Supports <br/> manually if needed, but innerText is safer
+    // Texts
+    if(titleEl) titleEl.innerText = item.nome;
+    if(priceEl) priceEl.innerText = formatCurrency(item.valor);
+    if(descEl) descEl.innerText = item.descricao || 'Sem descrição.';
+    if(ratingEl) ratingEl.innerText = '5.0'; // Mock
 
-    const priceEl = document.querySelector('.text-3xl.font-bold.text-primary'); // "R$ 42,50"
-    if (priceEl) priceEl.innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
-
-    // Description
-    const descEl = document.querySelector('p.text-white\\/70');
-    if (descEl) descEl.innerText = item.descricao || "Sem descrição disponível.";
-
-    // Update Favorite Icon State
-    const favButton = document.querySelector('[data-favorite-name]');
-    if (favButton) {
-        favButton.setAttribute('data-favorite-name', item.nome);
-        // Atualiza evento de click para usar dados reais
-        favButton.onclick = (e) => {
+    // Update Favorite Button Logic
+    if (favBtn) {
+        // Safe strings for inline onclick (if we were using it, but let's use event listener)
+        favBtn.setAttribute('data-favorite-name', item.nome);
+        favBtn.onclick = (e) => {
             e.stopPropagation();
             window.toggleFavorite(item.nome, item.valor, item.img_url);
-            updateFavIconState(favButton, item.nome);
         };
-        updateFavIconState(favButton, item.nome);
+
+        // Check initial state
+        // Precisamos esperar o orders.js carregar os favoritos do banco primeiro ou checar aqui
+        // Como loadProductDetails roda no DOMContentLoaded, se orders.js também roda, pode ter race condition.
+        // Vamos checar intervalado ou esperar signal?
+        // Simples: chamamos updateFavoriteIcons() aqui, ela vai olhar o array global currentUserFavs.
+        // Se orders.js ainda não carregou, vai estar vazio.
+        // Melhor disparar um check após loadFavorites terminar.
+        // Por hora, deixamos o orders.js cuidar disso via updateFavoriteIcons global.
     }
 
-    // Update Add to Cart Button
-    const addToCartBtn = document.querySelector('.fixed.bottom-\\[90px\\] button');
-    if (addToCartBtn) {
-        // Find the price span inside button
-        const btnPriceSpan = addToCartBtn.querySelectorAll('span')[1];
-        if (btnPriceSpan) btnPriceSpan.innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
-        
-        addToCartBtn.onclick = () => {
-            window.addToCart(item.nome, item.valor, item.img_url);
-            // Feedback visual ou redirecionar
-            const btnText = addToCartBtn.querySelector('span:first-child');
-            const originalText = btnText.innerText;
-            btnText.innerText = "Adicionado!";
-            setTimeout(() => {
-                btnText.innerText = originalText;
-            }, 1000);
+    // Update Cart Button Logic
+    if (cartBtn) {
+        // Atualiza UI do botão
+        const spanPrice = cartBtn.querySelectorAll('span')[1];
+        if (spanPrice) spanPrice.innerText = formatCurrency(item.valor);
+
+        cartBtn.onclick = () => {
+            window.addToCart(item.nome, item.valor, item.img_url || 'assets/img/placeholder_food.png');
         };
     }
 }
 
-function updateFavIconState(btn, name) {
-    const icon = btn.querySelector('.material-symbols-outlined');
-    if (window.isFavorite && window.isFavorite(name)) {
-        icon.classList.add('text-primary');
-        icon.style.fontVariationSettings = "'FILL' 1";
-    } else {
-        icon.classList.remove('text-primary');
-        icon.style.fontVariationSettings = "'FILL' 0";
-    }
-}
-
-document.addEventListener('DOMContentLoaded', loadProductDetails);
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    loadProductDetails();
+    
+    // Pequeno delay para garantir que orders.js carregou favoritos
+    setTimeout(() => {
+        if(window.updateFavoriteIcons) window.updateFavoriteIcons();
+    }, 1000);
+});
