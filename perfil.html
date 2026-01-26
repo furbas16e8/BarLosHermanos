@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -51,11 +53,11 @@
     <main class="max-w-md mx-auto pb-24">
         <section class="flex flex-col p-8 items-center text-center">
             <div class="flex flex-col gap-1">
-                <h1 class="text-3xl font-bold leading-tight tracking-tight font-display">João Augusto</h1>
+                <h1 id="profile-name" class="text-3xl font-bold leading-tight tracking-tight font-display">Carregando...</h1>
                 <p class="text-slate-400 text-sm">Membro desde Janeiro de 2026</p>
                 <div class="flex items-center justify-center gap-2 mt-4 text-primary">
                     <span class="material-symbols-outlined text-lg">location_on</span>
-                    <span class="text-sm font-medium text-slate-300">Rua Suíça, 22, Grã-Duquesa</span>
+                    <span id="profile-address" class="text-sm font-medium text-slate-300">Carregando endereço...</span>
                 </div>
             </div>
         </section>
@@ -103,7 +105,7 @@
         </section>
 
         <section class="mt-12 px-6 flex flex-col gap-4">
-            <button class="flex w-full items-center justify-center gap-2 p-4 text-red-500 font-bold border border-red-500/20 rounded-2xl hover:bg-red-500/5 transition-colors active:scale-[0.98]" onclick="window.location.href='login.html'">
+            <button class="flex w-full items-center justify-center gap-2 p-4 text-red-500 font-bold border border-red-500/20 rounded-2xl hover:bg-red-500/5 transition-colors active:scale-[0.98]" onclick="logoutUser()">
                 <span class="material-symbols-outlined">logout</span>
                 Sair
             </button>
@@ -113,5 +115,32 @@
 
     <!-- Global Navigation -->
     <script src="assets/js/navbar.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Verificar sessão
+        const session = await checkSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        // Carregar dados do usuário
+        const { data, error } = await getUserProfile(session.user.id);
+        
+        if (data) {
+            document.getElementById('profile-name').innerText = data.nome || 'Usuário';
+            
+            let endereco = 'Endereço não cadastrado';
+            if (data.endereco_rua) {
+                endereco = `${data.endereco_rua}, ${data.endereco_numero}`;
+                if (data.endereco_bairro) endereco += ` - ${data.endereco_bairro}`;
+            }
+            document.getElementById('profile-address').innerText = endereco;
+        } else {
+            console.error('Erro ao carregar perfil:', error);
+            document.getElementById('profile-name').innerText = 'Erro ao carregar';
+        }
+    });
+    </script>
 </body>
 </html>

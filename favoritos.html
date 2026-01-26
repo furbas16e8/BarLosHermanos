@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -56,5 +58,68 @@
     <script src="assets/js/navbar.js"></script>
     <!-- Cart Logic -->
     <script src="assets/js/orders.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const session = await checkSession();
+        if (!session) {
+            // Option 2: Show polite message (Preferred for UX)
+            document.getElementById('favorites-container').innerHTML = `
+                <div class="flex flex-col items-center justify-center py-20 text-center">
+                    <span class="material-symbols-outlined text-6xl text-white/20 mb-4">lock</span>
+                    <h3 class="text-xl font-bold mb-2">Login necessário</h3>
+                    <p class="text-white/60 mb-6">Entre na sua conta para ver seus itens favoritos.</p>
+                    <a href="login.html" class="bg-primary px-6 py-3 rounded-xl font-bold text-white">Fazer Login</a>
+                </div>
+            `;
+            return;
+        }
+        
+        // Load Favorites
+        document.getElementById('favorites-container').innerHTML = '<p class="text-center mt-10 text-white/50">Carregando...</p>';
+        
+        const { data, error } = await getFavorites(session.user.id);
+        const container = document.getElementById('favorites-container');
+        
+        if (error) {
+            console.error(error);
+            container.innerHTML = `<p class="text-center text-red-500 mt-10">Erro ao carregar favoritos.</p>`;
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-20 text-center">
+                    <span class="material-symbols-outlined text-6xl text-white/20 mb-4">favorite_border</span>
+                    <h3 class="text-xl font-bold mb-2">Nenhum favorito ainda</h3>
+                    <p class="text-white/60">Marque o coração nos itens que você mais gosta!</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Render List
+        let html = '<div class="flex flex-col gap-4">';
+        data.forEach(fav => {
+            const item = fav.cardapio;
+            // Validação simples caso item tenha sido deletado
+            if (!item) return;
+
+            html += `
+                <div class="bg-card-dark p-4 rounded-xl flex gap-4 border border-white/5 items-center">
+                    <div class="h-16 w-16 bg-white/5 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${item.img_url || 'assets/img/placeholder_food.png'}');"></div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-lg leading-tight mb-1">${item.nome}</h4>
+                        <span class="text-primary font-bold">R$ ${parseFloat(item.valor).toFixed(2)}</span>
+                    </div>
+                     <button class="h-10 w-10 flex items-center justify-center rounded-full bg-primary/10 text-primary active:bg-primary active:text-white transition-colors">
+                        <span class="material-symbols-outlined text-[20px] font-variation-[FILL_1]">shopping_bag</span>
+                     </button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    });
+    </script>
 </body>
 </html>

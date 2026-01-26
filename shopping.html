@@ -12,6 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="assets/css/styles_new.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+    <script src="assets/js/checkout.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -146,7 +149,7 @@
             </div>
             <div class="flex justify-between items-center text-sm">
                 <span class="text-[#cbad90]">Taxa de Entrega</span>
-                <span class="font-medium text-white">R$ 5,00</span>
+                <span class="font-medium text-white" id="taxa-entrega">R$ 0,00</span>
             </div>
             <div class="flex justify-between items-center text-sm">
                 <span class="text-[#cbad90]">Desconto</span>
@@ -169,7 +172,7 @@
                 <p class="text-[10px] text-[#8e7a65]">30-45 min</p>
             </div>
         </div>
-        <button class="w-full bg-primary hover:bg-red-700 active:scale-[0.98] transition-all text-white font-bold rounded-2xl py-5 shadow-xl shadow-red-900/30 flex justify-center items-center gap-2">
+        <button onclick="submitOrder()" class="w-full bg-primary hover:bg-red-700 active:scale-[0.98] transition-all text-white font-bold rounded-2xl py-5 shadow-xl shadow-red-900/30 flex justify-center items-center gap-2">
             <span>Finalizar Pedido</span>
             <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
         </button>

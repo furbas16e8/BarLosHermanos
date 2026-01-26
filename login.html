@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <!-- Theme Configuration -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/orders.js"></script>
 <!-- Custom Styles -->
 <link rel="stylesheet" href="assets/css/orders.css">
@@ -31,12 +33,12 @@
             </p>
 </div>
 <!-- Form Section -->
-<form action="#" class="space-y-5 w-full" onsubmit="event.preventDefault(); window.location.href='orders.html'">
+<form class="space-y-5 w-full" onsubmit="handleLogin(event)">
 <!-- Email Field -->
 <div class="flex flex-col gap-2">
 <label class="text-white text-sm font-semibold ml-1">E-mail</label>
 <div class="flex w-full items-center rounded-xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-<input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/40 h-14 px-4 focus:ring-0 text-base font-normal" placeholder="Digite seu e-mail" type="email" value=""/>
+<input id="email" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/40 h-14 px-4 focus:ring-0 text-base font-normal" placeholder="Digite seu e-mail" type="email" value="" required/>
 <div class="pr-4 text-white/60 group-focus-within:text-primary transition-colors">
 <span class="material-symbols-outlined">mail</span>
 </div>
@@ -46,7 +48,7 @@
 <div class="flex flex-col gap-2">
 <label class="text-white text-sm font-semibold ml-1">Senha</label>
 <div class="flex w-full items-center rounded-xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-<input class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/40 h-14 px-4 focus:ring-0 text-base font-normal" placeholder="Digite sua senha" type="password" value=""/>
+<input id="password" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/40 h-14 px-4 focus:ring-0 text-base font-normal" placeholder="Digite sua senha" type="password" value="" required/>
 <div class="pr-4 text-white/60 group-focus-within:text-primary transition-colors cursor-pointer">
 <span class="material-symbols-outlined">visibility_off</span>
 </div>
@@ -57,7 +59,7 @@
 <a class="text-primary text-sm font-semibold hover:text-white transition-colors" href="#">Esqueceu a senha?</a>
 </div>
 <!-- Login Button -->
-<button class="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all text-white text-lg font-bold shadow-lg shadow-primary/25 mt-4 flex items-center justify-center gap-2">
+<button type="submit" id="btn-login" class="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all text-white text-lg font-bold shadow-lg shadow-primary/25 mt-4 flex items-center justify-center gap-2">
                 ENTRAR
                 <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
 </button>
@@ -88,5 +90,41 @@
 </div>
 <div class="h-6"></div>
 </main>
+<script>
+    async function handleLogin(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btn-login');
+        const originalContent = btn.innerHTML;
+
+        // Feedback visual
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Entrando...';
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+        try {
+            const { data, error } = await loginUser(email, password);
+
+            if (error) {
+                // Tratamento de erro básico
+                alert('Erro ao entrar: ' + (error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos' : error.message));
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            } else {
+                // Sucesso
+                window.location.href = 'index.html';
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro inesperado de conexão.');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    }
+</script>
 </body></html>
 
