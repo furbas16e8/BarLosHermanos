@@ -1,12 +1,14 @@
 /**
- * checkout.js - Lógica de Finalização de Pedido
+ * checkout.js - Lógica de Finalização de Pedido Aprimorada
  */
 
 let currentUser = null;
 let currentZone = null;
-let currentCart = [];
 let deliveryFee = 0;
-let branchSelected = 'Bairro'; // Default
+let deliveryMode = 'delivery'; // 'delivery' ou 'pickup'
+let paymentMethod = 'online'; // 'online' ou 'cash'
+let discountValue = 0;
+let totalOrder = 0;
 
 document.addEventListener('DOMContentLoaded', initCheckout);
 
@@ -18,25 +20,24 @@ async function initCheckout() {
         return;
     }
 
-    // 2. Carregar Carrinho
-    currentCart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
-    if (currentCart.length === 0) {
-        document.getElementById('empty-cart-msg').classList.remove('hidden');
-        document.getElementById('empty-cart-msg').style.display = 'flex';
-        document.getElementById('cart-items-container').innerHTML = '';
-        updateTotals();
-        return;
+    // 2. Carregar Dados do Usuário
+    await loadUserData(session.user.id);
+
+    // 3. Inicializar Carrinho (usando orders.js)
+    if (typeof updateCartUI === 'function') {
+        updateCartUI();
+    } else {
+        console.error('orders.js não carregado corretamente.');
     }
 
-    // 3. Renderizar Itens (Visual apenas, não editável aqui por simplificação)
-    renderCheckoutItems();
+    // 4. Verificar Desconto Fidelidade
+    await checkLoyaltyDiscount(session.user.id);
 
-    // 4. Carregar Dados do Usuário
-    loadUserData(session.user.id);
-
-    // 5. Configurar Botão Finalizar
-    const btnFinish = document.querySelector('button[onclick="submitOrder()"]') || 
-                      document.querySelector('button.w-full.bg-primary'); // Fallback se não tiver onclick
+    // 5. Configurar Eventos e UI Inicial
+    updateCheckoutTotals();
+    
+    // Configurar Botão Finalizar
+    const btnFinish = document.getElementById('btn-finish') || document.querySelector('button[onclick="submitOrder()"]');
     if(btnFinish) {
         btnFinish.onclick = submitOrder;
         btnFinish.id = 'btn-finish';
@@ -48,17 +49,16 @@ async function loadUserData(userId) {
     
     if (error || !user) {
         console.error('Erro ao carregar usuário', error);
-        alert('Erro ao carregar seus dados. Tente recarregar.');
         return;
     }
 
     currentUser = user;
 
     // Preencher UI de Endereço
-    const addressContainer = document.querySelector('.bg-card-dark .pl-7');
-    if (addressContainer) {
+    const addressDetails = document.getElementById('address-details');
+    if (addressDetails) {
         if (user.endereco_rua) {
-            addressContainer.innerHTML = `
+            addressDetails.innerHTML = `
                 <p class="text-sm text-white font-medium">${user.endereco_rua}, ${user.endereco_numero} ${user.endereco_complemento || ''}</p>
                 <p class="text-xs text-[#cbad90]">${user.endereco_bairro} - Governador Valadares</p>
                 <div class="mt-3 flex items-center gap-2 text-primary">
@@ -68,11 +68,11 @@ async function loadUserData(userId) {
             `;
             
             // Buscar Zona de Entrega para Taxa
-            fetchDeliveryZone(user.endereco_bairro);
+            await fetchDeliveryZone(user.endereco_bairro);
 
         } else {
-            addressContainer.innerHTML = `
-                <p class="text-sm text-red-400 font-medium">Endereço incompleto</p>
+            addressDetails.innerHTML = `
+                <p class="text-sm text-red-400 font-medium whitespace-normal">Endereço incompleto no seu perfil.</p>
                 <p class="text-xs text-[#cbad90]">Toque em alterar para configurar.</p>
             `;
         }
@@ -80,76 +80,151 @@ async function loadUserData(userId) {
 }
 
 async function fetchDeliveryZone(bairro) {
+    if (!bairro) return;
     const { data: zone, error } = await getDeliveryZone(bairro);
     
     if (zone) {
         currentZone = zone;
         deliveryFee = parseFloat(zone.taxa_entrega);
         
-        // Atualizar UI de Taxa e Tempo
-        const subtotalEl = document.querySelectorAll('.flex.justify-between.items-center.text-sm span.font-medium')[1]; // Hacky selector
-        if(subtotalEl) subtotalEl.innerText = `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`;
-        
-        // Tempo estimado base (ex: 40 min) * multiplicador
-        // Pegar maior tempo de preparo do carrinho
-        let maxPrepTime = 25; // Default fallback
-        // Idealmente teríamos o tempo de preparo no objeto do carrinho, mas no localStorage só tem nome/preço/img
-        // Vamos assumir um tempo base médio de 30 min se não tiver info
-        
         const estimatedTime = Math.ceil(30 * zone.multiplicador_tempo);
-        document.getElementById('delivery-time').innerText = `Prazo Estimado: ${estimatedTime}-${estimatedTime+15} min`;
-
+        const timeEl = document.getElementById('delivery-time');
+        if(timeEl) timeEl.innerText = `Prazo Estimado: ${estimatedTime}-${estimatedTime+15} min`;
     } else {
-        console.warn('Bairro não encontrado na zona de entrega:', bairro);
-        deliveryFee = 0; // Ou bloquear entrega?
-        document.getElementById('delivery-time').innerText = `Consulte taxa de entrega`;
-        // Avisar user?
+        console.warn('Bairro não atendido:', bairro);
+        deliveryFee = 15; // Taxa padrão se não achar? Ou alertar?
     }
-    updateTotals();
+    updateCheckoutTotals();
 }
 
-function renderCheckoutItems() {
-    const container = document.getElementById('cart-items-container');
-    container.innerHTML = '';
-    
-    currentCart.forEach(item => {
-        container.innerHTML += `
-            <div class="flex items-center gap-4 bg-card-dark p-3 rounded-xl border border-white/5">
-                <div class="bg-center bg-no-repeat bg-cover rounded-lg size-16 shrink-0" style='background-image: url("${item.image}");'></div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold line-clamp-1">${item.name}</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-xs text-white/60">Qtd: ${item.quantity}</span>
-                        <span class="text-primary font-bold">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
+async function checkLoyaltyDiscount(userId) {
+    try {
+        // Contar pedidos concluídos do usuário
+        const { count, error } = await window.supabaseClient
+            .from('pedidos')
+            .select('*', { count: 'exact', head: true })
+            .eq('cliente_id', userId)
+            .eq('status', 'concluido');
+
+        if (!error && count >= 5) {
+            console.log('Cliente Fidelidade detectado! 10% de desconto aplicado.');
+            // O desconto será calculado sobre o subtotal no updateCheckoutTotals
+            document.getElementById('discount-row').classList.remove('hidden');
+            return true;
+        } else {
+            document.getElementById('discount-row').classList.add('hidden');
+            return false;
+        }
+    } catch (e) {
+        console.error('Erro ao verificar fidelidade:', e);
+        return false;
+    }
 }
 
-function updateTotals() {
-    let subtotal = currentCart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const total = subtotal + deliveryFee;
-
-    document.getElementById('cart-subtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+function setDeliveryMode(mode) {
+    deliveryMode = mode;
     
-    // Atualizar Elemento Taxa se tiver ID correto, senão usa index (frágil)
-    // Vamos assumir que o HTML será atualizado com IDs
-    const taxaEl = document.getElementById('taxa-entrega'); 
-    if(taxaEl) taxaEl.innerText = `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`;
+    const btnDelivery = document.getElementById('btn-delivery-mode');
+    const btnPickup = document.getElementById('btn-pickup-mode');
+    const addressSection = document.getElementById('address-section');
 
-    document.getElementById('checkout-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    if (mode === 'delivery') {
+        btnDelivery.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-primary text-white shadow-sm transition-all";
+        btnPickup.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold text-[#8e7a65] hover:bg-white/5 transition-all";
+        addressSection.classList.remove('hidden');
+    } else {
+        btnPickup.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-primary text-white shadow-sm transition-all";
+        btnDelivery.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold text-[#8e7a65] hover:bg-white/5 transition-all";
+        addressSection.classList.add('hidden');
+    }
+    
+    updateCheckoutTotals();
+}
+
+function setPaymentMethod(method) {
+    paymentMethod = method;
+    
+    const btnOnline = document.getElementById('pay-online');
+    const btnCash = document.getElementById('pay-cash');
+    const checkOnline = document.getElementById('check-online');
+    const checkCash = document.getElementById('check-cash');
+    const changeContainer = document.getElementById('change-container');
+    const textCash = document.getElementById('text-cash');
+
+    if (method === 'online') {
+        btnOnline.classList.add('border-primary/20');
+        btnOnline.classList.remove('border-white/5');
+        btnCash.classList.remove('border-primary/20');
+        btnCash.classList.add('border-white/5');
+        
+        checkOnline.classList.remove('hidden');
+        checkCash.classList.add('hidden');
+        changeContainer.classList.add('hidden');
+        
+        textCash.classList.add('text-[#8e7a65]');
+    } else {
+        btnCash.classList.add('border-primary/20');
+        btnCash.classList.remove('border-white/5');
+        btnOnline.classList.remove('border-primary/20');
+        btnOnline.classList.add('border-white/5');
+        
+        checkCash.classList.remove('hidden');
+        checkOnline.classList.add('hidden');
+        changeContainer.classList.remove('hidden');
+        
+        textCash.classList.remove('text-[#8e7a65]');
+        textCash.classList.add('text-white');
+    }
+}
+
+// Esta função é chamada globalmente por orders.js quando o carrinho muda
+function updateCheckoutTotals() {
+    const cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
+    let subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    
+    // 1. Taxa de Entrega
+    let activeDeliveryFee = (deliveryMode === 'delivery') ? deliveryFee : 0;
+    
+    // 2. Desconto (Fidelidade 10%)
+    let hasDiscount = !document.getElementById('discount-row').classList.contains('hidden');
+    discountValue = hasDiscount ? (subtotal * 0.10) : 0;
+    
+    totalOrder = subtotal + activeDeliveryFee - discountValue;
+
+    // Atualizar UI
+    const subtotalEl = document.getElementById('cart-subtotal');
+    const taxaEl = document.getElementById('taxa-entrega');
+    const discountEl = document.getElementById('cart-discount');
+    const totalEl = document.getElementById('checkout-total');
+    const deliveryRow = document.getElementById('delivery-row');
+
+    if(subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    
+    if(taxaEl) {
+        taxaEl.innerText = activeDeliveryFee > 0 ? `R$ ${activeDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis';
+        if(deliveryMode === 'pickup') deliveryRow.classList.add('opacity-50');
+        else deliveryRow.classList.remove('opacity-50');
+    }
+
+    if(discountEl) discountEl.innerText = `- R$ ${discountValue.toFixed(2).replace('.', ',')}`;
+    if(totalEl) totalEl.innerText = `R$ ${totalOrder.toFixed(2).replace('.', ',')}`;
 }
 
 async function submitOrder() {
-    if (!currentUser || !currentUser.endereco_rua) {
-        alert('Por favor, complete seu endereço de entrega.');
+    if (deliveryMode === 'delivery' && (!currentUser || !currentUser.endereco_rua)) {
+        alert('Por favor, complete seu endereço de entrega no perfil.');
         return;
     }
     
-    if (currentCart.length === 0) {
+    const cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
+    if (cart.length === 0) {
         alert('Seu carrinho está vazio.');
+        return;
+    }
+
+    const changeValue = document.getElementById('cash-change').value;
+    if (paymentMethod === 'cash' && changeValue && parseFloat(changeValue) < totalOrder) {
+        alert('O valor para troco deve ser maior que o total do pedido.');
         return;
     }
 
@@ -159,59 +234,35 @@ async function submitOrder() {
     btn.disabled = true;
 
     try {
-        // 1. Preparar Payload do Pedido
-        let subtotal = currentCart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        let subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
         
         const orderPayload = {
             cliente_id: currentUser.id,
-            status: 'pendente', // Default
-            tipo_pedido: 'delivery', // Fixo por enquanto
+            status: 'pendente',
+            tipo_pedido: deliveryMode,
             subtotal: subtotal,
-            taxa_entrega: deliveryFee,
-            desconto: 0,
-            total: subtotal + deliveryFee,
-            bairro_entrega: currentUser.endereco_bairro,
-            zona_entrega_id: currentZone ? currentZone.id : null,
-            endereco_entrega: {
+            taxa_entrega: (deliveryMode === 'delivery' ? deliveryFee : 0),
+            desconto: discountValue,
+            total: totalOrder,
+            bairro_entrega: deliveryMode === 'delivery' ? currentUser.endereco_bairro : 'RETIRADA',
+            zona_entrega_id: (deliveryMode === 'delivery' && currentZone) ? currentZone.id : null,
+            endereco_entrega: deliveryMode === 'delivery' ? {
                 rua: currentUser.endereco_rua,
                 numero: currentUser.endereco_numero,
                 complemento: currentUser.endereco_complemento,
                 bairro: currentUser.endereco_bairro
-            },
-            tempo_preparo_total: 30, // Mockado por enquanto (precisaria buscar do DB pra cada item)
-            // tempo_entrega_estimado: calculado por trigger ou função DB? 
-            // O DB tem trigger updated_at, mas não calculation auto on insert para esse campo complexo se não usarmos a função explicitamente.
-            // Vamos deixar NULL e o admin/sistema atualiza, ou passar calculado aqui?
-            // O ideal seria o Backend calcular, mas vamos enviar estimativa.
-            tempo_entrega_estimado: Math.ceil(30 * (currentZone?.multiplicador_tempo || 1)),
-            forma_pagamento: 'dinheiro_entrega', // Mockado (Falta UI de seleção real)
-            observacoes: 'Pedido via App Web'
+            } : { info: 'Retirada no Balcão' },
+            forma_pagamento: paymentMethod === 'online' ? 'cartao_pix' : 'dinheiro',
+            troco_para: (paymentMethod === 'cash' && changeValue) ? parseFloat(changeValue) : null,
+            observacoes: 'Pedido via Web App'
         };
 
-        // 2. Inserir Pedido
-        console.log('Enviando pedido:', orderPayload);
         const { data: orderData, error: orderError } = await createOrder(orderPayload);
+        if (orderError) throw orderError;
 
-        if (orderError) {
-            throw new Error(orderError.message);
-        }
-
-        // 3. Inserir Itens
-        // Precisamos do ID do item no banco (cardapio table). 
-        // Problema: localStorage só tem nome.
-        // Solução Robusta: Buscar IDs pelo nome ou carregar cardápio inteiro no inicio.
-        // Solução Rápida (MVP): Vamos tentar buscar o ID fazendo match pelo nome na hora ou...
-        // ...vamos salvar o Item ID no localStorage desde o inicio (melhor).
-        // COMO NÃO TEMOS ID NO STORAGE AGORA, O INSERT VAI FALHAR SE A TABELA ITENS_PEDIDO EXIGIR FK VALIDA.
-        // UPDATE: A tabela `itens_pedido` TEM `item_id INTEGER REFERENCES cardapio(id)`.
-        // CRÍTICO: O carrinho atual NÃO tem o ID. 
-        // WORKAROUND AGORA: Vamos ter que fazer uma busca reversa ou falhar.
-        // -> Vamos assumir que precisamos corrigir o `orders.js` para salvar ID, mas para não quebrar agora,
-        // vamos buscar o item pelo nome no DB antes de inserir.
-        
+        // Inserir Itens (Melhorado: Agora buscamos IDs antes)
         const itemsPayload = [];
-        for (const cartItem of currentCart) {
-            // Buscar ID do item no DB pelo nome (Lento, mas funcional pro MVP)
+        for (const cartItem of cart) {
             const { data: dbItem } = await window.supabaseClient
                 .from('cardapio')
                 .select('id, tempo_preparo')
@@ -222,39 +273,36 @@ async function submitOrder() {
                 itemsPayload.push({
                     pedido_id: orderData.id,
                     item_id: dbItem.id,
-                    item_cod: 'SKU-AUTO', // Deveria vir do DB
+                    item_cod: 'WEB', 
                     item_nome: cartItem.name,
                     item_valor: cartItem.price,
                     item_tempo_preparo: dbItem.tempo_preparo || 0,
                     quantidade: cartItem.quantity,
                     subtotal: cartItem.price * cartItem.quantity
                 });
-            } else {
-                console.warn('Item não encontrado no DB:', cartItem.name);
-                // Se não achar, o que fazer? Pular?
             }
         }
 
         if (itemsPayload.length > 0) {
             const { error: itemsError } = await createOrderItems(itemsPayload);
-            if (itemsError) throw new Error('Erro ao salvar itens: ' + itemsError.message);
+            if (itemsError) throw itemsError;
         }
 
-        // 4. Sucesso
-        alert('Pedido realizado com sucesso! Acompanhe no seu perfil.');
-        localStorage.removeItem('bar-los-hermanos-cart'); // Limpar carrinho
+        alert('Pedido realizado com sucesso!');
+        localStorage.removeItem('bar-los-hermanos-cart');
         window.location.href = 'perfil.html';
 
     } catch (e) {
         console.error(e);
-        // Tratamento específico para erro de horário (Trigger)
-        if (e.message.includes('Estamos fechados')) {
-            alert('🚫 O BAR ESTÁ FECHADO!\nHorário de funcionamento: Seg-Sáb 18h às 23h.');
-        } else {
-            alert('Erro ao finalizar pedido: ' + e.message);
-        }
+        alert('Erro ao finalizar pedido: ' + (e.message || 'Erro desconhecido'));
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
+
+// Expor funções para o HTML
+window.setDeliveryMode = setDeliveryMode;
+window.setPaymentMethod = setPaymentMethod;
+window.updateCheckoutTotals = updateCheckoutTotals;
+window.submitOrder = submitOrder;

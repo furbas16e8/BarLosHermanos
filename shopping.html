@@ -71,7 +71,7 @@
         <div class="w-10"></div>
     </header>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar pb-48">
+    <main class="flex-1 overflow-y-auto no-scrollbar pb-72">
         <div class="px-4 pt-6">
             <h2 class="text-[10px] font-bold uppercase tracking-widest text-[#8e7a65] mb-3 px-1">Selecione a Filial</h2>
             <div class="grid grid-cols-2 gap-3">
@@ -88,16 +88,17 @@
 
         <div class="px-4 py-6">
             <div class="flex p-1 bg-card-dark rounded-2xl">
-                <button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-primary text-white shadow-sm">
+                <button id="btn-delivery-mode" onclick="setDeliveryMode('delivery')" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-primary text-white shadow-sm transition-all">
                     Entrega
                 </button>
-                <button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-[#8e7a65]">
+                <button id="btn-pickup-mode" onclick="setDeliveryMode('pickup')" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-[#8e7a65] hover:bg-white/5 transition-all">
                     Retirada
                 </button>
             </div>
         </div>
 
-        <div class="px-4 mb-8">
+        <!-- Endereço (Pode ser ocultado se for retirada) -->
+        <div id="address-section" class="px-4 mb-8">
             <div class="bg-card-dark rounded-2xl p-4 border border-white/5">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
@@ -106,12 +107,12 @@
                     </div>
                     <button class="text-[10px] font-bold text-primary uppercase" onclick="window.location.href='address.html'">Alterar</button>
                 </div>
-                <div class="pl-7">
+                <div class="pl-7" id="address-details">
                     <p class="text-sm text-white font-medium">Rua das Flores, 123</p>
                     <p class="text-xs text-[#cbad90]">Centro - São Paulo</p>
                     <div class="mt-3 flex items-center gap-2 text-primary">
                         <span class="material-symbols-outlined text-sm">schedule</span>
-                        <span class="text-xs font-bold">Prazo Estimado: 30-45 min</span>
+                        <span class="text-xs font-bold" id="delivery-time">Prazo Estimado: 30-45 min</span>
                     </div>
                 </div>
             </div>
@@ -130,14 +131,38 @@
             </div>
         </div>
 
-        <div class="px-4 mt-10">
-            <div class="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center gap-4">
-                <div class="bg-primary rounded-full p-2 text-white shrink-0">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">payments</span>
-                </div>
-                <div>
-                    <p class="text-primary font-bold text-sm">Pague na entrega</p>
-                    <p class="text-xs text-primary/80">(Cartão ou Dinheiro)</p>
+        <!-- Forma de Pagamento -->
+        <div class="px-4 mt-8">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-[#8e7a65] mb-4">Forma de Pagamento</h2>
+            <div class="space-y-3">
+                <!-- Cartão/Pix -->
+                <button onclick="setPaymentMethod('online')" id="pay-online" class="w-full flex items-center justify-between p-4 bg-card-dark rounded-2xl border border-primary/20 transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">credit_card</span>
+                        <span class="text-sm font-bold">Cartão ou Pix</span>
+                    </div>
+                    <span class="material-symbols-outlined text-primary" id="check-online">check_circle</span>
+                </button>
+
+                <!-- Dinheiro -->
+                <button onclick="setPaymentMethod('cash')" id="pay-cash" class="w-full flex items-center justify-between p-4 bg-card-dark rounded-2xl border border-white/5 transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-[#8e7a65]">payments</span>
+                        <span class="text-sm font-bold text-[#8e7a65]" id="text-cash">Dinheiro (na entrega)</span>
+                    </div>
+                    <span class="material-symbols-outlined hidden text-primary" id="check-cash">check_circle</span>
+                </button>
+
+                <!-- Campo de Troco (Oculto inicialmente) -->
+                <div id="change-container" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div class="bg-card-dark border border-white/5 rounded-2xl p-4 mt-2">
+                        <label class="text-[10px] font-bold uppercase text-[#8e7a65] mb-2 block">Troco para quanto?</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[#8e7a65]">R$</span>
+                            <input type="number" id="cash-change" placeholder="Ex: 50,00" 
+                                   class="w-full bg-black/20 border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm font-bold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -147,18 +172,18 @@
                 <span class="text-[#cbad90]">Subtotal</span>
                 <span class="font-medium text-white" id="cart-subtotal">R$ 0,00</span>
             </div>
-            <div class="flex justify-between items-center text-sm">
+            <div class="flex justify-between items-center text-sm" id="delivery-row">
                 <span class="text-[#cbad90]">Taxa de Entrega</span>
                 <span class="font-medium text-white" id="taxa-entrega">R$ 0,00</span>
             </div>
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-[#cbad90]">Desconto</span>
-                <span class="font-medium text-green-500">- R$ 0,00</span>
+            <div class="flex justify-between items-center text-sm" id="discount-row">
+                <span class="text-[#cbad90]">Desconto Fidelidade (10%)</span>
+                <span class="font-medium text-green-500" id="cart-discount">- R$ 0,00</span>
             </div>
         </div>
     </main>
 
-    <div class="fixed bottom-0 left-0 right-0 z-50 bg-background-dark border-t border-white/5 px-4 pt-4 pb-8">
+    <div class="fixed bottom-[84px] left-0 right-0 z-40 bg-background-dark/95 backdrop-blur-md border-t border-white/5 px-4 pt-4 pb-4">
         <div class="flex justify-between items-end mb-4 px-1">
             <div>
                 <p class="text-xs text-[#8e7a65] font-medium uppercase tracking-widest">Total</p>
