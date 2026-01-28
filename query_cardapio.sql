@@ -12,10 +12,16 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Fígado com Jiló', NULL, 51.00, 'entradas', NULL, true),
 ('Torresmo de Barriga', NULL, 35.90, 'entradas', NULL, true),
 
+
+
+
 -- Fritas
 ('Batata Chips', 'Caseira com parmesão', 32.00, 'fritas', NULL, true),
 ('Fritas', 'Fritas tipo palito tradicional', 28.00, 'fritas', NULL, true),
 ('Fritas c/ Catupiry e Bacon', 'Fritas tipo palito com catupiry e bacon', 39.90, 'fritas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/fritas/fritas_queijo_e_bacon.png', true),
+
+
+
 
 -- Churrasquinhos
 ('Churrasquinho Frango', '160gr - Acompanha farofa e vinagrete', 17.00, 'churrasquinhos', NULL, true),
@@ -26,9 +32,15 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Frango Especial', '100gr - Com catupiry e batata palha caseira', 19.90, 'churrasquinhos', NULL, true),
 ('Frango Super Especial', '100gr - Com gorgonzola e batata palha caseira', 24.90, 'churrasquinhos', NULL, true),
 
+
+
+
 --Coxinhas
 ('Coxinha Gourmet Costelinha', 'Sem massa, costelinha defumada e catupiry', 44.00, 'coxinhas', NULL, true),
 ('Coxinha Gourmet Frango', 'Sem massa, frango com catupiry', 44.00, 'coxinhas', NULL, true),
+
+
+
 
 -- Jantinhas
 ('Jantinha de Filé Mingon', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_file.png', true),
@@ -36,6 +48,8 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Jantinha de Frango', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_frango.png', true),
 ('Jantinha de Frango Arrepiado', 'Com iscas de frango empanado, arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_frango_arrepiado.png', true),
 ('Jantinha de Carne de Sol', 'Com arroz, farofa, vinagrete e fritas', 33.00, 'jantinhas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/jantinhas/jantinha_carne_sol.png', true),
+
+
 
 
 -- Batatas Rosti (Vegetarianas)
@@ -61,6 +75,9 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Batata Rosti Camarão', NULL, 46.00, 'batatas', NULL, true),
 ('Batata Rosti Camarão c/ Palmito', NULL, 48.00, 'batatas', NULL, true),
 
+
+
+
 -- Porçoes
 ('Filé Mignon Acebolado', 'Filé na manteiga acebolado', 92.00, 'porcoes', NULL, true),
 ('Filé c/ Fritas ou Mandioca', 'Na manteiga, sal grosso e cebola', 115.00, 'porcoes', NULL, true),
@@ -82,8 +99,14 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Carne de Sol à Moda Nordestina', 'Mandioca, tomate, cebola, farofa, vinagrete e banana', 106.90, 'porcoes', NULL, true),
 ('Carne de Sol c/ Fritas ou Mandioca', 'Carne de sol na manteiga com acompanhamento', 95.90, 'porcoes', NULL, true),
 
+
+
+
 -- Especiais
 ('Costelinha Outback', 'Defumada com barbecue e mandioca ou batata rústica', 89.90, 'especiais', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/especiais/costela_outback.png', true),
+
+
+
 
 -- Peixes e Frutos do Mar
 ('Filé de Tilápia', 'Isca de tilápia empanada e frita', 56.90, 'peixes', NULL, true),
@@ -92,10 +115,16 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Oasis do Mar c/ Camarão', 'Tilápia, ervas, arroz, 3 camarões VM e salada', 69.00, 'peixes', NULL, true),
 ('Camarão Alho e Óleo', 'Camarão VM flambado no azeite com alho e ervas', 109.90, 'peixes', NULL, true),
 
+
+
+
 -- Escondidinhos
 ('Escondidinho à Moda', 'Purê de mandioca e mussarela (Serve 2)', 68.00, 'escondidinhos', NULL, true),
 ('Escondidinho Camarão', 'Purê de mandioca e mussarela (Individual)', 37.00, 'escondidinhos', NULL, true),
 ('Escondidinho Carne de Sol', 'Purê de mandioca e mussarela (Individual)', 37.00, 'escondidinhos', NULL, true),
+
+
+
 
 -- Mexicanos
 ('Quesadilla Filé (1 un)', 'Tortilha de trigo, salada, mussarela e bacon', 38.00, 'mexicanos', NULL, true),
@@ -109,16 +138,38 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('La Vitta Bacon (1 un)', 'Massa fina, bacon, cebola, cream cheese', 30.00, 'mexicanos', NULL, true),
 ('La Vitta Bacon (2 un)', 'Massa fina, bacon, cebola, cream cheese', 49.00, 'mexicanos', NULL, true),
 
+
+
+
 -- Burgers
 ('Combo The Beatles', 'Hambúrguer + Refri mini + Fritas', 39.00, 'burgers', NULL, true),
 ('Hambúrguer The Beatles', 'Blend bovino 130g, bacon, queijo, cebola caramelizada', 32.00, 'burgers',  'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/burgers/burger_beatles.png', true),
 ('Bob Marley', NULL, 32.00, 'burgers', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/burgers/burger_bobmarley.png', true),
+
+
+
 
 -- Caldos
 ('Caldo de Feijão', NULL, 23.90, 'caldos', NULL, true),
 ('Angu à Baiana', NULL, 23.90, 'caldos', NULL, true),
 ('Bobó de Camarão', NULL, 33.00, 'caldos', NULL, true),
 ('Caldo de Pinto', NULL, 23.90, 'caldos', NULL, true),
+
+
+
+
+-- Pizzas
+('Sertaneja Arretada', 'Carne de sol com banana-da-terra, tomate, cebola e pingos de catupiry.', 72.00, 'Pizzas', NULL, false),
+('Calabroca', 'Calabresa acebolada com muçarela dourada; levemente picante.', 55.00, 'Pizzas', NULL, false),
+('Dona Verde', 'Marguerita com tomate fresco, manjericão e muito amor.', 65.00, 'Pizzas', NULL, false),
+('Frangolícia', 'Frango desfiado, cebola, milho, tomate com catupiry legítimo.', 75.00, 'Pizzas', NULL, false),
+('Branquela Safada', 'Só queijo, pura sedução: muçarela derretida em dose dupla.', 55.00, 'Pizzas', NULL, false),
+('Rainha Dos Queijos', 'Muçarela, parmesão, gorgonzola e provolone.', 75.00, 'Pizzas', NULL, false),
+('Camarão Paulista', 'Camarão ao molho branco de palmito, um toque de alho.', 95.00, 'Pizzas', NULL, false),
+('Camarão Mineiro', 'Camarão com bacon crocante e pingos de catupiry ao molho branco.', 98.00, 'Pizzas', NULL, false);
+
+
+
 
 -- Bebidas Alcoólicas
 ('Gin Tônica', 'Gin, limão, tônica e gelo', 37.00, NULL, NULL, true),
@@ -152,6 +203,8 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Dose Whisky Red Label', NULL, 22.00, NULL, NULL, true),
 ('Dose Whisky Black Label', NULL, 32.00, NULL, NULL, true),
 
+
+
 -- Sucos
 ('Suco Natural de Laranja', NULL, 14.00, 'bebidas', NULL, true),
 ('Suco Natural de Limão', NULL, 14.00, 'bebidas', NULL, true),
@@ -160,6 +213,8 @@ INSERT INTO cardapio (nome, descricao, valor, categoria, img_url, ativo) VALUES
 ('Suco Natural de Morango', NULL, 14.00, 'bebidas', NULL, true),
 ('Suco Natural de Morango c/ Maracujá', NULL, 16.00, 'bebidas', NULL, true),
 ('Suco Natural de Laranja c/ Morango', NULL, 16.00, 'bebidas', NULL, true),
+
+
 
 -- Bebidas
 ('Água Mineral sem gás - 500ml', NULL, 4,50, 'bebidas', 'https://bdkqoyalqrypfzwijosd.supabase.co/storage/v1/object/public/cardapio_imagens/bebidas/agua_sem_gas.jpg', true),
