@@ -270,11 +270,17 @@ async function submitOrder() {
                 .single();
             
             if (dbItem) {
+                let finalName = cartItem.name;
+                if (cartItem.removed && cartItem.removed.length > 0) {
+                    const modifications = cartItem.removed.map(r => r.toUpperCase()).join(', ');
+                    finalName = `${cartItem.name} (SEM: ${modifications})`;
+                }
+
                 itemsPayload.push({
                     pedido_id: orderData.id,
                     item_id: dbItem.id,
                     item_cod: 'WEB', 
-                    item_nome: cartItem.name,
+                    item_nome: finalName,
                     item_valor: cartItem.price,
                     item_tempo_preparo: dbItem.tempo_preparo || 0,
                     quantidade: cartItem.quantity,

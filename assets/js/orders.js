@@ -36,16 +36,23 @@ function saveCart(cart) {
   if (typeof updateNavbarCartCount === "function") updateNavbarCartCount();
 }
 
-function addToCart(name, price, image) {
+function addToCart(name, price, image, removedIngredients = []) {
   let cart = getCart();
-  let item = cart.find((i) => i.name === name);
+  
+  // Normalizar array para comparação (sort)
+  const incomingRemoved = (removedIngredients || []).sort();
+  
+  let item = cart.find((i) => {
+      const existingRemoved = (i.removed || []).sort();
+      return i.name === name && JSON.stringify(existingRemoved) === JSON.stringify(incomingRemoved);
+  });
+
   if (item) {
     item.quantity++;
   } else {
-    cart.push({ name, price, image, quantity: 1 });
+    cart.push({ name, price, image, quantity: 1, removed: incomingRemoved });
   }
   saveCart(cart);
-  // Substituído alert por feedback silencioso/visual
   console.log(`${name} adicionado ao carrinho!`);
 }
 // Exposing globally for module access
@@ -89,12 +96,21 @@ function updateCartUI() {
 
   cart.forEach((item, index) => {
     subtotal += item.price * item.quantity;
+    const removedText = (item.removed && item.removed.length > 0) 
+        ? `<div class="mt-1 flex flex-wrap gap-1">
+             ${item.removed.map(ing => `<span class="text-[10px] font-bold text-red-500 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800 uppercase tracking-wide">SEM ${ing}</span>`).join("")}
+           </div>`
+        : "";
+
     const itemHtml = `
             <div class="flex items-center gap-4 px-4 py-4 border-b border-gray-200 dark:border-white/5 last:border-0">
                 <div class="bg-center bg-no-repeat bg-cover rounded-xl size-20 shrink-0 shadow-sm" style='background-image: url("${item.image}");'></div>
                 <div class="flex flex-col flex-1 min-w-0">
                     <div class="flex justify-between items-start">
-                        <h3 class="text-base font-bold leading-tight line-clamp-1">${item.name}</h3>
+                        <div>
+                            <h3 class="text-base font-bold leading-tight line-clamp-1">${item.name}</h3>
+                            ${removedText}
+                        </div>
                         <button class="text-gray-400 hover:text-red-500 transition-colors ml-2" onclick="removeFromCart(${index})">
                             <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                         </button>
