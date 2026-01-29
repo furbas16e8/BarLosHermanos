@@ -111,7 +111,7 @@ async function loadProductDetails() {
                 window.addToCart(
                     item.nome, 
                     item.valor, 
-                    item.img_url || 'assets/img/placeholder_food.png', 
+                    item.img_url, 
                     removedList
                 );
             }

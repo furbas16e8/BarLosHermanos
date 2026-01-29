@@ -55,34 +55,35 @@ function renderCartItems(cart) {
     const container = document.getElementById('cart-items-container');
     container.innerHTML = '';
     
-    // Simple render implementation matching dom-helpers style roughly
-    // Render Cart Items
+    // Unificado para usarem o estilo Vanilla correto
     cart.forEach((item, index) => {
-        let modifications = '';
-        if (item.removed && item.removed.length > 0) {
-            modifications = `<div class="text-xs text-red-400 mt-1">SEM: ${item.removed.join(', ')}</div>`;
-        }
+        const removedText = (item.removed && item.removed.length > 0) 
+            ? `<div class="mt-1 flex flex-wrap gap-1">
+                 ${item.removed.map(ing => `<span class="text-[10px] font-bold text-red-500 bg-red-900/10 px-1.5 py-0.5 rounded border border-red-500/20 uppercase tracking-wide">SEM ${ing}</span>`).join("")}
+               </div>`
+            : "";
         
-        // Property fallback: item.img (saved locally) OR item.img_url (if from raw db) OR placeholder
-        const imgSrc = item.img || item.img_url || 'assets/img/placeholder_food.png';
-
-        const el = document.createElement('div');
-        el.className = 'flex items-center gap-4 bg-surface-dark p-3 rounded-2xl border border-white/5';
-        el.innerHTML = `
-            <img src="${imgSrc}" class="w-16 h-16 rounded-xl object-cover" alt="${item.name}">
-            <div class="flex-1">
-                <h4 class="font-bold text-white text-sm">${item.name}</h4>
-                ${modifications}
-                <div class="flex justify-between items-center mt-2">
-                    <span class="text-primary font-bold text-sm">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
-                    <span class="text-xs text-white/60 bg-white/10 px-2 py-1 rounded-lg">x${item.quantity}</span>
+        const itemHtml = `
+            <div class="flex items-center gap-4 bg-surface-dark p-3 rounded-2xl border border-white/5">
+                <div class="bg-center bg-no-repeat bg-cover rounded-xl w-20 h-20 shrink-0 shadow-sm" style='background-image: url("${item.img_url}");'></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-white text-sm line-clamp-1">${item.name}</h4>
+                        <button onclick="removeItem(${index})" class="text-white/20 hover:text-red-500 transition-colors ml-2">
+                             <span class="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                    </div>
+                    ${removedText}
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-primary font-bold text-sm">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
+                        <div class="flex items-center bg-white/5 rounded-full p-1 h-8">
+                            <span class="px-3 text-xs font-bold text-white/60">x${item.quantity}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button onclick="removeItem(${index})" class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 transition-colors hover:bg-red-500/20">
-                <span class="material-symbols-outlined text-lg">delete</span>
-            </button>
         `;
-        container.appendChild(el);
+        container.innerHTML += itemHtml;
     });
 }
 window.removeItem = (index) => {

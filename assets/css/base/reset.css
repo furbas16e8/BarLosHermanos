@@ -16,8 +16,9 @@ body {
   background-color: var(--color-bg-dark);
   color: var(--color-white);
   min-height: 100vh;
-  /* Fix para mobile overflow */
+  /* Fix para mobile overflow e bounce */
   overflow-x: hidden; 
+  overscroll-behavior-y: none;
   display: flex;
   flex-direction: column;
 }

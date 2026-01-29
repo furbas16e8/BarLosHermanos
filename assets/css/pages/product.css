@@ -62,7 +62,7 @@
     position: relative;
     z-index: 10;
     margin-top: -1.5rem; /* -mt-6 */
-    padding-bottom: 14rem; /* pb-56 space for footer + navbar + safe area */
+    padding-bottom: 16rem; /* Aumentado para garantir respiro (Opção L) */
 }
 
 .product-header {
@@ -211,9 +211,9 @@
     bottom: var(--navbar-height); /* Fix: navbar-height (84px) to sit above global nav */
     left: 0;
     right: 0;
-    padding: 0 1.5rem 1.5rem 1.5rem; /* px-6 pb-6 */
-    z-index: 30; /* Navbar is 50, but this floats above physically. Wait. If Navbar is 50, this must be >50 to be clickable if they overlap? No, if bottom is 84px, they don't overlap. */
-    background: linear-gradient(to top, var(--color-bg-dark) 60%, transparent);
+    padding: 0 1.5rem 1.25rem 1.5rem; /* px-6 pb-5 */
+    z-index: 30; 
+    background: transparent;
     pointer-events: none;
 }
 

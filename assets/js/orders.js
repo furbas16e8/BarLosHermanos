@@ -36,7 +36,7 @@ function saveCart(cart) {
   if (typeof updateNavbarCartCount === "function") updateNavbarCartCount();
 }
 
-function addToCart(name, price, image, removedIngredients = []) {
+function addToCart(name, price, img_url, removedIngredients = []) {
   let cart = getCart();
   
   // Normalizar array para comparação (sort)
@@ -50,7 +50,7 @@ function addToCart(name, price, image, removedIngredients = []) {
   if (item) {
     item.quantity++;
   } else {
-    cart.push({ name, price, image, quantity: 1, removed: incomingRemoved });
+    cart.push({ name, price, img_url, quantity: 1, removed: incomingRemoved });
   }
   saveCart(cart);
   console.log(`${name} adicionado ao carrinho!`);
@@ -104,7 +104,7 @@ function updateCartUI() {
 
     const itemHtml = `
             <div class="flex items-center gap-4 px-4 py-4 border-b border-gray-200 dark:border-white/5 last:border-0">
-                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-20 shrink-0 shadow-sm" style='background-image: url("${item.image}");'></div>
+                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-20 shrink-0 shadow-sm" style='background-image: url("${item.img_url}");'></div>
                 <div class="flex flex-col flex-1 min-w-0">
                     <div class="flex justify-between items-start">
                         <div>
@@ -301,7 +301,7 @@ function updateFavoritesUI() {
                     </div>
                     <div class="flex items-center justify-between mt-2">
                         <span class="text-primary font-bold text-lg">R$ ${parseFloat(item.price).toFixed(2).replace(".", ",")}</span>
-                        <button class="bg-primary text-white p-2 rounded-xl flex items-center justify-center hover:scale-95 transition-all" onclick="addToCart('${item.name}', ${item.price}, '${item.image}')">
+                        <button class="bg-primary text-white p-2 rounded-xl flex items-center justify-center hover:scale-95 transition-all" onclick="addToCart('${item.name}', ${item.price}, '${item.img_url}')">
                             <span class="material-symbols-outlined">add_shopping_cart</span>
                         </button>
                     </div>
