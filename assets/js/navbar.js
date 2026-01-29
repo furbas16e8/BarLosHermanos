@@ -1,84 +1,122 @@
+import { el, $, $$ } from './dom-helpers.js';
+
 /**
- * navbar.js - Gerencia a barra de navegação global do Bar Los Hermanos
+ * navbar.js - Gerencia a barra de navegação global
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    const navbarHTML = `
-        <nav class="fixed bottom-0 w-full bg-[#000000] border-t border-white/5 h-[84px] pb-4 z-50 flex justify-around items-center px-2">
-            <a class="flex flex-col items-center justify-center w-16 gap-1 group" href="orders.html" id="nav-home">
-                <span class="material-symbols-outlined text-white/50 group-hover:text-primary transition-colors text-[28px]">home</span>
-                <span class="text-[10px] font-semibold text-white/40 group-hover:text-primary">Início</span>
-            </a>
-            <a class="flex flex-col items-center justify-center w-16 gap-1 group" href="favoritos.html" id="nav-favoritos">
-                <span class="material-symbols-outlined text-white/50 group-hover:text-primary transition-colors text-[28px]">favorite</span>
-                <span class="text-[10px] font-semibold text-white/40 group-hover:text-primary">Favoritos</span>
-            </a>
-            <a class="flex flex-col items-center justify-center w-16 gap-1 group relative" href="shopping.html" id="nav-cart">
-                <div class="absolute top-0 right-3 w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full border-2 border-[#1a130c] flex items-center justify-center opacity-0" id="navbar-cart-count">0</div>
-                <span class="material-symbols-outlined text-white/50 group-hover:text-primary transition-colors text-[28px]">shopping_bag</span>
-                <span class="text-[10px] font-semibold text-white/40 group-hover:text-primary">Carrinho</span>
-            </a>
-            <a class="flex flex-col items-center justify-center w-16 gap-1 group" href="perfil.html" id="nav-profile">
-                <span class="material-symbols-outlined text-white/50 group-hover:text-primary transition-colors text-[28px]">person</span>
-                <span class="text-[10px] font-semibold text-white/40 group-hover:text-primary">Perfil</span>
-            </a>
-        </nav>
-    `;
+function initNavbar() {
+    // 1. Construir a Navbar usando DOM Helpers e BEM
+    const navbar = el('nav', { class: 'bottom-nav' }, [
+        // Home
+        createNavItem({ 
+            id: 'nav-home', 
+            href: 'orders.html', 
+            icon: 'home', 
+            label: 'Início' 
+        }),
+        // Favoritos
+        createNavItem({ 
+            id: 'nav-favoritos', 
+            href: 'favoritos.html', 
+            icon: 'favorite', 
+            label: 'Favoritos' 
+        }),
+        // Carrinho
+        createNavItem({ 
+            id: 'nav-cart', 
+            href: 'shopping.html', 
+            icon: 'shopping_bag', 
+            label: 'Carrinho',
+            hasBadge: true
+        }),
+        // Perfil
+        createNavItem({ 
+            id: 'nav-profile', 
+            href: 'perfil.html', 
+            icon: 'person', 
+            label: 'Perfil' 
+        })
+    ]);
 
-    // Insere a barra no final do body
-    document.body.insertAdjacentHTML('beforeend', navbarHTML);
+    // 2. Inserir no Body (se ainda não existir)
+    if (!document.querySelector('.bottom-nav')) {
+        document.body.appendChild(navbar);
+    }
 
-    // Define o estado ativo baseado na página atual
+    // 3. Destacar Link Ativo
+    highlightActiveLink();
+
+    // 4. Configurar Listener do Carrinho
+    updateNavbarCartCount();
+}
+
+// Ensure execution
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavbar);
+} else {
+    initNavbar();
+}
+
+function createNavItem({ id, href, icon, label, hasBadge = false }) {
+    // Estrutura:
+    // a.nav-item
+    //   div.nav-badge (opcional)
+    //   span.material-symbols-outlined.nav-item__icon
+    //   span.nav-item__label
+    
+    const children = [
+        el('span', { class: 'material-symbols-outlined nav-item__icon' }, icon),
+        el('span', { class: 'nav-item__label' }, label)
+    ];
+
+    if (hasBadge) {
+        children.unshift(el('div', { id: 'navbar-cart-count', class: 'nav-badge' }, '0'));
+    }
+
+    return el('a', { id, href, class: 'nav-item' }, children);
+}
+
+function highlightActiveLink() {
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
     
     const activeMapping = {
+        '': 'nav-home', // root
         'index.html': 'nav-home',
         'orders.html': 'nav-home',
+        'pagina_pedido.html': 'nav-home',
+        'historia.html': 'nav-home',
         'favoritos.html': 'nav-favoritos',
         'shopping.html': 'nav-cart',
         'perfil.html': 'nav-profile',
         'address.html': 'nav-profile',
         'login.html': 'nav-profile',
-        'cadastro.html': 'nav-profile',
-        'pagina_pedido.html': 'nav-home',
-        'historia.html': 'nav-home'
+        'cadastro.html': 'nav-profile'
     };
 
     const activeId = activeMapping[currentPath];
     if (activeId) {
         const activeLink = document.getElementById(activeId);
         if (activeLink) {
-            const icon = activeLink.querySelector('.material-symbols-outlined');
-            const label = activeLink.querySelector('span:not(.material-symbols-outlined)');
-            
-            icon.classList.remove('text-white/50');
-            icon.classList.add('text-primary', 'fill-1');
-            label.classList.remove('text-white/40');
-            label.classList.add('text-primary', 'font-bold');
+            activeLink.classList.add('nav-item--active');
         }
     }
-
-    // Configuração de cores (Vermelho Global #ff3131)
-    document.documentElement.style.setProperty('--primary', '#ff3131');
-
-    // Listener para o contador do carrinho
-    updateNavbarCartCount();
-});
+}
 
 /**
- * Atualiza o contador do carrinho na barra de navegação
+ * Atualiza o contador do carrinho
  */
-function updateNavbarCartCount() {
+window.updateNavbarCartCount = function() {
     const badge = document.getElementById('navbar-cart-count');
     if (!badge) return;
 
+    // Supomos que orders.js já definiu a key ou método global
     const cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
     
     if (totalItems > 0) {
         badge.innerText = totalItems;
-        badge.classList.remove('opacity-0');
+        badge.classList.add('visible');
     } else {
-        badge.classList.add('opacity-0');
+        badge.classList.remove('visible');
     }
-}
+};

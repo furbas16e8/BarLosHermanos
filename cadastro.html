@@ -4,143 +4,177 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Bar Los Hermanos | Cadastro</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Google Fonts -->
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
-    <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="assets/css/styles_new.css">
+    
+    <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#ff3131",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#000000",
-                        "surface-dark": "#1a130c",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans", "sans-serif"],
-                        "title": ["Bebas Neue", "cursive"],
-                        "body": ["Poppins", "sans-serif"]
-                    }
-                },
-            },
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    
+    <!-- Inline styles for unique layout bits if not in utils/form.css -->
+    <style>
+        .auth-container-scroll {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 2.5rem 1.5rem; /* pt-12 px-6 */
         }
-    </script>
+        
+        .auth-header-lg h1 {
+            font-family: var(--font-display);
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--color-white);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header-lg p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        .highlight-text {
+            color: var(--color-primary);
+            font-family: var(--font-title-alt);
+            font-size: 3rem; /* text-5xl */
+            vertical-align: middle;
+        }
+
+        .section-separator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .separator-label {
+            color: var(--color-primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .separator-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, rgba(255,255,255,0.2), transparent);
+        }
+    </style>
 </head>
-<body class="font-display bg-background-dark min-h-screen relative flex flex-col overflow-x-hidden">
+<body class="font-display">
     <!-- Background Layer -->
     <div class="fixed inset-0 z-0">
         <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCnWdzeBM8n7grZP1A7hHvjXqk2vMWoZipIYpwhDE_Jvh0H2ON5jbxISFJ60B2GMJ9bDKaHY3jbhwKmuEPIPwuCCDlBLqHh2axvmkDTGwRJJ43Xk6f1BZtMsOBm_ByICVqc6r2G__xfxidZqN0gHHCgkSM5qa-1wwlgTf-CM7QSC7Kz9gI1OaOe_umW-P4yzc9irsO_YFLqeZBUavZ8VUZd3J3os6zAk3MhN23lKdDf9J7XvwmFHlgrQUm-dVWl6rzmWSx-iqDvctAx');"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/95 to-background-dark/40"></div>
     </div>
 
-    <main class="relative z-10 flex-1 flex flex-col w-full max-w-[480px] mx-auto px-6 py-12">
+    <main class="auth-container-scroll">
         <div class="mb-10">
-            <button class="mb-6 flex items-center text-white/60 hover:text-primary transition-colors" onclick="history.back()">
+            <button class="mb-6 flex items-center gap-1 text-white-60 hover:text-primary transition-colors" onclick="history.back()">
                 <span class="material-symbols-outlined">arrow_back_ios</span>
                 <span class="text-sm font-semibold">Voltar</span>
             </button>
-            <h1 class="text-white tracking-tight text-4xl font-extrabold leading-[1.1] mb-2 font-display">
-                Entre para a<br/><span class="text-primary font-title text-5xl">Família.</span>
-            </h1>
-            <p class="text-white/60 text-lg font-medium">
-                Crie sua conta para começar a pedir.
-            </p>
+            <div class="auth-header-lg">
+                <h1>Entre para a<br/><span class="highlight-text">Família.</span></h1>
+                <p>Crie sua conta para começar a pedir.</p>
+            </div>
         </div>
 
-        <form class="space-y-6 w-full" onsubmit="handleCadastro(event)">
-            <div class="space-y-4">
-                <div class="flex flex-col gap-2">
-                    <label class="text-white/90 text-sm font-semibold ml-1">Nome Completo</label>
-                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                        <input id="nome" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Ex: João Silva" type="text" required/>
-                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors">
-                            <span class="material-symbols-outlined">person</span>
-                        </div>
+        <form class="flex flex-col gap-6 w-full" onsubmit="handleCadastro(event)">
+            <!-- Personal Info -->
+            <div class="flex flex-col gap-4">
+                <div class="input-group">
+                    <label class="input-label">Nome Completo</label>
+                    <div class="input-wrapper">
+                        <input id="nome" class="input-field" placeholder="Ex: João Silva" type="text" required/>
+                        <div class="input-icon"><span class="material-symbols-outlined">person</span></div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-white/90 text-sm font-semibold ml-1">Celular</label>
-                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                        <input id="telefone" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="(00) 00000-0000" type="tel" required/>
-                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors">
-                            <span class="material-symbols-outlined">phone_iphone</span>
-                        </div>
+                <div class="input-group">
+                    <label class="input-label">Celular</label>
+                    <div class="input-wrapper">
+                        <input id="telefone" class="input-field" placeholder="(00) 00000-0000" type="tel" required/>
+                        <div class="input-icon"><span class="material-symbols-outlined">phone_iphone</span></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">E-mail</label>
+                    <div class="input-wrapper">
+                        <input id="email" class="input-field" placeholder="email@exemplo.com" type="email" required/>
+                        <div class="input-icon"><span class="material-symbols-outlined">mail</span></div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-white/90 text-sm font-semibold ml-1">E-mail</label>
-                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                        <input id="email" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="email@exemplo.com" type="email" required/>
-                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-2">
-                    <label class="text-white/90 text-sm font-semibold ml-1">Senha</label>
-                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                        <input id="senha" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Crie uma senha" type="password" required/>
-                        <div class="pr-5 text-white/40 group-focus-within:text-primary transition-colors cursor-pointer">
+                <div class="input-group">
+                    <label class="input-label">Senha</label>
+                    <div class="input-wrapper">
+                        <input id="senha" class="input-field" placeholder="Crie uma senha" type="password" required/>
+                        <div class="input-icon input-icon--clickable">
                             <span class="material-symbols-outlined">visibility</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 py-4">
-                <span class="text-primary text-xs font-bold uppercase tracking-widest whitespace-nowrap">Endereço de Entrega</span>
-                <div class="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
+            <!-- Separator -->
+            <div class="section-separator">
+                <span class="separator-label">Endereço de Entrega</span>
+                <div class="separator-line"></div>
             </div>
 
-            <div class="space-y-4">
-                <div class="flex flex-col gap-2">
-                    <label class="text-white/90 text-sm font-semibold ml-1">Bairro</label>
-                    <div class="relative w-full rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                        <select id="bairro" class="w-full bg-transparent border-none text-white px-5 h-14 focus:ring-0 text-base appearance-none" required>
+            <!-- Address Info -->
+            <div class="flex flex-col gap-4">
+                <div class="input-group">
+                    <label class="input-label">Bairro</label>
+                    <div class="input-wrapper relative">
+                        <select id="bairro" class="input-field" style="appearance: none;" required>
                             <option disabled selected value="" class="bg-surface-dark">Carregando bairros...</option>
                         </select>
-                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                        <div class="input-icon absolute right-0 pointer-events-none">
                             <span class="material-symbols-outlined">keyboard_arrow_down</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label class="text-white/90 text-sm font-semibold ml-1">Rua</label>
-                    <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                        <input id="rua" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Nome da rua" type="text" required/>
+                <div class="input-group">
+                    <label class="input-label">Rua</label>
+                    <div class="input-wrapper">
+                        <input id="rua" class="input-field" placeholder="Nome da rua" type="text" required/>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-4">
-                    <div class="flex flex-col gap-2 col-span-1">
-                        <label class="text-white/90 text-sm font-semibold ml-1">Número</label>
-                        <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                            <input id="numero" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="123" type="text" required/>
+                    <div class="input-group col-span-1">
+                        <label class="input-label">Número</label>
+                        <div class="input-wrapper">
+                            <input id="numero" class="input-field" placeholder="123" type="text" required/>
                         </div>
                     </div>
-                    <div class="flex flex-col gap-2 col-span-2">
-                        <label class="text-white/90 text-sm font-semibold ml-1">Complemento</label>
-                        <div class="flex w-full items-center rounded-2xl glass-input group focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
-                            <input id="complemento" class="flex-1 w-full bg-transparent border-none text-white placeholder:text-white/30 h-14 px-5 focus:ring-0 text-base" placeholder="Apto, Bloco..." type="text"/>
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label class="input-label">Complemento</label>
+                        <div class="input-wrapper">
+                            <input id="complemento" class="input-field" placeholder="Apto, Bloco..." type="text"/>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button type="submit" id="btn-cadastro" class="w-full h-16 rounded-2xl bg-primary hover:bg-red-700 active:scale-[0.98] transition-all text-white text-lg font-bold shadow-xl shadow-red-900/20 mt-8 flex items-center justify-center gap-3">
+            <button type="submit" id="btn-cadastro" class="btn btn-primary" style="height: 4rem; margin-top: 2rem;">
                 CRIAR CONTA
                 <span class="material-symbols-outlined text-[24px]">person_add</span>
             </button>
@@ -152,24 +186,24 @@
                 const { data, error } = await getDeliveryZones();
                 
                 if (data && data.length > 0) {
-                    bairroSelect.innerHTML = '<option disabled selected value="" class="bg-surface-dark">Selecione o bairro</option>';
+                    bairroSelect.innerHTML = '<option disabled selected value="" style="background-color: var(--color-surface-dark);">Selecione o bairro</option>';
                     data.forEach(zone => {
                         const option = document.createElement('option');
-                        option.value = zone.bairro; // Usar o nome do bairro como valor para simplificar
-                        option.className = 'bg-surface-dark';
+                        option.value = zone.bairro;
+                        option.style.backgroundColor = 'var(--color-surface-dark)';
                         option.textContent = zone.bairro;
                         bairroSelect.appendChild(option);
                     });
                 } else {
-                    bairroSelect.innerHTML = '<option disabled selected value="" class="bg-surface-dark">Erro ao carregar ou sem cobertura</option>';
+                    bairroSelect.innerHTML = '<option disabled selected value="" style="background-color: var(--color-surface-dark);">Erro ao carregar ou sem cobertura</option>';
                     console.error('Erro bairros:', error);
                 }
             });
         </script>
 
         <div class="mt-10 text-center">
-            <p class="text-white/60 text-base">
-                Já tem uma conta? <a class="text-primary font-bold hover:underline ml-1" href="login.html">Entrar</a>
+            <p class="auth-text">
+                Já tem uma conta? <a class="auth-link" href="login.html">Entrar</a>
             </p>
         </div>
         <div class="h-10"></div>
@@ -197,35 +231,27 @@
         // Feedback visual
         btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Criando conta...';
         btn.disabled = true;
-        btn.classList.add('opacity-70', 'cursor-not-allowed');
 
         try {
             // Tenta criar usuário
             const { data, error } = await signUpUser(email, senha, {
                 nome: nome,
                 telefone: telefone,
-                cpf: null, // Campo não estava no form
+                cpf: null,
                 endereco_rua: endereco.rua,
                 endereco_numero: endereco.numero,
                 endereco_bairro: endereco.bairro,
-                // address meta data fields need to be adapted in signUpUser or user table structure if flat
             });
 
             if (error) {
                 alert('Erro ao cadastrar: ' + error.message);
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
-                btn.classList.remove('opacity-70', 'cursor-not-allowed');
             } else {
-                // Tentar login automático ou redirecionar se já vier com sessão
-                // Se o settings do Supabase tiver "Enable Email Confirm" OFF, signUp já loga.
-                // Se tiver ON, não loga. Vamos assumir OFF pelo pedido do usuário de "simplificar".
-                
                 if (data.session) {
                     alert('Cadastro realizado com sucesso! Entrando...');
                     window.location.href = 'orders.html';
                 } else {
-                    // Caso fallback onde email confirm é obrigatório
                     alert('Cadastro realizado! Se necessário, verifique seu email. Direcionando...');
                     window.location.href = 'orders.html';
                 }
@@ -235,7 +261,6 @@
             alert('Erro inesperado.');
             btn.innerHTML = originalContent;
             btn.disabled = false;
-            btn.classList.remove('opacity-70', 'cursor-not-allowed');
         }
     }
 </script>

@@ -1,0 +1,223 @@
+/* assets/css/pages/cart.css */
+
+.cart-container {
+    padding-bottom: 240px; /* Space for checkout bar + navbar */
+    overflow-y: auto;
+    flex: 1; /* Fix: Use flex-1 instead of height-100% to fill available space correctly */
+    min-height: 0; /* Fix: Allow flex container to shrink correctly */
+    width: 100%;
+}
+
+.cart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background-color: var(--color-bg-dark);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--color-white-5);
+}
+
+.section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+    padding-left: 0.25rem;
+}
+
+/* Branch Selector */
+.branch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 0 1rem;
+}
+
+.branch-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-white-10); /* Default border */
+    background: var(--color-surface-dark); /* Default bg */
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.branch-option--selected {
+    border-color: var(--color-primary);
+    background-color: rgba(255, 49, 49, 0.1);
+    color: var(--color-primary);
+}
+
+.branch-option--selected .branch-subtitle {
+     color: var(--color-primary);
+}
+
+.branch-title {
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 700;
+}
+
+.branch-subtitle {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+/* Delivery Mode Switch */
+.delivery-switch {
+    display: flex;
+    padding: 0.25rem;
+    background-color: var(--color-surface-dark);
+    border-radius: var(--radius-xl);
+    margin: 0 1rem 2rem 1rem;
+}
+
+.delivery-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: center;
+    transition: all 0.2s;
+    color: var(--color-text-secondary);
+}
+
+.delivery-btn:hover {
+    background-color: var(--color-white-5);
+}
+
+.delivery-btn--active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Address Card */
+.address-card {
+    background-color: var(--color-surface-dark);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-white-5);
+    padding: 1rem;
+    margin: 0 1rem 2rem 1rem;
+}
+
+.address-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.cart-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0 1rem;
+}
+
+/* Empty State */
+.cart-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 0;
+    text-align: center;
+}
+
+/* Payment Methods */
+.payment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 1rem;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--color-surface-dark);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-white-5);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.payment-option--selected {
+    border-color: rgba(255, 49, 49, 0.5); /* primary/50 */
+}
+
+/* Checkout Bar (FIXED POSITION) */
+.checkout-bar {
+    position: fixed;
+    /* Sit exactly above the navbar */
+    bottom: var(--navbar-height); 
+    left: 0;
+    right: 0;
+    z-index: 60; /* Higher than navbar (50) to be safe, or 40 if below */
+    /* User said "log acima da barra", so above physically. If it overlaps content, content needs padding. */
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--color-white-5);
+    padding: 1rem;
+    
+    /* Animation for entering */
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.checkout-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+}
+
+.checkout-total-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
+}
+
+.checkout-total-value {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.checkout-meta {
+    text-align: right;
+}
+
+/* Troco Input */
+.change-container {
+    margin-top: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.change-input-wrapper {
+    background-color: var(--color-surface-dark);
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-xl);
+    padding: 1rem;
+    margin-top: 0.5rem;
+}

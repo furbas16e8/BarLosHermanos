@@ -1,27 +1,113 @@
-/* Custom scrollbar hide for cleaner mobile look */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+/* assets/css/orders.css */
 
-/* Glassmorphism Utilities */
-.glass-panel {
-    background: rgba(255, 255, 255, 0.08);
+/* Top App Bar */
+.top-app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.25rem 0.5rem 1.25rem; /* pt-6 pb-2 px-5 */
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: var(--color-bg-light); /* fallback */
+    background-color: rgba(248, 247, 245, 0.9); /* light transport */
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.glass-input {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* Dark Mode Support via class explicitly */
+@media (prefers-color-scheme: dark) {
+    .top-app-bar {
+        background-color: rgba(0, 0, 0, 0.95);
+        border-bottom: 1px solid var(--color-white-5);
+    }
+}
+/* Ou se usarmos classe .dark no body como o tailwind fazia */
+body.dark .top-app-bar {
+    background-color: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid var(--color-white-5);
 }
 
-/* Global Fixes */
-body {
-    min-height: max(884px, 100dvh);
+.user-greeting {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.user-name {
+    color: var(--color-white);
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.location-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-surface-dark);
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-white-5);
+}
+
+.location-badge__icon {
+    font-size: 18px;
+    color: var(--color-primary);
+}
+
+.location-badge__text {
+    color: var(--color-text-secondary);
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Headers de Seção */
+.section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem 0.75rem 1.25rem; /* px-5 py-3 */
+}
+
+.section-title {
+    color: var(--color-white);
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 700;
+    letter-spacing: -0.025em; /* tracking-tight */
+    line-height: 1.25;
+}
+
+.section-link {
+    color: var(--color-primary);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 700;
+}
+
+/* Grids e Containers (Specific overrides) */
+.featured-container {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    gap: 1.25rem; /* gap-5 */
+    min-height: 12rem;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* grid-cols-3 is default in old orders.html? checking... yes grid-cols-3 */
+    gap: 1rem; /* gap-4 */
+    padding: 0 1.25rem;
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 cols on very small screens? Actually user had grid-cols-3 always */
+    }
 }

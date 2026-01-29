@@ -1,54 +1,34 @@
 
-// orders-view.js - Lógica de Visualização do Dashboard
+import { el, $, $$ } from './dom-helpers.js';
 
-// Helper de Formatação
+// orders-view.js - Lógica de Visualização do Dashboard (Refatorado)
+
+// Configuration
+const CATEGORY_ORDER = [
+    'entradas', 'jantinhas', 'porcoes', 'especiais', 'burguers', 
+    'fritas', 'batatas', 'caldos', 'coxinhas', 'escondidinhos', 'bebidas'
+];
+
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// Global Category Order
-const CATEGORY_ORDER = [
-    'entradas', 
-    'jantinhas', 
-    'porcoes', 
-    'especiais', 
-    'burguers', 
-    'fritas', 
-    'batatas', 
-    'caldos', 
-    'coxinhas', 
-    'escondidinhos', 
-    'bebidas'
-];
-
-// --- SERVIÇOS DE DADOS (Substituindo menu-service.js) ---
+// --- DATA SERVICES (Supabase Wrapper) ---
 
 async function getFeaturedItems() {
-    // Exemplo: Itens 'especiais' ou aleatórios
+    if (!window.supabaseClient) return [];
     const { data, error } = await window.supabaseClient
         .from('cardapio')
         .select('*')
         .eq('ativo', true)
         .eq('destaque', true) 
         .limit(5);
-    
     if (error) console.error('Erro featured:', error);
     return data || [];
 }
 
-async function getPopularItems() {
-    // Exemplo: Itens aleatórios ou fixos. Vamos pegar 'burgers' e 'entradas' por enquanto.
-    const { data, error } = await window.supabaseClient
-        .from('cardapio')
-        .select('*')
-        .eq('ativo', true)
-        .limit(9);
-    
-    if (error) console.error('Erro popular:', error);
-    return data || [];
-}
-
 async function getAllItems() {
+    if (!window.supabaseClient) return [];
     const { data, error } = await window.supabaseClient
         .from('cardapio')
         .select('*')
@@ -57,6 +37,7 @@ async function getAllItems() {
 }
 
 async function getItemsByCategory(category) {
+    if (!window.supabaseClient) return [];
     const { data, error } = await window.supabaseClient
         .from('cardapio')
         .select('*')
@@ -65,153 +46,161 @@ async function getItemsByCategory(category) {
     return data || [];
 }
 
-// --- LÓGICA DE UI ---
+// --- UI LOGIC ---
 
 async function loadUserProfile() {
+    if (!window.checkSession) return;
     const session = await checkSession();
     if (!session) {
         window.location.href = 'login.html';
         return;
     }
 
-    const { data: user, error } = await getUserProfile(session.user.id);
+    const { data: user } = await getUserProfile(session.user.id);
     
     if (user) {
-        const nameEl = document.getElementById('header-name');
-        const addrEl = document.getElementById('header-address');
+        const nameEl = $('#header-name');
+        const addrEl = $('#header-address');
         
         if (nameEl) nameEl.innerText = user.nome || 'Cliente';
-        
         if (addrEl) {
-            if (user.endereco_rua) {
-                // Formata endereço curto: Rua X, 123...
-                addrEl.innerText = `${user.endereco_rua}, ${user.endereco_numero}`;
-            } else {
-                addrEl.innerText = 'Sem endereço';
-            }
+            addrEl.innerText = user.endereco_rua 
+                ? `${user.endereco_rua}, ${user.endereco_numero}`
+                : 'Sem endereço';
         }
     }
 }
 
 async function loadFeatured() {
-    const container = document.getElementById('featured-container');
+    const container = $('#featured-container');
     if (!container) return;
 
-    container.innerHTML = '<div class="text-white/50 px-5">Carregando destaques...</div>';
+    container.innerHTML = '';
     const items = await getFeaturedItems();
 
     if (!items || items.length === 0) {
-        container.innerHTML = '<div class="text-white/50 px-5">Sem destaques hoje.</div>';
+        container.appendChild(el('div', { class: 'text-muted px-5 py-4' }, 'Sem destaques hoje.'));
         return;
     }
 
-    container.innerHTML = '';
     items.forEach(item => {
-        // Card de Destaque
-        const card = document.createElement('div');
-        card.className = 'relative flex-none w-72 h-48 rounded-2xl overflow-hidden group';
-        card.innerHTML = `
-            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" 
-                 style="background-image: url('${item.img_url || 'assets/img/placeholder_food.png'}');">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-            </div>
-            <div class="absolute inset-0 flex flex-col justify-end p-4 border-2 border-primary/60 rounded-2xl shadow-[0_0_20px_rgba(242,127,13,0.3)] cursor-pointer"
-                 onclick="window.location.href='pagina_pedido.html?id=${item.id}'">
-                <div class="flex justify-between items-end">
-                    <div>
-                        <span class="px-2 py-0.5 rounded-md bg-primary text-white text-[10px] font-bold uppercase tracking-wider mb-1 inline-block">Destaque</span>
-                        <h3 class="text-white text-lg font-bold leading-tight">${item.nome}</h3>
-                        <p class="text-secondary-text text-xs mt-0.5 truncate max-w-[150px]">${item.descricao || ''}</p>
-                    </div>
-                    <p class="text-primary text-xl font-extrabold">${formatCurrency(item.valor)}</p>
-                </div>
-            </div>
-        `;
+        // [REF] assets/css/components/card.css (.featured-card)
+        const card = el('div', { 
+            class: 'featured-card group',
+            onclick: () => window.location.href = `pagina_pedido.html?id=${item.id}`
+        }, [
+            // Background Layer
+            el('div', { 
+                class: 'featured-card__bg',
+                style: { backgroundImage: `url('${item.img_url || 'assets/img/placeholder_food.png'}')` }
+            }),
+            // Gradient Overlay
+            el('div', { class: 'featured-card__overlay' }),
+            // Content
+            el('div', { class: 'featured-card__content' }, [
+                el('div', { class: 'flex justify-between items-end' }, [
+                    el('div', {}, [
+                        el('span', { class: 'featured-card__tag' }, 'Destaque'),
+                        el('h3', { class: 'featured-card__title' }, item.nome),
+                        el('p', { class: 'featured-card__desc' }, item.descricao || '')
+                    ]),
+                    el('p', { class: 'featured-card__price' }, formatCurrency(item.valor))
+                ])
+            ])
+        ]);
+
         container.appendChild(card);
     });
 }
 
+// Renderiza grid principal (Populares ou Filtrados)
+function renderGridItems(items, container) {
+    container.innerHTML = '';
+
+    if (!items || items.length === 0) {
+        container.appendChild(el('div', { class: 'text-muted col-span-3 text-center py-8' }, 'Nenhum item encontrado.'));
+        return;
+    }
+
+    items.forEach(item => {
+        const safeName = item.nome.replace(/'/g, "\\'");
+        
+        // [REF] assets/css/components/card.css (.product-card)
+        const card = el('div', { class: 'product-card group' }, [
+            // Image Container
+            el('div', { 
+                class: 'product-card__image-container',
+                style: { backgroundImage: `url('${item.img_url || 'assets/img/placeholder_food.png'}')` },
+                onclick: () => window.location.href = `pagina_pedido.html?id=${item.id}`
+            }, [
+                // Favorite Button
+                el('button', { 
+                    class: 'product-card__fav-btn',
+                    'data-favorite-name': item.nome,
+                    onclick: (e) => {
+                        e.stopPropagation();
+                        // Assume window.toggleFavorite global from orders.js
+                        if(window.toggleFavorite) window.toggleFavorite(item.nome, item.valor, item.img_url || '');
+                    }
+                }, [
+                    el('span', { class: 'material-symbols-outlined product-card__fav-icon' }, 'favorite')
+                ])
+            ]),
+            
+            // Info Container
+            el('div', { 
+                class: 'product-card__info',
+                onclick: () => window.location.href = `pagina_pedido.html?id=${item.id}`
+            }, [
+                el('h3', { class: 'product-card__title' }, item.nome),
+                el('div', { class: 'flex items-center justify-between' }, [
+                    el('span', { class: 'product-card__price' }, formatCurrency(item.valor))
+                ])
+            ])
+        ]);
+
+        container.appendChild(card);
+    });
+
+    // Reapply favorite states
+    if (window.updateFavoriteIcons) window.updateFavoriteIcons();
+}
+
 async function loadPopular() {
-    const container = document.getElementById('popular-container');
+    const container = $('#popular-container');
     if (!container) return;
     
-    container.innerHTML = '<div class="text-white/50 col-span-3 text-center text-sm py-8">Carregando cardápio...</div>';
+    container.innerHTML = ''; 
+    container.appendChild(el('div', { class: 'text-muted py-8 text-center w-full' }, 'Carregando cardápio...'));
+    
+    // Default load: all items (sorted later)
     const items = await getAllItems();
     renderGridItems(items, container);
 }
 
-function renderGridItems(items, container) {
-    if (!items || items.length === 0) {
-        container.innerHTML = '<div class="text-white/50 col-span-3 text-center text-sm py-8">Nenhum item encontrado.</div>';
-        return;
-    }
-
-    container.innerHTML = '';
-    items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'bg-surface-dark rounded-2xl p-3 flex flex-col gap-3 group';
-        const safeName = item.nome.replace(/'/g, "\\'");
-        
-        card.innerHTML = `
-            <div class="w-full aspect-square rounded-xl bg-cover bg-center relative overflow-hidden" 
-                 style="background-image: url('${item.img_url || 'assets/img/placeholder_food.png'}');"
-                 onclick="window.location.href='pagina_pedido.html?id=${item.id}'">
-                 <button class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1 z-10 hover:scale-110 transition-transform" 
-                    data-favorite-name="${item.nome}" 
-                    onclick="event.stopPropagation(); window.toggleFavorite('${safeName}', ${item.valor}, '${item.img_url || ''}')">
-                    <span class="material-symbols-outlined text-white text-[16px]">favorite</span>
-                </button>
-            </div>
-            <div onclick="window.location.href='pagina_pedido.html?id=${item.id}'" class="cursor-pointer">
-                <h3 class="text-white font-bold text-sm leading-tight mb-1 cursor-pointer line-clamp-1">${item.nome}</h3>
-                <div class="flex items-center justify-between">
-                    <span class="text-secondary-text text-sm font-semibold">${formatCurrency(item.valor)}</span>
-                </div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-    
-    // Atualiza ícones de favorito se a função existir
-    if (window.updateFavoriteIcons) window.updateFavoriteIcons();
-}
-
+// Logic to filter by category
 async function filterByCategory(category, element) {
-    const container = document.getElementById('popular-container');
-    // UI Update (Visual Selection)
+    // 1. Update UI (Active State)
     if (element) {
-        const allButtons = element.parentElement.children;
-        for (let btn of allButtons) {
-            const circle = btn.querySelector('div');
-            const label = btn.querySelector('span:last-child');
-            circle.classList.remove('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/30');
-            circle.classList.add('bg-surface-dark', 'text-secondary-text', 'border', 'border-white/5');
-            label.classList.remove('text-white');
-            label.classList.add('text-secondary-text');
-        }
-        const circle = element.querySelector('div');
-        const label = element.querySelector('span:last-child');
-        circle.classList.remove('bg-surface-dark', 'text-secondary-text', 'border', 'border-white/5');
-        circle.classList.add('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/30');
-        label.classList.remove('text-secondary-text');
-        label.classList.add('text-white');
+        // Remove .category-item--active de todos
+        $$('.category-item').forEach(btn => btn.classList.remove('category-item--active'));
+        // Adiciona ao clicado
+        element.classList.add('category-item--active');
     }
 
-    container.innerHTML = '<div class="text-white/50 col-span-3 text-center text-sm py-8">Carregando...</div>';
-    
+    const container = $('#popular-container');
+    container.innerHTML = '';
+    container.appendChild(el('div', { class: 'text-muted py-8 text-center' }, 'Carregando...'));
+
     let items;
     if (category === 'todas') {
-        items = await getAllItems(); // Busca tudo ao filtrar por 'todas'
-        
-        // Ordenação personalizada por categoria
+        items = await getAllItems();
+        // Custom Sort by CATEGORY_ORDER
         items.sort((a, b) => {
             const indexA = CATEGORY_ORDER.indexOf(a.categoria?.toLowerCase());
             const indexB = CATEGORY_ORDER.indexOf(b.categoria?.toLowerCase());
-            
-            // Se não encontrar, joga pro final
             const posA = indexA === -1 ? 999 : indexA;
             const posB = indexB === -1 ? 999 : indexB;
-            
             return posA - posB;
         });
     } else {
@@ -221,12 +210,66 @@ async function filterByCategory(category, element) {
     renderGridItems(items, container);
 }
 
-// Inicialização
+// Bind Global
+window.filterMenuByCategory = filterByCategory;
+
+/**
+ * Renderiza a lista de categorias dinamicamente
+ * (Substitui o HTML estático)
+ */
+function renderCategoryList() {
+    const container = $('#category-list-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+    
+    // Mapeamento Icones
+    const icons = {
+        'todas': 'menu_book',
+        'entradas': 'restaurant',
+        'jantinhas': 'dinner_dining',
+        'porcoes': 'tapas',
+        'especiais': 'star',
+        'burguers': 'lunch_dining',
+        'fritas': 'fastfood',
+        'batatas': 'egg',
+        'caldos': 'soup_kitchen',
+        'coxinhas': 'bakery_dining',
+        'escondidinhos': 'rice_bowl',
+        'bebidas': 'local_bar'
+    };
+
+    // Item "Todas"
+    const allBtn = createCategoryItem('todas', 'Todas', icons['todas'], true);
+    container.appendChild(allBtn);
+
+    // Outras Categorias
+    CATEGORY_ORDER.forEach(cat => {
+        const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+        const icon = icons[cat] || 'restaurant';
+        const btn = createCategoryItem(cat, label, icon, false);
+        container.appendChild(btn);
+    });
+}
+
+function createCategoryItem(id, label, iconName, isActive) {
+    // [REF] assets/css/components/category-nav.css (.category-item)
+    const btn = el('div', { 
+        class: `category-item ${isActive ? 'category-item--active' : ''}`,
+        onclick: function() { filterMenuByCategory(id, this); } 
+    }, [
+        el('div', { class: 'category-item__circle' }, [
+            el('span', { class: 'material-symbols-outlined category-item__icon' }, iconName)
+        ]),
+        el('span', { class: 'category-item__label' }, label)
+    ]);
+    return btn;
+}
+
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
     loadUserProfile();
+    renderCategoryList();
     loadFeatured();
-    loadPopular(); // Carrega inicial
-    
-    // Bind global para o HTML acessar
-    window.filterMenuByCategory = filterByCategory;
+    loadPopular();
 });

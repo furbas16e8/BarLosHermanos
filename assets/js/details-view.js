@@ -1,5 +1,6 @@
+import { el, $, $$ } from './dom-helpers.js';
 
-// details-view.js - Lógica da Página de Detalhes
+// details-view.js - Lógica da Página de Detalhes (Refatorado)
 
 // --- Mapeamento de Ingredientes ---
 const INGREDIENT_ICONS = {
@@ -7,7 +8,7 @@ const INGREDIENT_ICONS = {
     "Queijo": { icon: "ph-cheese", color: "text-yellow-400" },
     "Bacon": { icon: "ph-waves", color: "text-red-500" },
     "Alface": { icon: "ph-plant", color: "text-green-500" },
-    "Tomate": { icon: "ph-pizza", color: "text-red-600" }, // Metafórico até achar melhor
+    "Tomate": { icon: "ph-pizza", color: "text-red-600" }, 
     "Cebola": { icon: "ph-wind", color: "text-purple-300" },
     "Ovo": { icon: "ph-egg", color: "text-yellow-200" },
     "Picles": { icon: "ph-cactus", color: "text-green-700" },
@@ -15,35 +16,48 @@ const INGREDIENT_ICONS = {
     "Pão": { icon: "ph-grains", color: "text-amber-200" }
 };
 
-// Estado local de exclusão
+// Colors map for inline style (fallback if classes not working with Phosphor inside JS)
+// Note: Tailwind "text-orange-400" classes won't work without Tailwind. 
+// We should use hex codes or var colors in style attribute.
+const COLOR_MAP = {
+    "text-orange-400": "#fb923c",
+    "text-yellow-400": "#facc15",
+    "text-red-500": "#ef4444",
+    "text-green-500": "#22c55e",
+    "text-red-600": "#dc2626",
+    "text-purple-300": "#d8b4fe",
+    "text-yellow-200": "#fef08a",
+    "text-green-700": "#15803d",
+    "text-orange-300": "#fdba74",
+    "text-amber-200": "#fde68a",
+    "text-gray-400": "#9ca3af",
+    "text-gray-500": "#6b7280"
+};
+
 let removedIngredients = new Set();
 let currentProduct = null;
 
-// Helper de Formatação
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// Carregar Detalhes
 async function loadProductDetails() {
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('id');
 
     if (!productId) {
-        // Fallback silencioso ou redirect
         window.location.href = 'orders.html';
         return;
     }
 
     // Elements
-    const imgEl = document.querySelector('.bg-cover'); 
-    const titleEl = document.querySelector('h1');
-    const priceEl = document.querySelector('.text-3xl.font-bold.text-primary'); // Preço topo direita
-    const priceBtnEl = document.getElementById('btn-price-display'); // Preço botão
-    const descEl = document.querySelector('p.text-white\\/70');
-    const ratingEl = document.querySelector('.text-white.font-semibold');
-    const favBtn = document.querySelector('[data-favorite-name]');
-    const cartBtn = document.getElementById('btn-add-cart');
+    const heroBg = $('.product-hero__bg');
+    const titleEl = $('#product-title');
+    const priceTopEl = $('#product-price-top');
+    const priceBtnEl = $('#btn-price-display');
+    const descEl = $('#product-desc');
+    const favBtn = $('#btn-favorite');
+    const cartBtn = $('#btn-add-cart');
 
     // Fetch Data
     const { data: item, error } = await window.supabaseClient
@@ -58,84 +72,83 @@ async function loadProductDetails() {
         return;
     }
 
-    currentProduct = item; // Guardar referência global
+    currentProduct = item; 
 
     // Update UI
     document.title = `Bar Los Hermanos - ${item.nome}`;
     
-    if(imgEl) imgEl.style.backgroundImage = `url('${item.img_url || 'assets/img/placeholder_food.png'}')`;
+    if(heroBg) heroBg.style.backgroundImage = `url('${item.img_url || 'assets/img/placeholder_food.png'}')`;
     if(titleEl) titleEl.innerText = item.nome;
-    if(priceEl) priceEl.innerText = formatCurrency(item.valor);
+    if(priceTopEl) priceTopEl.innerText = formatCurrency(item.valor);
     if(priceBtnEl) priceBtnEl.innerText = formatCurrency(item.valor);
     if(descEl) descEl.innerText = item.descricao || 'Sem descrição.';
-    if(ratingEl) ratingEl.innerText = '5.0'; 
 
     // Render Ingredientes
     renderIngredients(item.ingredientes);
 
-    // Update Favorite Button
+    // Update Favorite Button logic
     if (favBtn) {
-        favBtn.setAttribute('data-favorite-name', item.nome);
+        // Assume window.toggleFavorite exists globally from orders.js
         favBtn.onclick = (e) => {
             e.stopPropagation();
-            window.toggleFavorite(item.nome, item.valor, item.img_url);
+            if(window.toggleFavorite) window.toggleFavorite(item.nome, item.valor, item.img_url);
+            
+            // Toggle local visual state (simple version)
+            const icon = favBtn.querySelector('span');
+            if(icon.style.color === 'var(--color-primary)') {
+                icon.style.color = 'white';
+            } else {
+                icon.style.color = 'var(--color-primary)';
+            }
         };
     }
 
-    // Update Cart Button
+    // Update Cart Button Logic
     if (cartBtn) {
         cartBtn.onclick = () => {
-            // Passar lista de removidos para o carrinho
-            // Convertendo Set para Array
             const removedList = Array.from(removedIngredients);
-            window.addToCart(
-                item.nome, 
-                item.valor, 
-                item.img_url || 'assets/img/placeholder_food.png', 
-                removedList
-            );
-            
-            // Feedback simples (opcional, já que addToCart pode ter)
-            // Resetar estado após adicionar? 
-            // removedIngredients.clear();
-            // renderIngredients(item.ingredientes);
-            // Decisão: manter estado caso usuário queira adicionar outro igual.
+            if(window.addToCart) {
+                window.addToCart(
+                    item.nome, 
+                    item.valor, 
+                    item.img_url || 'assets/img/placeholder_food.png', 
+                    removedList
+                );
+            }
         };
     }
 }
 
 function renderIngredients(ingredientsList) {
-    const container = document.getElementById('ingredients-container');
+    const container = $('#ingredients-container');
     if (!container) return;
 
     container.innerHTML = '';
 
-    // Se nulo ou vazio, esconder seção inteira? Por enquanto deixa vazio.
     if (!ingredientsList || !Array.isArray(ingredientsList) || ingredientsList.length === 0) {
-        // Opcional: container.innerHTML = '<span class="text-white/50 text-sm italic">Sem ingredientes listados.</span>';
         return;
     }
 
     ingredientsList.forEach(ingName => {
-        // Tenta achar no mapa, se não, usa fallback
         const mapData = INGREDIENT_ICONS[ingName] || { icon: "ph-fork-knife", color: "text-gray-400" };
-        
-        // Verificar estado (removido ou não)
         const isRemoved = removedIngredients.has(ingName);
         
-        // Estilos dinâmicos
-        const activeClasses = "glass-panel opacity-100 border-transparent";
-        const removedClasses = "bg-white/5 opacity-50 grayscale border-red-500/30 line-through decoration-red-500 decoration-2";
-        
-        const card = document.createElement('button');
-        card.className = `min-w-[70px] h-[90px] rounded-2xl flex flex-col items-center justify-center gap-2 p-2 border transition-all active:scale-95 ${isRemoved ? removedClasses : activeClasses}`;
-        
-        card.innerHTML = `
-            <i class="ph-duotone ${mapData.icon} text-2xl ${isRemoved ? 'text-gray-500' : mapData.color} transition-colors"></i>
-            <span class="text-xs font-medium text-white/80 ${isRemoved ? 'line-through' : ''}">${ingName}</span>
-        `;
+        // Determine Color Style
+        const iconColor = isRemoved ? COLOR_MAP['text-gray-500'] : (COLOR_MAP[mapData.color] || '#ffffff');
 
-        card.onclick = () => toggleIngredient(ingName);
+        // [REF] assets/css/pages/product.css (.ingredient-card)
+        const cardClass = `ingredient-card ${isRemoved ? 'ingredient-card--removed' : ''}`;
+
+        const card = el('button', { 
+            class: cardClass,
+            onclick: () => toggleIngredient(ingName)
+        }, [
+            el('i', { 
+                class: `ph-duotone ${mapData.icon}`,
+                style: { fontSize: '24px', color: iconColor, transition: 'color 0.2s' }
+            }),
+            el('span', { class: 'ingredient-card__label' }, ingName)
+        ]);
         
         container.appendChild(card);
     });
@@ -147,18 +160,12 @@ function toggleIngredient(name) {
     } else {
         removedIngredients.add(name);
     }
-    // Re-renderizar para atualizar visual
-    // Usamos currentProduct.ingredientes pois é a fonte da verdade da ordem
+    
     if (currentProduct && currentProduct.ingredientes) {
         renderIngredients(currentProduct.ingredientes);
     }
 }
 
-// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
     loadProductDetails();
-    
-    setTimeout(() => {
-        if(window.updateFavoriteIcons) window.updateFavoriteIcons();
-    }, 1000);
 });
