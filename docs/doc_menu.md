@@ -1,4 +1,4 @@
-# Schema Database: Cardápio Inteligente
+# Documentação do Banco de Dados: Cardápio Inteligente
 
 Este documento descreve a estrutura de banco de dados para o sistema de cardápio, incluindo a tabela principal, função de geração de códigos (SKU), gatilhos de automação e políticas de segurança.
 
