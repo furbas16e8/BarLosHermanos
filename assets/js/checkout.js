@@ -57,27 +57,44 @@ function renderCartItems(cart) {
     
     // Unificado para usarem o estilo Vanilla correto
     cart.forEach((item, index) => {
+        // Fallback para imagem
+        const imageUrl = item.img_url || item.image || 'assets/img/placeholder_food.png';
+        
         const removedText = (item.removed && item.removed.length > 0) 
-            ? `<div class="mt-1 flex flex-wrap gap-1">
-                 ${item.removed.map(ing => `<span class="text-[10px] font-bold text-red-500 bg-red-900/10 px-1.5 py-0.5 rounded border border-red-500/20 uppercase tracking-wide">SEM ${ing}</span>`).join("")}
+            ? `<div class="cart-item__extras">
+                 ${item.removed.map(ing => `<span class="cart-item__extra-tag">SEM ${ing}</span>`).join("")}
+               </div>`
+            : "";
+        
+        // Mostrar extras adicionados
+        const extrasText = (item.extras && item.extras.length > 0)
+            ? `<div class="cart-item__extras">
+                 ${item.extras.map(ext => `<span class="cart-item__extra-tag cart-item__extra-tag--added">+ ${ext.name}</span>`).join("")}
                </div>`
             : "";
         
         const itemHtml = `
-            <div class="flex items-center gap-4 bg-surface-dark p-3 rounded-2xl border border-white/5">
-                <div class="bg-center bg-no-repeat bg-cover rounded-xl w-20 h-20 shrink-0 shadow-sm" style='background-image: url("${item.img_url}");'></div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-bold text-white text-sm line-clamp-1">${item.name}</h4>
-                        <button onclick="removeItem(${index})" class="text-white/20 hover:text-red-500 transition-colors ml-2">
-                             <span class="material-symbols-outlined text-lg">delete</span>
+            <div class="cart-item">
+                <div class="cart-item__image" style="background-image: url('${imageUrl}');"></div>
+                <div class="cart-item__content">
+                    <div class="cart-item__header">
+                        <h4 class="cart-item__name">${item.name}</h4>
+                        <button onclick="removeItem(${index})" class="cart-item__remove">
+                             <span class="material-symbols-outlined">delete</span>
                         </button>
                     </div>
                     ${removedText}
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="text-primary font-bold text-sm">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
-                        <div class="flex items-center bg-white/5 rounded-full p-1 h-8">
-                            <span class="px-3 text-xs font-bold text-white/60">x${item.quantity}</span>
+                    ${extrasText}
+                    <div class="cart-item__footer">
+                        <span class="cart-item__price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+                        <div class="cart-item__quantity">
+                            <button class="cart-item__qty-btn" onclick="changeCartQuantity(${index}, -1)">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
+                            </button>
+                            <span class="cart-item__qty-value">${item.quantity}</span>
+                            <button class="cart-item__qty-btn cart-item__qty-btn--add" onclick="changeCartQuantity(${index}, 1)">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -86,6 +103,28 @@ function renderCartItems(cart) {
         container.innerHTML += itemHtml;
     });
 }
+
+// Função para alterar quantidade no carrinho (checkout)
+window.changeCartQuantity = function(index, delta) {
+    let cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
+    
+    if (cart[index]) {
+        cart[index].quantity += delta;
+        
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        
+        localStorage.setItem('bar-los-hermanos-cart', JSON.stringify(cart));
+        
+        // Atualizar UI
+        renderCartItems(cart);
+        updateCheckoutTotals();
+        
+        // Atualizar badge global
+        if(window.updateNavbarCartCount) window.updateNavbarCartCount();
+    }
+};
 window.removeItem = (index) => {
     let cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
     cart.splice(index, 1);

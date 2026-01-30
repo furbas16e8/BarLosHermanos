@@ -36,24 +36,38 @@ function saveCart(cart) {
   if (typeof updateNavbarCartCount === "function") updateNavbarCartCount();
 }
 
-function addToCart(name, price, img_url, removedIngredients = []) {
+function addToCart(name, price, img_url, removedIngredients = [], extras = []) {
   let cart = getCart();
   
-  // Normalizar array para comparação (sort)
+  // Normalizar arrays para comparação (sort)
   const incomingRemoved = (removedIngredients || []).sort();
+  const incomingExtras = (extras || []).slice().sort((a, b) => a.name.localeCompare(b.name));
   
   let item = cart.find((i) => {
       const existingRemoved = (i.removed || []).sort();
-      return i.name === name && JSON.stringify(existingRemoved) === JSON.stringify(incomingRemoved);
+      const existingExtras = (i.extras || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+      
+      const sameName = i.name === name;
+      const sameRemoved = JSON.stringify(existingRemoved) === JSON.stringify(incomingRemoved);
+      const sameExtras = JSON.stringify(existingExtras) === JSON.stringify(incomingExtras);
+      
+      return sameName && sameRemoved && sameExtras;
   });
 
   if (item) {
     item.quantity++;
   } else {
-    cart.push({ name, price, img_url, quantity: 1, removed: incomingRemoved });
+    cart.push({ 
+      name, 
+      price, 
+      img_url, 
+      quantity: 1, 
+      removed: incomingRemoved,
+      extras: incomingExtras
+    });
   }
   saveCart(cart);
-  console.log(`${name} adicionado ao carrinho!`);
+  console.log(`${name} adicionado ao carrinho!`, { extras: incomingExtras });
 }
 // Exposing globally for module access
 window.addToCart = addToCart;
@@ -80,49 +94,58 @@ function updateCartUI() {
   let cart = getCart();
 
   if (cart.length === 0) {
-    if (emptyMsg) emptyMsg.style.display = "flex";
+    if (emptyMsg) emptyMsg.classList.remove("hidden");
     container.innerHTML = "";
-    if (emptyMsg) container.appendChild(emptyMsg);
     if (subtotalEl) subtotalEl.innerText = "R$ 0,00";
     if (totalEl) totalEl.innerText = "R$ 0,00";
     if (checkoutTotalEl) checkoutTotalEl.innerText = "R$ 0,00";
     return;
   }
 
-  if (emptyMsg) emptyMsg.style.display = "none";
+  if (emptyMsg) emptyMsg.classList.add("hidden");
   container.innerHTML = "";
 
   let subtotal = 0;
 
   cart.forEach((item, index) => {
     subtotal += item.price * item.quantity;
+    
+    // Fallback para imagem
+    const imageUrl = item.img_url || item.image || 'assets/img/placeholder_food.png';
+    
     const removedText = (item.removed && item.removed.length > 0) 
-        ? `<div class="mt-1 flex flex-wrap gap-1">
-             ${item.removed.map(ing => `<span class="text-[10px] font-bold text-red-500 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800 uppercase tracking-wide">SEM ${ing}</span>`).join("")}
+        ? `<div class="cart-item__extras">
+             ${item.removed.map(ing => `<span class="cart-item__extra-tag">SEM ${ing}</span>`).join("")}
+           </div>`
+        : "";
+    
+    // Mostrar extras adicionados
+    const extrasText = (item.extras && item.extras.length > 0)
+        ? `<div class="cart-item__extras">
+             ${item.extras.map(ext => `<span class="cart-item__extra-tag cart-item__extra-tag--added">+ ${ext.name}</span>`).join("")}
            </div>`
         : "";
 
     const itemHtml = `
-            <div class="flex items-center gap-4 px-4 py-4 border-b border-gray-200 dark:border-white/5 last:border-0">
-                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-20 shrink-0 shadow-sm" style='background-image: url("${item.img_url}");'></div>
-                <div class="flex flex-col flex-1 min-w-0">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-base font-bold leading-tight line-clamp-1">${item.name}</h3>
-                            ${removedText}
-                        </div>
-                        <button class="text-gray-400 hover:text-red-500 transition-colors ml-2" onclick="removeFromCart(${index})">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+            <div class="cart-item">
+                <div class="cart-item__image" style="background-image: url('${imageUrl}');"></div>
+                <div class="cart-item__content">
+                    <div class="cart-item__header">
+                        <h3 class="cart-item__name">${item.name}</h3>
+                        <button class="cart-item__remove" onclick="removeFromCart(${index})">
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </div>
-                    <div class="flex items-center justify-between mt-3">
-                        <p class="text-primary font-bold">R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
-                        <div class="flex items-center bg-gray-100 dark:bg-[#342618] rounded-full p-1 h-8">
-                            <button class="w-7 h-full flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-[#493622] text-gray-600 dark:text-white transition-colors" onclick="changeQuantity(${index}, -1)">
+                    ${removedText}
+                    ${extrasText}
+                    <div class="cart-item__footer">
+                        <span class="cart-item__price">R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
+                        <div class="cart-item__quantity">
+                            <button class="cart-item__qty-btn" onclick="changeQuantity(${index}, -1)">
                                 <span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
                             </button>
-                            <span class="w-6 text-center text-sm font-semibold">${item.quantity}</span>
-                            <button class="w-7 h-full flex items-center justify-center rounded-full bg-white dark:bg-primary shadow-sm text-gray-900 dark:text-white transition-colors" onclick="changeQuantity(${index}, 1)">
+                            <span class="cart-item__qty-value">${item.quantity}</span>
+                            <button class="cart-item__qty-btn cart-item__qty-btn--add" onclick="changeQuantity(${index}, 1)">
                                 <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
                             </button>
                         </div>

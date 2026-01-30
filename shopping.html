@@ -17,40 +17,39 @@
     <script src="assets/js/supabase-client.js"></script>
     <script src="assets/js/checkout.js"></script>
 </head>
-<body class="font-display flex flex-col h-screen overflow-hidden">
+<body class="checkout-layout">
     <!-- Header -->
     <header class="cart-header">
-        <button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors" onclick="history.back()">
-            <span class="material-symbols-outlined text-white">arrow_back</span>
+        <button class="icon-btn" onclick="history.back()">
+            <span class="material-symbols-outlined icon-btn__icon">arrow_back</span>
         </button>
-        <h1 class="text-lg font-bold tracking-tight text-white">Finalizar Pedido</h1>
-        <div class="w-10"></div>
+        <h1 class="page-title">Finalizar Pedido</h1>
+        <div class="icon-btn-placeholder"></div>
     </header>
 
     <!-- Content Scroller -->
     <main class="cart-container no-scrollbar">
-        <!-- Branch Selector -->
-        <div class="pt-6">
-            <h2 class="section-label px-6">Selecione a Filial</h2>
-            <div class="branch-grid">
-                <button id="btn-branch-bairro" onclick="setBranch('Bairro')" class="branch-option">
-                    <span class="branch-title text-white">Los Bairro</span>
-                    <span class="branch-subtitle text-white">Unidade Principal</span>
-                </button>
-                <button id="btn-branch-centro" onclick="setBranch('Centro')" class="branch-option">
-                    <span class="branch-title text-white">Los Centro</span>
-                    <span class="branch-subtitle text-white">Unidade Centro</span>
-                </button>
+        <!-- Branch Info (Substitui o seletor de filiais) -->
+        <div class="branch-info-section">
+            <h2 class="section-label">Local do Pedido</h2>
+            <div class="branch-info-box">
+                <span class="material-symbols-outlined branch-info__icon">store</span>
+                <div class="branch-info__content">
+                    <p class="branch-info__name">Você está pedindo no <strong>Los Hermanos Grã Duquesa</strong></p>
+                    <p class="branch-info__address">Rua Suíça, 22</p>
+                </div>
             </div>
         </div>
 
         <!-- Delivery Mode -->
-        <div>
+        <div class="delivery-section">
             <div class="delivery-switch">
                 <button id="btn-delivery-mode" onclick="setDeliveryMode('delivery')" class="delivery-btn delivery-btn--active">
+                    <span class="material-symbols-outlined">delivery_dining</span>
                     Entrega
                 </button>
                 <button id="btn-pickup-mode" onclick="setDeliveryMode('pickup')" class="delivery-btn">
+                    <span class="material-symbols-outlined">storefront</span>
                     Retirada
                 </button>
             </div>
@@ -59,90 +58,89 @@
         <!-- Address -->
         <div id="address-section" class="address-card">
             <div class="address-header">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-xl">location_on</span>
-                    <h3 class="text-sm font-bold text-white">Endereço de Entrega</h3>
+                <div class="address-title-group">
+                    <span class="material-symbols-outlined address-title-group__icon">location_on</span>
+                    <h3 class="address-title-group__text">Endereço de Entrega</h3>
                 </div>
-                <button class="text-[10px] font-bold text-primary uppercase" onclick="window.location.href='perfil.html'">Alterar</button>
+                <button class="address-change-btn" onclick="window.location.href='perfil.html'">Alterar</button>
             </div>
-            <div id="address-details" class="pl-7">
+            <div id="address-details" class="address-details">
                 <!-- JS injeta aqui -->
-                <p class="text-xs text-white/50">Carregando...</p>
+                <p class="address-loading">Carregando...</p>
             </div>
         </div>
 
         <!-- Items -->
-        <div class="mb-8">
-            <h2 class="section-label px-6">Seus Itens</h2>
+        <div class="cart-items-section">
+            <h2 class="section-label">Seus Itens</h2>
             <div id="cart-items-container" class="cart-items-list">
                 <!-- JS injeta aqui -->
             </div>
             
             <div id="empty-cart-msg" class="cart-empty hidden">
-                <span class="material-symbols-outlined text-6xl text-white/10 mb-4">shopping_cart_off</span>
-                <p class="text-white/40 mb-4">Seu carrinho está vazio</p>
-                <a href="orders.html" class="text-primary font-bold">Ver cardápio</a>
+                <span class="material-symbols-outlined cart-empty__icon">shopping_cart_off</span>
+                <p class="cart-empty__text">Seu carrinho está vazio</p>
+                <a href="orders.html" class="cart-empty__link">Ver cardápio</a>
             </div>
         </div>
 
         <!-- Payment -->
-        <div class="mb-8">
-            <h2 class="section-label px-6">Forma de Pagamento</h2>
+        <div class="payment-section">
+            <h2 class="section-label">Forma de Pagamento</h2>
             <div class="payment-list">
                 <button onclick="setPaymentMethod('online')" id="pay-online" class="payment-option payment-option--selected">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-primary">credit_card</span>
-                        <span class="text-sm font-bold text-white">Cartão ou Pix</span>
+                    <div class="payment-option__left">
+                        <span class="material-symbols-outlined payment-option__icon payment-option__icon--primary">credit_card</span>
+                        <span class="payment-option__text">Cartão ou Pix</span>
                     </div>
-                    <span class="material-symbols-outlined text-primary" id="check-online">check_circle</span>
+                    <span class="material-symbols-outlined payment-option__check" id="check-online">check_circle</span>
                 </button>
 
                 <button onclick="setPaymentMethod('cash')" id="pay-cash" class="payment-option">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[#8e7a65]">payments</span>
-                        <span class="text-sm font-bold text-[#cbad90]" id="text-cash">Dinheiro (na entrega)</span>
+                    <div class="payment-option__left">
+                        <span class="material-symbols-outlined payment-option__icon payment-option__icon--cash">payments</span>
+                        <span class="payment-option__text payment-option__text--cash" id="text-cash">Dinheiro (na entrega)</span>
                     </div>
-                    <span class="material-symbols-outlined hidden text-primary" id="check-cash">check_circle</span>
+                    <span class="material-symbols-outlined payment-option__check hidden" id="check-cash">check_circle</span>
                 </button>
 
                 <div id="change-container" class="change-container hidden">
                     <div class="change-input-wrapper">
-                        <label class="section-label" style="margin-bottom: 0.5rem; display: block;">Troco para quanto?</label>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-white">R$</span>
-                            <input type="number" id="cash-change" placeholder="Ex: 50,00" 
-                                   class="bg-transparent border-none text-white font-bold w-full focus:ring-0">
+                        <label class="section-label change-label">Troco para quanto?</label>
+                        <div class="change-input-group">
+                            <span class="change-input__prefix">R$</span>
+                            <input type="number" id="cash-change" placeholder="Ex: 50,00" class="change-input">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Totals Lines -->
-        <div class="px-6 space-y-3 pb-8">
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-[#cbad90]">Subtotal</span>
-                <span class="font-medium text-white" id="cart-subtotal">R$ 0,00</span>
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="totals-row">
+                <span class="totals-row__label">Subtotal</span>
+                <span class="totals-row__value" id="cart-subtotal">R$ 0,00</span>
             </div>
             
-            <div class="flex justify-between items-center text-sm hidden" id="discount-row">
-                <span class="text-[#cbad90]">Desconto Fidelidade (10%)</span>
-                <span class="font-medium text-green-500" id="cart-discount">- R$ 0,00</span>
+            <div class="totals-row hidden" id="discount-row">
+                <span class="totals-row__label totals-row__label--highlight">Desconto Fidelidade (10%)</span>
+                <span class="totals-row__value totals-row__value--discount" id="cart-discount">- R$ 0,00</span>
             </div>
 
-            <div class="flex justify-between items-center text-sm" id="delivery-row">
-                <span class="text-[#cbad90]">Taxa de Entrega</span>
-                <span class="font-medium text-white" id="taxa-entrega">R$ 0,00</span>
+            <div class="totals-row" id="delivery-row">
+                <span class="totals-row__label">Taxa de Entrega</span>
+                <span class="totals-row__value" id="taxa-entrega">R$ 0,00</span>
             </div>
 
             <!-- Total Highlighted -->
-            <div class="flex justify-between items-end pt-4 border-t border-white/5 mt-2">
-                <span class="text-sm font-bold uppercase tracking-widest text-white">Total</span>
-                <div class="text-right">
-                    <span class="text-3xl font-bold text-primary block leading-none" id="checkout-total">R$ 0,00</span>
-                    <div class="flex items-center justify-end gap-1 text-green-500 mt-1">
-                        <span class="material-symbols-outlined text-[12px]">bolt</span>
-                        <span class="text-[10px] font-bold uppercase">Entrega Rápida</span>
+            <div class="total-highlight">
+                <span class="total-highlight__label">Total</span>
+                <div class="total-highlight__right">
+                    <span class="total-highlight__value" id="checkout-total">R$ 0,00</span>
+                    <div class="total-highlight__badge">
+                        <span class="material-symbols-outlined total-highlight__badge-icon">bolt</span>
+                        <span class="total-highlight__badge-text">Entrega Rápida</span>
                     </div>
                 </div>
             </div>
@@ -151,9 +149,9 @@
 
     <!-- Checkout Bar (Fixed) -->
     <div class="checkout-bar">
-        <button id="btn-finish" class="btn btn-primary w-full h-14 text-lg flex justify-center items-center gap-2 shadow-xl shadow-red-900/20">
-            <span>Finalizar Pedido</span>
-            <span class="material-symbols-outlined">check_circle</span>
+        <button id="btn-finish" class="btn-finish">
+            <span class="btn-finish__text">Finalizar Pedido</span>
+            <span class="material-symbols-outlined btn-finish__icon">check_circle</span>
         </button>
     </div>
 

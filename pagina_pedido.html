@@ -27,10 +27,10 @@
         
         <div class="product-hero__nav">
             <button class="product-hero__btn" onclick="history.back()">
-                <span class="material-symbols-outlined text-white">arrow_back</span>
+                <span class="material-symbols-outlined icon-white">arrow_back</span>
             </button>
-            <button id="btn-favorite" class="product-hero__btn group">
-                <span class="material-symbols-outlined text-white transition-colors">favorite</span>
+            <button id="btn-favorite" class="product-hero__btn">
+                <span class="material-symbols-outlined icon-white icon-transition">favorite</span>
             </button>
         </div>
     </div>
@@ -42,9 +42,9 @@
             <div>
                 <h1 id="product-title" class="product-title">Carregando...</h1>
                 <div class="product-meta">
-                    <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1">star</span>
-                    <span class="font-semibold text-white">5.0</span>
-                    <span>(Avaliações)</span>
+                    <span class="material-symbols-outlined product-meta__icon">star</span>
+                    <span class="product-meta__rating">5.0</span>
+                    <span class="product-meta__label">(Avaliações)</span>
                 </div>
             </div>
             <div id="product-price-top" class="product-price">...</div>
@@ -52,52 +52,51 @@
 
         <p id="product-desc" class="product-desc">...</p>
 
-        <!-- Components List -->
-        <div class="mb-8">
-            <h3 class="text-white text-lg font-bold mb-4">Ingredientes</h3>
+        <!-- Ingredients List -->
+        <div class="section-spacing">
+            <h3 class="section-title">Ingredientes</h3>
             <div id="ingredients-container" class="ingredients-scroll no-scrollbar">
                 <!-- JS Injects Here -->
             </div>
         </div>
 
         <!-- Extra Toppings -->
-        <div class="mb-8">
-            <h3 class="text-white text-lg font-bold mb-4">Acompanhamentos Extra</h3>
-            <div class="flex flex-col gap-3">
+        <div class="section-spacing">
+            <h3 class="section-title">Acompanhamentos Extra</h3>
+            <div class="toppings-list">
                 <!-- Extra Queijo -->
-                <label class="checkbox-card group">
-                    <div class="flex items-center gap-3">
-                        <input class="hidden" type="checkbox" />
+                <label class="checkbox-card" onclick="toggleExtra('queijo', 4.50)">
+                    <div class="checkbox-card__left">
+                        <input class="checkbox-input" type="checkbox" id="extra-queijo" data-name="queijo" data-price="4.50" />
                         <div class="checkbox-visual">
                             <span class="material-symbols-outlined checkbox-icon">check</span>
                         </div>
-                        <span class="font-medium text-white/90">Extra Queijo</span>
+                        <span class="checkbox-label">Extra Queijo</span>
                     </div>
-                    <span class="checkbox-price">+R$ 4,50</span>
+                    <span class="checkbox-price" data-extra-price="4.50">+R$ 4,50</span>
                 </label>
                 
                 <!-- Ovo Frito -->
-                <label class="checkbox-card group">
-                    <div class="flex items-center gap-3">
-                        <input class="hidden" type="checkbox" />
+                <label class="checkbox-card" onclick="toggleExtra('ovo', 3.00)">
+                    <div class="checkbox-card__left">
+                        <input class="checkbox-input" type="checkbox" id="extra-ovo" data-name="ovo" data-price="3.00" />
                         <div class="checkbox-visual">
                             <span class="material-symbols-outlined checkbox-icon">check</span>
                         </div>
-                        <span class="font-medium text-white/90">Ovo Frito</span>
+                        <span class="checkbox-label">Ovo Frito</span>
                     </div>
-                    <span class="checkbox-price">+R$ 3,00</span>
+                    <span class="checkbox-price" data-extra-price="3.00">+R$ 3,00</span>
                 </label>
             </div>
         </div>
 
         <!-- Notes -->
-        <div class="mb-8">
-            <h3 class="text-white text-lg font-bold mb-4">Observações</h3>
+        <div class="section-spacing">
+            <h3 class="section-title">Observações</h3>
             <div class="input-group">
-                <div class="input-wrapper" style="height: auto; align-items: flex-start; padding-top: 1rem;">
+                <div class="input-wrapper input-wrapper--textarea">
                     <textarea
-                        class="input-field"
-                        style="height: 100px; resize: none;"
+                        class="input-field input-field--textarea"
                         placeholder="Ex: Sem cebola, molho à parte..."
                     ></textarea>
                 </div>
@@ -108,8 +107,8 @@
     <!-- Bottom Bar -->
     <div class="bottom-bar">
         <button id="btn-add-cart" class="bottom-bar__btn">
-            <span class="text-white font-extrabold text-lg">Adicionar ao Carrinho</span>
-            <span id="btn-price-display" class="text-white/90 font-bold text-lg">...</span>
+            <span class="bottom-bar__btn-text">Adicionar ao Carrinho</span>
+            <span id="btn-price-display" class="bottom-bar__btn-price">...</span>
         </button>
     </div>
 

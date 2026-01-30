@@ -35,7 +35,9 @@ const COLOR_MAP = {
 };
 
 let removedIngredients = new Set();
+let selectedExtras = new Map(); // Mapa de extras: nome -> preço
 let currentProduct = null;
+let basePrice = 0;
 
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -73,15 +75,16 @@ async function loadProductDetails() {
     }
 
     currentProduct = item; 
+    basePrice = parseFloat(item.valor) || 0;
 
     // Update UI
     document.title = `Bar Los Hermanos - ${item.nome}`;
     
     if(heroBg) heroBg.style.backgroundImage = `url('${item.img_url || 'assets/img/placeholder_food.png'}')`;
     if(titleEl) titleEl.innerText = item.nome;
-    if(priceTopEl) priceTopEl.innerText = formatCurrency(item.valor);
-    if(priceBtnEl) priceBtnEl.innerText = formatCurrency(item.valor);
-    if(descEl) descEl.innerText = item.descricao || 'Sem descrição.';
+    
+    // Atualizar preços
+    updatePriceDisplay();
 
     // Render Ingredientes
     renderIngredients(item.ingredientes);
@@ -105,19 +108,71 @@ async function loadProductDetails() {
 
     // Update Cart Button Logic
     if (cartBtn) {
+        console.log('[Details] Botão carrinho encontrado e configurado');
+        cartBtn.style.display = 'flex'; // Garantir visibilidade
         cartBtn.onclick = () => {
             const removedList = Array.from(removedIngredients);
+            const extrasList = Array.from(selectedExtras.entries()).map(([name, price]) => ({ name, price }));
+            const finalPrice = calculateTotalPrice();
+            
             if(window.addToCart) {
                 window.addToCart(
                     item.nome, 
-                    item.valor, 
+                    finalPrice, // Preço com extras
                     item.img_url, 
-                    removedList
+                    removedList,
+                    extrasList // Enviar extras para o carrinho
                 );
+                // Feedback visual
+                cartBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    cartBtn.style.transform = '';
+                }, 150);
             }
         };
+    } else {
+        console.error('[Details] Botão carrinho NÃO encontrado!');
     }
 }
+
+// Calcular preço total (base + extras)
+function calculateTotalPrice() {
+    let extrasTotal = 0;
+    selectedExtras.forEach(price => {
+        extrasTotal += price;
+    });
+    return basePrice + extrasTotal;
+}
+
+// Atualizar display de preço
+function updatePriceDisplay() {
+    const priceTopEl = $('#product-price-top');
+    const priceBtnEl = $('#btn-price-display');
+    const totalPrice = calculateTotalPrice();
+    
+    if(priceTopEl) priceTopEl.innerText = formatCurrency(totalPrice);
+    if(priceBtnEl) priceBtnEl.innerText = formatCurrency(totalPrice);
+}
+
+// Toggle extra (função global chamada pelo onclick)
+window.toggleExtra = function(name, price) {
+    const checkbox = document.getElementById(`extra-${name}`);
+    if (!checkbox) return;
+    
+    // Prevenir duplo toggle (o label já dispara o checkbox)
+    setTimeout(() => {
+        const isChecked = checkbox.checked;
+        
+        if (isChecked) {
+            selectedExtras.set(name, price);
+        } else {
+            selectedExtras.delete(name);
+        }
+        
+        console.log('[Details] Extras atualizados:', Array.from(selectedExtras.entries()));
+        updatePriceDisplay();
+    }, 0);
+};
 
 function renderIngredients(ingredientsList) {
     const container = $('#ingredients-container');
