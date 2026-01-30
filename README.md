@@ -29,13 +29,7 @@ O projeto foi construído com a filosofia "Keep It Simple", utilizando tecnologi
 ├── assets/              # Recursos estáticos
 │   ├── css/             # Estilos (style.css principal e modularização em andamento)
 │   ├── img/             # Imagens (otimizadas, formato webp/jpeg/png)
-│   ├── js/              # Lógica da aplicação (Modular)
-│   ├── video/           # Vídeos de fundo (Hero section)
-│   └── menu/            # Arquivos PDF do cardápio físico
-├── docs/                # Documentação adicional
-├── schema_cardapio.md   # Documentação detalhada do Banco de Dados
-├── setup_delivery.sql   # Scripts SQL para configuração de entregas
-├── AGENTS.md            # Documentação técnica para IAs
+│   └── js/              # Lógica da aplicação (Modular)
 └── *.html               # Páginas da aplicação (index, login, perfil, etc.)
 ```
 

@@ -25,22 +25,25 @@ O **Bar Los Hermanos** é uma aplicação web estática (Client-Side) construíd
 
 ## 2. Estrutura de Diretórios e Arquivos
 
-A organização do projeto é direta e sem ferramentas de build complexas.
+A organização do projeto é híbrida: diretórios públicos (`assets`) e diretórios de desenvolvimento/documentação que não vão para produção (ignorados no git).
 
 ```bash
 /
-├── .agent/              # Configurações e workflows de agentes IA
-├── assets/              # Recursos estáticos
-│   ├── css/             # Estilos (style.css principal e modularização em andamento)
-│   ├── img/             # Imagens (otimizadas, formato webp/jpeg/png)
-│   ├── js/              # Lógica da aplicação (Modular)
-│   ├── video/           # Vídeos de fundo (Hero section)
-│   └── menu/            # Arquivos PDF do cardápio físico
-├── docs/                # Documentação adicional
-├── *.html               # Páginas da aplicação (index, login, perfil, etc.)
-├── schema_cardapio.md   # Documentação detalhada do Banco de Dados
-├── setup_delivery.sql   # Scripts SQL para configuração de entregas
-└── AGENTS.md            # Este arquivo
+├── .gitignore           # Arquivos ignorados pelo Git
+├── AGENTS.md            # [DEV] Este arquivo (Documentação Agente)
+├── assets/              # Recursos estáticos (Público)
+│   ├── css/             # Estilos (style.css, orders.css)
+│   ├── img/             # Imagens otimizadas (webp/jpeg)
+│   ├── js/              # Lógica Client-side (Supabase client, UI events)
+│   ├── menu/            # PDFs do cardápio físico
+│   └── video/           # Vídeos de background
+├── db/                  # [DEV] Scripts SQL e Schema
+├── debug/               # [DEV] Logs e relatórios de debug ocasionais
+├── docs/                # [DEV] Documentação detalhada
+│   └── doc_*.md           # Documentação de partes importantes do projeto
+├── plans/               # [DEV] Planos de implementação e tarefas
+│   └── implementation_plan-*.md     # Histórico de planejamentos complexos
+└── *.html               # Páginas da aplicação (index, login, perfil, etc.)
 ```
 
 ### Principais Scripts (`assets/js/`)

@@ -12,3 +12,4 @@ trigger: always_on
 8. **Tratamento de Imagens:** Imagens de pratos e eventos devem sempre utilizar `object-fit: cover` para evitar distorções nas grades de exibição.
 9. **Acessibilidade de Imagens:** Todo elemento `<img>` deve conter um atributo `alt` descritivo focado no contexto do bar (ex: "Prato de Jiló Especial do Bar Los Hermanos").
 10. **Padronização de Transições:** Use sempre o tempo de transição de `0.3s` para efeitos de hover em links e botões, mantendo a suavidade da navegação.
+11. **Stack Tecnológica (Vanilla):** Este projeto está em processo de transição para **HTML, CSS e JavaScript puros (Vanilla)**. Não utilize frameworks como React, Vue ou bibliotecas de build como Webpack/Vite. O design existente deve ser preservado identicamente durante essa migração.
