@@ -1,61 +1,61 @@
 # Changelog
 
-All notable changes to the "Bar Los Hermanos" project will be documented in this file.
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
-## [Unreleased] - 2025-12-31
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Added
+## [Unreleased]
 
-- **SEO Completo**: Meta tags para buscadores e redes sociais.
-  - `meta description` e `keywords` para otimização de busca.
-  - Open Graph (`og:title`, `og:description`, `og:image`) para compartilhamento no Facebook.
-  - Twitter Cards para compartilhamento no Twitter/X.
-  - Referência ao favicon (`assets/img/favicon.ico`).
-- **Acessibilidade (A11y)**: Melhorias no formulário de reserva.
-  - Labels com `aria-label` e `id` em todos os campos.
-  - Classe `.sr-only` para labels ocultos visualmente mas acessíveis para leitores de tela.
-  - Atributos `name` nos inputs para submissão de formulário.
-- **Performance**: Atributo `loading="lazy"` na imagem da seção de eventos.
-
-### Changed
-
-- **Padronização de Botões**: `border-radius: 50px` aplicado em:
-  - `.btn-reserve` (antes: `5px`)
-  - `.btn-event` (antes: `4px`)
-  - `.form-btn` (antes: não tinha)
-- **Cores CSS Variáveis**: Substituição de `#000` por `var(--bg-color)` em:
-  - `.btn-reserve:hover`, `.btn-primary`, `.form-btn`, `.btn-event:hover`, `.btn-menu-highlight:hover`
-- **Localização pt-BR**: Comentários de seção do CSS traduzidos para português.
-  - `Hero Section` → `Seção Hero`
-  - `Section Geral` → `Seção Geral`
-  - `Menu Section` → `Seção do Menu`
-  - `Reservation / Form` → `Reserva / Formulário`
-  - `Footer` → `Rodapé`
-
----
-
-## [Unreleased] - 2025-12-30
+## [1.1.0] - 2026-01-30
 
 ### Added
 
-- **Menu Section Redesign**: Implemented a new asymmetrical grid layout for the Menu section to better showcase items.
-  - Added a fixed sidebar with the "Nossa Cozinha" kicker and specific beer list (Heineken, Original, Stella, Corona, Spaten, Brahma).
-  - Added a "Ver Cardápio Completo" button linking to `assets/menu/cardapio-completo.pdf` with a rounded style.
-  - Added two distinct columns for content: one for **Drinks** (Caipirinha, Gin, etc.) and one for **Food** (Jiló, Costelinha, etc.), both with 6 items and short descriptions.
-- **Section Title Standardization**: Unified visual style for section headers.
-  - Kickers (e.g., "Nossa Essência") are now Red (`#ff3131`).
-  - Main Titles (e.g., "TRADIÇÃO E SABOR EM GV") are now White (`#fff`) and formatted to `4rem`.
+- Sistema de extras dinâmicos com cálculo de preço em tempo real na página de detalhes do produto (`pagina_pedido.html`).
+- Botões interativos de quantidade (+/-) para itens no carrinho de compras (`shopping.html`).
+- Fallback automático para imagens de produtos (usando `placeholder_food.png`) quando a URL estiver ausente.
+- Tags visuais para identificação de extras adicionados e ingredientes removidos no checkout.
 
 ### Changed
 
-- **Color Palette Updates**:
-  - Updated `#menu` background color to `#081211` to match the Reservation section.
-  - Updated `.event-card` background color to `#081211` for consistency.
-- **Typography**:
-  - Adjusted font sizes in the menu section for better information density.
-- **Assets**:
-  - Replaced Hero video references (swapped positions of chef and drinks videos).
+- Migração completa de Tailwind CSS para Vanilla CSS nas páginas de produto (`pagina_pedido.html`) e checkout (`shopping.html`).
+- Refatoração do sistema de design utilizando variáveis CSS (`:root`) para cores, fontes e espaçamentos padronizados.
+- Otimização da lógica de comparação de itens no carrinho para considerar variações de extras e ingredientes.
+- Remoção do seletor de filiais para simplificar a experiência do usuário (UX).
 
 ### Fixed
 
-- Fixed inconsistent button rounding in the menu section to match the global site style (`border-radius: 50px`).
+- Correção de sobreposição de botões flutuantes fixos em relação à navbar global (ajuste de `z-index` e `bottom`).
+- Correção do carregamento de imagens oriundas do Supabase com tratamento de campos nulos.
+- Ajuste na responsividade dos botões de ação principal, garantindo o arredondamento de `50px`.
+
+## [1.0.0] - 2025-12-31
+
+### Added
+
+- **SEO Completo**: Meta tags para buscadores e redes sociais (Open Graph, Twitter Cards).
+- **Acessibilidade (A11y)**: Melhorias nos formulários com `aria-label`, IDs únicos e classes `.sr-only`.
+- **Performance**: Implementação de `loading="lazy"` em imagens pesadas.
+
+### Changed
+
+- **Padronização de Botões**: Aplicação global de `border-radius: 50px` em botões de reserva e eventos.
+- **Cores CSS Variáveis**: Substituição definitiva de hexadecimais por variáveis CSS em todos os componentes.
+- **Localização pt-BR**: Tradução e padronização de todos os comentários técnicos no CSS.
+
+## [0.9.0] - 2025-12-30
+
+### Added
+
+- **Redesign da Seção Menu**: Implementação de grade assimétrica e nova barra lateral fixa.
+- **Padronização de Títulos**: Unificação visual de kickers e títulos principais (H2) seguindo o guia de estilo.
+- **Lista de Cervejas**: Atualização da lista de bebidas disponíveis na barra lateral.
+
+### Changed
+
+- **Paleta de Cores**: Atualização dos fundos das seções de Menu e Reserva para consistência visual (`#081211`).
+- **Ativos**: Reorganização dos vídeos da seção Hero.
+
+### Fixed
+
+- Inconsistências no arredondamento de botões na seção de menu.
