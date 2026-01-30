@@ -23,7 +23,10 @@ erDiagram
         uuid id PK
         string email
         string nome
-        string telefone
+        uuid id PK
+        string email
+        string nome
+        string telefone "VARCHAR(16) | Apenas Números"
     }
 
     CARDAPIO {

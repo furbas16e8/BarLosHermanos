@@ -7,6 +7,17 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-01-30
+
+### Added
+
+- **Smart Phone Logic**: Implementação de lógica inteligente no frontend (`cadastro.html`) para preenchimento automático de prefixos telefônicos (Governador Valadares e Brasil) e remoção de zeros à esquerda.
+
+### Changed
+
+- **Banco de Dados (Clientes)**: Alteração da coluna `telefone` para `VARCHAR(16)` e adição de restriction check (`^[0-9]+$`) para garantir armazenamento apenas numérico.
+- **Documentação**: Atualização do diagrama de tabelas (`docs/doc_tables.md`) refletindo a nova tipagem segura.
+
 ## [1.1.0] - 2026-01-30
 
 ### Added

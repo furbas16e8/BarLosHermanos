@@ -219,8 +219,36 @@
         const email = document.getElementById('email').value;
         const senha = document.getElementById('senha').value;
         const nome = document.getElementById('nome').value;
-        const telefone = document.getElementById('telefone').value;
+        let telefoneRaw = document.getElementById('telefone').value;
         
+        // --- SMART PHONE LOGIC (Padronização Numérica) ---
+        // 1. Sanitização: Remove não-dígitos e zero à esquerda
+        let telefone = telefoneRaw.replace(/\D/g, ''); 
+        if (telefone.startsWith('0')) {
+            telefone = telefone.substring(1);
+        }
+
+        // 2. Regras de Prefixo Automático
+        if (telefone.length < 8) {
+            alert('Número de telefone inválido. Digite apenas números, incluindo o DDD.');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            return;
+        }
+
+        if (telefone.length === 8) {
+             // Caso GV sem o 9 (ex: 8888-7777) -> Add 55339
+             telefone = '55339' + telefone;
+        } else if (telefone.length === 9) {
+             // Caso GV com 9 (ex: 98888-7777) -> Add 5533
+             telefone = '5533' + telefone;
+        } else if (telefone.length === 10 || telefone.length === 11) {
+             // Caso Brasil com DDD (ex: 33 98888-7777) -> Add 55
+             telefone = '55' + telefone;
+        }
+        // Se > 11, assume internacional ou já completo -> Mantém original
+        // -------------------------------------------------
+
         const endereco = {
             bairro: document.getElementById('bairro').value,
             rua: document.getElementById('rua').value,
