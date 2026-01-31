@@ -110,24 +110,37 @@ async function loadProductDetails() {
     if (cartBtn) {
         console.log('[Details] Botão carrinho encontrado e configurado');
         cartBtn.style.display = 'flex'; // Garantir visibilidade
-        cartBtn.onclick = () => {
+        cartBtn.onclick = async () => {
+            console.log('[Details] Botão carrinho clicado!');
             const removedList = Array.from(removedIngredients);
             const extrasList = Array.from(selectedExtras.entries()).map(([name, price]) => ({ name, price }));
             const finalPrice = calculateTotalPrice();
             
             if(window.addToCart) {
-                window.addToCart(
-                    item.nome, 
-                    finalPrice, // Preço com extras
-                    item.img_url, 
-                    removedList,
-                    extrasList // Enviar extras para o carrinho
-                );
+                console.log('[Details] Chamando addToCart...');
+                try {
+                    await window.addToCart(
+                        item.nome, 
+                        finalPrice, // Preço com extras
+                        item.img_url, 
+                        removedList,
+                        extrasList // Enviar extras para o carrinho
+                    );
+                    console.log('[Details] addToCart concluído');
+                    
+                    // Redirecionar para o carrinho após adicionar
+                    // window.location.href = 'orders.html';
+                } catch (e) {
+                    console.error('[Details] Erro ao chamar addToCart:', e);
+                }
+                
                 // Feedback visual
                 cartBtn.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     cartBtn.style.transform = '';
                 }, 150);
+            } else {
+                console.error('[Details] window.addToCart não está disponível!');
             }
         };
     } else {

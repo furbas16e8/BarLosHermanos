@@ -4,6 +4,49 @@ import { el, $, $$ } from './dom-helpers.js';
  * navbar.js - Gerencia a barra de navegação global
  */
 
+// ============================================
+// FUNÇÕES GLOBAIS (definidas primeiro para evitar hoisting issues)
+// ============================================
+
+/**
+ * Atualiza o contador do carrinho na navbar
+ * Definida antes de initNavbar para evitar ReferenceError
+ */
+window.updateNavbarCartCount = function() {
+    const badge = document.getElementById('navbar-cart-count');
+    if (!badge) return;
+
+    // Tenta usar getCart() do orders.js (valida userId e expiração)
+    let cart = [];
+    if (typeof getCart === 'function') {
+        cart = getCart();
+    } else {
+        // Fallback: tenta nova chave primeiro, depois legada
+        const raw = localStorage.getItem('bar_los_hermanos_cart_v2') || localStorage.getItem('bar-los-hermanos-cart');
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                cart = Array.isArray(parsed) ? parsed : (parsed.items || []);
+            } catch (e) {
+                cart = [];
+            }
+        }
+    }
+    
+    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+    
+    if (totalItems > 0) {
+        badge.innerText = totalItems;
+        badge.classList.add('visible');
+    } else {
+        badge.classList.remove('visible');
+    }
+};
+
+// ============================================
+// INICIALIZAÇÃO DA NAVBAR
+// ============================================
+
 function initNavbar() {
     // 1. Construir a Navbar usando DOM Helpers e BEM
     const navbar = el('nav', { class: 'bottom-nav' }, [
@@ -104,13 +147,31 @@ function highlightActiveLink() {
 
 /**
  * Atualiza o contador do carrinho
+ * DEFINIDA ANTES DE initNavbar PARA EVITAR REFERENCE ERROR
  */
 window.updateNavbarCartCount = function() {
     const badge = document.getElementById('navbar-cart-count');
     if (!badge) return;
 
-    // Supomos que orders.js já definiu a key ou método global
-    const cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
+    // Tenta usar getCart() do orders.js (valida userId e expiração)
+    // Se não disponível, tenta ler diretamente do localStorage (fallback)
+    let cart = [];
+    if (typeof getCart === 'function') {
+        cart = getCart();
+    } else {
+        // Fallback: tenta nova chave primeiro, depois legada
+        const raw = localStorage.getItem('bar_los_hermanos_cart_v2') || localStorage.getItem('bar-los-hermanos-cart');
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                // Se for novo formato, extrai items; se for legado, usa direto
+                cart = Array.isArray(parsed) ? parsed : (parsed.items || []);
+            } catch (e) {
+                cart = [];
+            }
+        }
+    }
+    
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
     
     if (totalItems > 0) {

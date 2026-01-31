@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="assets/css/styles_new.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
+    <script src="assets/js/addresses.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -34,6 +35,30 @@
             },
         }
     </script>
+    <style>
+        .address-card {
+            transition: all 0.3s ease;
+        }
+        .address-card:hover {
+            transform: translateY(-2px);
+        }
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+        .btn-action {
+            transition: all 0.2s ease;
+        }
+        .btn-action:hover {
+            transform: scale(1.05);
+        }
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+        .badge-padrao {
+            background: linear-gradient(135deg, #ff3131, #ff5555);
+        }
+    </style>
 </head>
 <body class="bg-background-dark text-white min-h-screen">
     <header class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
@@ -43,47 +68,224 @@
             </div>
             <h2 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display">Meus Endereços</h2>
             <div class="flex w-10 items-center justify-end">
-                <button class="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent">
-                    <span class="material-symbols-outlined text-white">more_vert</span>
-                </button>
+                <div class="text-xs text-slate-400" id="address-counter">
+                    0/3
+                </div>
             </div>
         </div>
     </header>
 
     <main class="max-w-md mx-auto pb-32 px-6 pt-6">
-        <section class="mb-8" id="address-section">
-            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4 px-1">Endereço Atual</h3>
-            <div class="bg-primary/5 border-2 border-primary rounded-2xl p-5 shadow-[0_0_15px_rgba(255,49,49,0.1)] relative">
-                <div class="absolute top-4 right-4 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">
-                    Selecionado
-                </div>
-                <div class="flex items-start gap-4">
-                    <div class="bg-primary p-3 rounded-xl shadow-lg">
-                        <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">home</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <span id="addr-name" class="font-bold text-lg">Principal</span>
-                        <p id="addr-text" class="text-slate-400 text-sm mt-0.5">Carregando...</p>
-                        <p id="addr-city" class="text-slate-500 text-xs mt-1 leading-snug">Governador Valadares, MG</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de múltiplos endereços removida pois o DB suporta apenas 1 atualmente -->
-        <div class="text-center p-4">
-            <p class="text-white/30 text-xs">O sistema atual suporta apenas um endereço de entrega padrão.</p>
+        <!-- Loading State -->
+        <div class="flex items-center justify-center py-12" id="loading-state">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span class="ml-3 text-slate-400">Carregando endereços...</span>
         </div>
 
-        <button class="fixed bottom-28 left-6 right-6 max-w-md mx-auto bg-primary text-white font-bold py-5 rounded-2xl shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-transform z-40">
+        <!-- Lista de Endereços -->
+        <section class="space-y-4" id="addresses-list" style="display: none;">
+            <!-- Cards serão inseridos aqui via JS -->
+        </section>
+
+        <!-- Estado Vazio -->
+        <section class="text-center py-12" id="empty-state" style="display: none;">
+            <div class="bg-card-dark rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-4xl text-slate-500">location_off</span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Nenhum endereço cadastrado</h3>
+            <p class="text-slate-400 text-sm">Adicione seu primeiro endereço de entrega</p>
+        </section>
+
+        <!-- Botão Novo Endereço -->
+        <button class="fixed bottom-28 left-6 right-6 max-w-md mx-auto bg-primary text-white font-bold py-5 rounded-2xl shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-transform z-40" id="btn-new-address" onclick="openModal()">
             <span class="material-symbols-outlined">add_location_alt</span>
             NOVO ENDEREÇO
         </button>
+
+        <!-- Mensagem de Limite Atingido -->
+        <div class="fixed bottom-28 left-6 right-6 max-w-md mx-auto bg-slate-700 text-slate-300 font-medium py-4 rounded-2xl flex items-center justify-center gap-2 z-40 hidden" id="limit-message">
+            <span class="material-symbols-outlined">block</span>
+            Limite de 3 endereços atingido
+        </div>
     </main>
+
+    <!-- Modal Add/Edit Endereço -->
+    <div class="fixed inset-0 z-50 hidden" id="address-modal">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-card-dark rounded-t-3xl max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-card-dark p-4 border-b border-white/10 flex items-center justify-between">
+                <h3 class="text-lg font-bold" id="modal-title">Novo Endereço</h3>
+                <button class="p-2 hover:bg-white/10 rounded-full transition-colors" onclick="closeModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <form class="p-6 space-y-4" id="address-form" onsubmit="handleSubmit(event)">
+                <input id="address-id" type="hidden">
+                
+                <!-- Apelido -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">
+                        Apelido <span class="text-slate-600">(opcional)</span>
+                    </label>
+                    <input 
+                        class="w-full bg-background-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors"
+                        id="apelido"
+                        maxlength="50"
+                        placeholder="Ex: Casa, Trabalho, Casa da Mãe"
+                        type="text"
+                    >
+                    <p class="text-xs text-slate-500 mt-1">Um nome para identificar este endereço facilmente</p>
+                </div>
+
+                <!-- Rua -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-200 mb-1">Rua *</label>
+                    <input 
+                        class="w-full bg-background-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors"
+                        id="rua"
+                        maxlength="200"
+                        placeholder="Nome da rua"
+                        required
+                        type="text"
+                    >
+                </div>
+
+                <!-- Número e Complemento -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-200 mb-1">Número *</label>
+                        <input 
+                            class="w-full bg-background-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors"
+                            id="numero"
+                            maxlength="20"
+                            placeholder="123"
+                            required
+                            type="text"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Complemento</label>
+                        <input 
+                            class="w-full bg-background-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors"
+                            id="complemento"
+                            maxlength="100"
+                            placeholder="Apto, Bloco"
+                            type="text"
+                        >
+                    </div>
+                </div>
+
+                <!-- Bairro -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-200 mb-1">Bairro *</label>
+                    <select 
+                        class="w-full bg-background-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer"
+                        id="bairro"
+                        required
+                    >
+                        <option value="">Selecione o bairro</option>
+                        <!-- Será populado via JS -->
+                    </select>
+                </div>
+
+                <!-- Cidade e Estado (readonly) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Cidade</label>
+                        <input 
+                            class="w-full bg-slate-800 border border-white/5 rounded-xl px-4 py-3 text-slate-400 cursor-not-allowed"
+                            id="cidade"
+                            readonly
+                            type="text"
+                            value="Governador Valadares"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Estado</label>
+                        <input 
+                            class="w-full bg-slate-800 border border-white/5 rounded-xl px-4 py-3 text-slate-400 cursor-not-allowed"
+                            id="estado"
+                            readonly
+                            type="text"
+                            value="MG"
+                        >
+                    </div>
+                </div>
+
+                <!-- Definir como padrão -->
+                <label class="flex items-center gap-3 p-4 bg-background-dark rounded-xl cursor-pointer hover:bg-white/5 transition-colors">
+                    <input class="w-5 h-5 accent-primary cursor-pointer" id="is-padrao" type="checkbox">
+                    <span class="text-sm">Definir como endereço padrão</span>
+                </label>
+
+                <!-- Botões -->
+                <div class="flex gap-3 pt-4">
+                    <button 
+                        class="flex-1 py-4 rounded-xl font-semibold border border-white/20 hover:bg-white/5 transition-colors"
+                        onclick="closeModal()"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        class="flex-1 py-4 rounded-xl font-semibold bg-primary hover:bg-primary/90 transition-colors"
+                        type="submit"
+                    >
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação Exclusão -->
+    <div class="fixed inset-0 z-50 hidden" id="delete-modal">
+        <div class="modal-overlay absolute inset-0" onclick="closeDeleteModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-card-dark rounded-2xl p-6 max-w-sm w-full mx-4">
+            <div class="text-center">
+                <div class="bg-red-500/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <span class="material-symbols-outlined text-3xl text-red-500">delete_forever</span>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Excluir endereço?</h3>
+                <p class="text-slate-400 text-sm mb-6">Esta ação não pode ser desfeita. O endereço será removido permanentemente.</p>
+                <div class="flex gap-3">
+                    <button 
+                        class="flex-1 py-3 rounded-xl font-semibold border border-white/20 hover:bg-white/5 transition-colors"
+                        onclick="closeDeleteModal()"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        class="flex-1 py-3 rounded-xl font-semibold bg-red-500 hover:bg-red-600 transition-colors"
+                        id="btn-confirm-delete"
+                    >
+                        Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 hidden" id="toast">
+        <div class="bg-card-dark border border-white/10 rounded-xl px-6 py-4 shadow-xl flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary" id="toast-icon">check_circle</span>
+            <span id="toast-message">Operação realizada com sucesso</span>
+        </div>
+    </div>
 
     <!-- Global Navigation -->
     <script src="assets/js/navbar.js"></script>
+    
     <script>
+        // Estado global
+        let addresses = [];
+        let editingId = null;
+        let deletingId = null;
+        let zonasEntrega = [];
+
+        // Inicialização
         document.addEventListener('DOMContentLoaded', async () => {
             const session = await checkSession();
             if (!session) {
@@ -91,18 +293,340 @@
                 return;
             }
 
-            const { data: user, error } = await getUserProfile(session.user.id);
-            if (user) {
-                const addrEl = document.getElementById('addr-text');
-                const cityEl = document.getElementById('addr-city');
+            await Promise.all([
+                loadZonasEntrega(),
+                loadAddresses()
+            ]);
+        });
+
+        // Carregar zonas de entrega para o select de bairros
+        async function loadZonasEntrega() {
+            try {
+                const { data, error } = await _supabase
+                    .from('zonas_entrega')
+                    .select('bairro, ativo')
+                    .eq('ativo', true)
+                    .order('bairro');
+
+                if (error) throw error;
                 
-                if (user.endereco_rua) {
-                    addrEl.innerText = `${user.endereco_rua}, ${user.endereco_numero} ${user.endereco_complemento || ''}`;
-                    cityEl.innerText = `${user.endereco_bairro} - Governador Valadares, MG`;
-                } else {
-                    addrEl.innerText = 'Nenhum endereço cadastrado.';
-                    cityEl.innerText = 'Toque em Novo Endereço para adicionar.';
+                zonasEntrega = data || [];
+                populateBairroSelect();
+            } catch (err) {
+                console.error('Erro ao carregar zonas:', err);
+                showToast('Erro ao carregar bairros', 'error');
+            }
+        }
+
+        // Popular select de bairros
+        function populateBairroSelect() {
+            const select = document.getElementById('bairro');
+            const currentValue = select.value;
+            
+            // Manter a opção padrão
+            select.innerHTML = '<option value="">Selecione o bairro</option>';
+            
+            zonasEntrega.forEach(zona => {
+                const option = document.createElement('option');
+                option.value = zona.bairro;
+                option.textContent = zona.bairro;
+                select.appendChild(option);
+            });
+            
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        }
+
+        // Carregar endereços do usuário
+        async function loadAddresses() {
+            try {
+                showLoading(true);
+                
+                const { data, error } = await addressesAPI.getUserAddresses();
+                
+                if (error) throw error;
+                
+                addresses = data || [];
+                renderAddresses();
+                updateUIState();
+                
+            } catch (err) {
+                console.error('Erro ao carregar endereços:', err);
+                showToast('Erro ao carregar endereços', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mostrar/esconder loading
+        function showLoading(show) {
+            document.getElementById('loading-state').style.display = show ? 'flex' : 'none';
+        }
+
+        // Renderizar lista de endereços
+        function renderAddresses() {
+            const container = document.getElementById('addresses-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (addresses.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            container.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            container.innerHTML = addresses.map(address => createAddressCard(address)).join('');
+        }
+
+        // Criar card de endereço
+        function createAddressCard(address) {
+            const isPadrao = address.is_padrao;
+            const formattedAddress = addressesAPI.formatAddress(address);
+            
+            return `
+                <div class="address-card bg-card-dark border ${isPadrao ? 'border-primary' : 'border-white/10'} rounded-2xl p-5 relative" data-id="${address.id}">
+                    ${isPadrao ? `
+                        <div class="absolute top-4 right-4 badge-padrao text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                            Padrão
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex items-start gap-4">
+                        <div class="bg-${isPadrao ? 'primary' : 'white/10'} p-3 rounded-xl ${isPadrao ? 'shadow-lg' : ''}">
+                            <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">
+                                ${isPadrao ? 'home' : 'location_on'}
+                            </span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-lg truncate">
+                                    ${address.apelido || 'Endereço'}
+                                </h4>
+                            </div>
+                            <p class="text-slate-400 text-sm leading-relaxed">${formattedAddress}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 mt-4 pt-4 border-t border-white/10">
+                        ${!isPadrao ? `
+                            <button onclick="setAsDefault('${address.id}')" 
+                                class="btn-action flex-1 py-2 rounded-lg text-sm font-medium bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-sm">star</span>
+                                Tornar Padrão
+                            </button>
+                        ` : '<div class="flex-1"></div>'}
+                        
+                        <button onclick="editAddress('${address.id}')" 
+                            class="btn-action p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                        
+                        <button onclick="confirmDelete('${address.id}')" 
+                            class="btn-action p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Atualizar estado da UI (botão novo endereço, contador)
+        async function updateUIState() {
+            const { canAdd, count, remaining } = await addressesAPI.canAddMoreAddresses();
+            
+            // Atualizar contador
+            document.getElementById('address-counter').textContent = `${count}/${addressesAPI.MAX_ADDRESSES}`;
+            
+            // Mostrar/esconder botão novo endereço
+            const btnNew = document.getElementById('btn-new-address');
+            const limitMsg = document.getElementById('limit-message');
+            
+            if (canAdd) {
+                btnNew.classList.remove('hidden');
+                limitMsg.classList.add('hidden');
+            } else {
+                btnNew.classList.add('hidden');
+                limitMsg.classList.remove('hidden');
+            }
+        }
+
+        // Abrir modal (novo ou editar)
+        async function openModal(addressId = null) {
+            editingId = addressId;
+            const modal = document.getElementById('address-modal');
+            const title = document.getElementById('modal-title');
+            const form = document.getElementById('address-form');
+            
+            if (addressId) {
+                // Modo edição
+                title.textContent = 'Editar Endereço';
+                const address = addresses.find(a => a.id === addressId);
+                if (address) {
+                    document.getElementById('address-id').value = address.id;
+                    document.getElementById('apelido').value = address.apelido || '';
+                    document.getElementById('rua').value = address.rua;
+                    document.getElementById('numero').value = address.numero;
+                    document.getElementById('complemento').value = address.complemento || '';
+                    document.getElementById('bairro').value = address.bairro;
+                    document.getElementById('cidade').value = address.cidade;
+                    document.getElementById('estado').value = address.estado;
+                    document.getElementById('is-padrao').checked = address.is_padrao;
                 }
+            } else {
+                // Modo novo
+                title.textContent = 'Novo Endereço';
+                form.reset();
+                document.getElementById('address-id').value = '';
+                document.getElementById('cidade').value = 'Governador Valadares';
+                document.getElementById('estado').value = 'MG';
+                // Se não tiver nenhum endereço, marcar como padrão por padrão
+                document.getElementById('is-padrao').checked = addresses.length === 0;
+            }
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fechar modal
+        function closeModal() {
+            const modal = document.getElementById('address-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            editingId = null;
+        }
+
+        // Handler do formulário
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                apelido: document.getElementById('apelido').value,
+                rua: document.getElementById('rua').value,
+                numero: document.getElementById('numero').value,
+                complemento: document.getElementById('complemento').value,
+                bairro: document.getElementById('bairro').value,
+                cidade: document.getElementById('cidade').value,
+                estado: document.getElementById('estado').value,
+                is_padrao: document.getElementById('is-padrao').checked
+            };
+            
+            try {
+                let result;
+                
+                if (editingId) {
+                    // Atualizar existente
+                    result = await addressesAPI.updateAddress(editingId, formData);
+                } else {
+                    // Criar novo
+                    result = await addressesAPI.createAddress(formData);
+                }
+                
+                if (result.error) {
+                    showToast(result.error.message, 'error');
+                    return;
+                }
+                
+                showToast(editingId ? 'Endereço atualizado!' : 'Endereço adicionado!');
+                closeModal();
+                await loadAddresses();
+                
+            } catch (err) {
+                console.error('Erro ao salvar:', err);
+                showToast('Erro ao salvar endereço', 'error');
+            }
+        }
+
+        // Definir como padrão
+        async function setAsDefault(addressId) {
+            try {
+                const { data, error } = await addressesAPI.setDefaultAddress(addressId);
+                
+                if (error) {
+                    showToast(error.message, 'error');
+                    return;
+                }
+                
+                showToast('Endereço padrão atualizado!');
+                await loadAddresses();
+                
+            } catch (err) {
+                console.error('Erro ao definir padrão:', err);
+                showToast('Erro ao atualizar', 'error');
+            }
+        }
+
+        // Editar endereço
+        function editAddress(addressId) {
+            openModal(addressId);
+        }
+
+        // Confirmar exclusão
+        function confirmDelete(addressId) {
+            deletingId = addressId;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+        }
+
+        // Fechar modal de exclusão
+        function closeDeleteModal() {
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            deletingId = null;
+        }
+
+        // Handler de exclusão
+        document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+            if (!deletingId) return;
+            
+            try {
+                const { success, error } = await addressesAPI.deleteAddress(deletingId);
+                
+                if (!success) {
+                    showToast(error?.message || 'Erro ao excluir', 'error');
+                    return;
+                }
+                
+                showToast('Endereço excluído!');
+                closeDeleteModal();
+                await loadAddresses();
+                
+            } catch (err) {
+                console.error('Erro ao excluir:', err);
+                showToast('Erro ao excluir endereço', 'error');
+            }
+        });
+
+        // Mostrar toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                toastIcon.textContent = 'error';
+                toastIcon.className = 'material-symbols-outlined text-red-500';
+            } else {
+                toastIcon.textContent = 'check_circle';
+                toastIcon.className = 'material-symbols-outlined text-primary';
+            }
+            
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Fechar modais com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDeleteModal();
             }
         });
     </script>

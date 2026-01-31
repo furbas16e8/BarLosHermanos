@@ -7,6 +7,29 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-01-31
+
+### Added
+
+- **Sistema de Múltiplos Endereços**: Implementação completa de gerenciamento de endereços de entrega.
+  - Nova tabela `enderecos` no banco (1:N com clientes)
+  - Limite de 3 endereços por usuário na UI (ilimitado na estrutura do banco)
+  - Campo `apelido` opcional para identificação (Casa, Trabalho, etc)
+  - Sistema de endereço padrão (`is_padrao`) com trigger de unicidade
+  - Nova API em `assets/js/addresses.js` com funções CRUD completas
+  - Página `address.html` refatorada com cards, modal e validações
+  - Integração no checkout (`shopping.html`) com cálculo de taxa por bairro
+  - Salvamento de `endereco_id` na tabela `pedidos` para auditoria
+
+### Changed
+
+- **Perfil**: Exibição do apelido do endereço padrão na página de perfil
+- **Checkout**: Simplificação da seleção de endereço - botão "ALTERAR" redireciona para gerenciamento centralizado
+
+### Fixed
+
+- **Bug**: `addressesAPI is not defined` no checkout - adicionado import do script em `shopping.html`
+
 ## [1.2.0] - 2026-01-30
 
 ### Added

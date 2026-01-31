@@ -1,43 +1,270 @@
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        primary: "#ff3131", // Global Red
-        "background-light": "#f8f7f5", // Neutral Light
-        "background-dark": "#000000", // Global Black
-        "surface-dark": "#1a130c",
-        "secondary-text": "#cbad90",
-      },
-      fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["Plus Jakarta Sans", "sans-serif"],
-      },
-      borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        "2xl": "1rem",
-        full: "9999px",
+// ============================================
+// CART LOGIC V2 - Isolamento e Expiração
+// ============================================
+// CONSTANTES PRIMEIRO (evitar hoisting issues)
+const CART_STORAGE_KEY = 'bar_los_hermanos_cart_v2';
+const LEGACY_CART_KEY = 'bar-los-hermanos-cart';
+const STORE_CLOSE_HOUR = 23; // Horário de fechamento da loja
+
+// Tailwind config (deve vir depois ou ser movido para arquivo separado)
+if (typeof tailwind !== 'undefined') {
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#ff3131",
+          "background-light": "#f8f7f5",
+          "background-dark": "#000000",
+          "surface-dark": "#1a130c",
+          "secondary-text": "#cbad90",
+        },
+        fontFamily: {
+          display: ["Plus Jakarta Sans", "sans-serif"],
+          body: ["Plus Jakarta Sans", "sans-serif"],
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem",
+          lg: "0.5rem",
+          xl: "0.75rem",
+          "2xl": "1rem",
+          full: "9999px",
+        },
       },
     },
-  },
-};
-
-// --- Cart Logic ---
-
-function getCart() {
-  return JSON.parse(localStorage.getItem("bar-los-hermanos-cart")) || [];
+  };
 }
 
-function saveCart(cart) {
-  localStorage.setItem("bar-los-hermanos-cart", JSON.stringify(cart));
+/**
+ * Obtém o ID do usuário atual logado
+ * @returns {string|null} UUID do usuário ou null se não logado
+ */
+function getCurrentUserId() {
+  // Primeiro tenta o cache global
+  if (window.currentUserId) {
+    return window.currentUserId;
+  }
+  
+  // Tenta obter do localStorage como fallback (útil para recarregamento de página)
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (raw) {
+      const cartData = JSON.parse(raw);
+      if (cartData && cartData.userId) {
+        // Verifica se o carrinho ainda é válido antes de usar o userId
+        const cartDate = new Date(cartData.createdAt);
+        const now = new Date();
+        if (isSameDay(cartDate, now) && isBeforeClosingTime()) {
+          window.currentUserId = cartData.userId;
+          return cartData.userId;
+        }
+      }
+    }
+  } catch (e) {
+    // Ignora erro
+  }
+  
+  return null;
+}
+
+/**
+ * Define o ID do usuário atual (chamado pelo listener de auth)
+ * @param {string|null} userId 
+ */
+function setCurrentUserId(userId) {
+  window.currentUserId = userId;
+}
+
+/**
+ * Verifica se duas datas são do mesmo dia
+ */
+function isSameDay(date1, date2) {
+  return date1.getFullYear() === date2.getFullYear() &&
+         date1.getMonth() === date2.getMonth() &&
+         date1.getDate() === date2.getDate();
+}
+
+/**
+ * Verifica se o horário atual é antes do fechamento da loja (23:00)
+ */
+function isBeforeClosingTime() {
+  const now = new Date();
+  return now.getHours() < STORE_CLOSE_HOUR;
+}
+
+/**
+ * Valida se o carrinho é válido (usuário correto e não expirado)
+ * @param {Object} cartData 
+ * @returns {boolean}
+ */
+function isCartValid(cartData) {
+  // Verificar estrutura mínima
+  if (!cartData || !cartData.userId || !cartData.createdAt || !Array.isArray(cartData.items)) {
+    console.log('[Cart] isCartValid: Estrutura inválida');
+    return false;
+  }
+
+  // Verificar se o carrinho pertence ao usuário logado
+  const currentUserId = getCurrentUserId();
+  console.log('[Cart] isCartValid: Cart userId:', cartData.userId, 'Current userId:', currentUserId);
+  
+  if (cartData.userId !== currentUserId) {
+    console.log('[Cart] Carrinho de outro usuário detectado. Esperado:', currentUserId, 'Encontrado:', cartData.userId);
+    return false;
+  }
+
+  // Verificar se é do mesmo dia
+  const cartDate = new Date(cartData.createdAt);
+  const now = new Date();
+  if (!isSameDay(cartDate, now)) {
+    console.log('[Cart] Carrinho de outro dia detectado. Limpando...');
+    return false;
+  }
+
+  // Verificar se já passou do horário de fechamento
+  if (!isBeforeClosingTime()) {
+    console.log('[Cart] Horário após fechamento (23h). Limpando carrinho...');
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Limpa o carrinho do localStorage
+ */
+function clearCartStorage() {
+  localStorage.removeItem(CART_STORAGE_KEY);
+  console.log('[Cart] Carrinho limpo do localStorage');
+}
+
+/**
+ * Carrega os itens do carrinho (após validação)
+ * @returns {Array} Array de itens ou array vazio
+ */
+function getCart() {
+  const raw = localStorage.getItem(CART_STORAGE_KEY);
+  if (!raw) {
+    console.log('[Cart] getCart: Nenhum carrinho encontrado');
+    return [];
+  }
+
+  try {
+    const cartData = JSON.parse(raw);
+    console.log('[Cart] getCart: Carrinho encontrado, validando...', { userId: cartData.userId });
+    
+    if (!isCartValid(cartData)) {
+      console.log('[Cart] getCart: Carrinho inválido, limpando');
+      clearCartStorage();
+      return [];
+    }
+    console.log('[Cart] getCart: Carrinho válido, items:', cartData.items.length);
+    return cartData.items || [];
+  } catch (e) {
+    console.error('[Cart] Erro ao parsear carrinho:', e);
+    clearCartStorage();
+    return [];
+  }
+}
+
+/**
+ * Salva o carrinho com metadata de usuário e timestamp
+ * @param {Array} items 
+ */
+function saveCart(items) {
+  const currentUserId = getCurrentUserId();
+  
+  console.log('[Cart] saveCart chamado. UserId:', currentUserId, 'Items:', items.length);
+  
+  if (!currentUserId) {
+    console.error('[Cart] Tentativa de salvar carrinho sem usuário logado');
+    return;
+  }
+
+  const cartData = {
+    userId: currentUserId,
+    createdAt: new Date().toISOString(),
+    items: items
+  };
+
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+    console.log('[Cart] Carrinho salvo no localStorage:', CART_STORAGE_KEY);
+  } catch (e) {
+    console.error('[Cart] Erro ao salvar no localStorage:', e);
+  }
+  
   updateCartBadge();
   if (typeof updateNavbarCartCount === "function") updateNavbarCartCount();
 }
 
-function addToCart(name, price, img_url, removedIngredients = [], extras = []) {
+/**
+ * Migra carrinho legado se possível (mesmo usuário e mesmo dia)
+ */
+function migrateLegacyCart() {
+  const legacyRaw = localStorage.getItem(LEGACY_CART_KEY);
+  if (!legacyRaw) return;
+
+  try {
+    const legacyItems = JSON.parse(legacyRaw);
+    if (Array.isArray(legacyItems) && legacyItems.length > 0) {
+      const currentUserId = getCurrentUserId();
+      if (currentUserId && isBeforeClosingTime()) {
+        // Criar novo formato com dados do usuário atual
+        const cartData = {
+          userId: currentUserId,
+          createdAt: new Date().toISOString(),
+          items: legacyItems
+        };
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+        console.log('[Cart] Carrinho legado migrado com sucesso');
+      }
+    }
+    // Sempre remove o legado após tentativa de migração
+    localStorage.removeItem(LEGACY_CART_KEY);
+  } catch (e) {
+    console.error('[Cart] Erro ao migrar carrinho legado:', e);
+    localStorage.removeItem(LEGACY_CART_KEY);
+  }
+}
+
+// Expor funções globalmente
+window.clearCartStorage = clearCartStorage;
+window.getCurrentUserId = getCurrentUserId;
+window.setCurrentUserId = setCurrentUserId;
+
+async function addToCart(name, price, img_url, removedIngredients = [], extras = []) {
+  console.log('[Cart] addToCart chamado:', { name, price });
+  
+  // Verificar se usuário está logado
+  let session = null;
+  if (typeof checkSession === 'function') {
+    try {
+      session = await checkSession();
+      console.log('[Cart] Sessão obtida:', session ? 'SIM' : 'NÃO');
+    } catch (e) {
+      console.error('[Cart] Erro ao verificar sessão:', e);
+    }
+  }
+  
+  if (!session) {
+    console.log('[Cart] Usuário não logado. Redirecionando para login...');
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Garantir que o userId está definido
+  if (session.user && session.user.id) {
+    setCurrentUserId(session.user.id);
+    console.log('[Cart] UserId definido:', session.user.id);
+  } else {
+    console.error('[Cart] Sessão sem userId!');
+    window.location.href = 'login.html';
+    return;
+  }
+  
   let cart = getCart();
+  console.log('[Cart] Carrinho atual:', cart);
   
   // Normalizar arrays para comparação (sort)
   const incomingRemoved = (removedIngredients || []).sort();
@@ -67,9 +294,12 @@ function addToCart(name, price, img_url, removedIngredients = [], extras = []) {
     });
   }
   saveCart(cart);
-  console.log(`${name} adicionado ao carrinho!`, { extras: incomingExtras });
+  console.log(`[Cart] ${name} adicionado ao carrinho! Total items:`, cart.reduce((a, b) => a + b.quantity, 0));
+  
+  // Feedback visual opcional
+  // alert(`${name} adicionado ao carrinho!`);
 }
-// Exposing globally for module access
+// Exposing globally for module access (agora é async)
 window.addToCart = addToCart;
 
 function updateCartBadge() {
@@ -338,9 +568,24 @@ function updateFavoritesUI() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Verificar sessão antes de carregar carrinho
+  if (typeof checkSession === 'function') {
+    const session = await checkSession();
+    if (session && session.user) {
+      setCurrentUserId(session.user.id);
+      // Tenta migrar carrinho legado se existir
+      migrateLegacyCart();
+    } else {
+      // Sem usuário logado, limpa referência
+      setCurrentUserId(null);
+    }
+  }
+  
+  // Atualiza UI do carrinho (vai validar e limpar se necessário)
   updateCartBadge();
   updateCartUI();
+  
   // Load favorites from DB instead of local storage
   if (window.supabaseClient) {
     loadFavorites();
