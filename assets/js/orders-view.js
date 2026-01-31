@@ -63,10 +63,22 @@ async function loadUserProfile() {
         const addrEl = $('#header-address');
         
         if (nameEl) nameEl.innerText = user.nome || 'Cliente';
-        if (addrEl) {
-            addrEl.innerText = user.endereco_rua 
-                ? `${user.endereco_rua}, ${user.endereco_numero}`
-                : 'Sem endereço';
+        
+        // Buscar endereço padrão da nova tabela 'enderecos'
+        if (addrEl && window.addressesAPI) {
+            try {
+                const { data: address } = await window.addressesAPI.getDefaultAddress();
+                if (address) {
+                    addrEl.innerText = window.addressesAPI.formatAddressShort(address);
+                } else {
+                    addrEl.innerText = 'Sem endereço';
+                }
+            } catch (e) {
+                console.error('Erro ao carregar endereço:', e);
+                addrEl.innerText = 'Sem endereço';
+            }
+        } else if (addrEl) {
+            addrEl.innerText = 'Sem endereço';
         }
     }
 }

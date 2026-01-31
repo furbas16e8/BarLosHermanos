@@ -12,6 +12,7 @@
     <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
+    <script src="assets/js/addresses.js"></script>
     
     <!-- Styles -->
     <link rel="stylesheet" href="assets/css/main.css">
@@ -261,14 +262,11 @@
         btn.disabled = true;
 
         try {
-            // Tenta criar usuário
+            // Tenta criar usuário (sem dados de endereço - nova estrutura)
             const { data, error } = await signUpUser(email, senha, {
                 nome: nome,
                 telefone: telefone,
-                cpf: null,
-                endereco_rua: endereco.rua,
-                endereco_numero: endereco.numero,
-                endereco_bairro: endereco.bairro,
+                cpf: null
             });
 
             if (error) {
@@ -276,6 +274,28 @@
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
             } else {
+                // Cadastro bem-sucedido - agora criar o endereço na tabela 'enderecos'
+                if (data.user) {
+                    // Aguardar um momento para garantir que o perfil foi criado
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Criar endereço usando a API
+                    const { data: addressData, error: addressError } = await addressesAPI.createAddress({
+                        apelido: 'Principal',
+                        rua: endereco.rua,
+                        numero: endereco.numero,
+                        complemento: endereco.complemento,
+                        bairro: endereco.bairro,
+                        is_padrao: true
+                    });
+                    
+                    if (addressError) {
+                        console.error('Erro ao criar endereço:', addressError);
+                        // Não bloqueia o cadastro, apenas avisa
+                        alert('Cadastro realizado, mas houve um erro ao salvar o endereço. Você pode cadastrá-lo depois em "Meus Endereços".');
+                    }
+                }
+                
                 if (data.session) {
                     alert('Cadastro realizado com sucesso! Entrando...');
                     window.location.href = 'orders.html';
@@ -283,7 +303,6 @@
                     alert('Cadastro realizado! Se necessário, verifique seu email. Direcionando...');
                     window.location.href = 'orders.html';
                 }
-            }
         } catch (e) {
             console.error(e);
             alert('Erro inesperado.');

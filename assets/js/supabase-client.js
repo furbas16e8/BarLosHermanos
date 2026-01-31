@@ -34,7 +34,7 @@ async function signUpUser(email, password, userData) {
 
     if (authError) return { error: authError };
 
-    // 2. Criar Perfil na tabela 'clientes'
+    // 2. Criar Perfil na tabela 'clientes' (sem dados de endereço - nova estrutura)
     // Nota: O ID do cliente deve ser o mesmo do Auth (authData.user.id)
     if (authData.user) {
         const { error: profileError } = await _supabase
@@ -44,12 +44,8 @@ async function signUpUser(email, password, userData) {
                 email: email,
                 nome: userData.nome,
                 telefone: userData.telefone,
-                cpf: userData.cpf,
-                endereco_rua: userData.endereco_rua,
-                endereco_numero: userData.endereco_numero,
-                endereco_bairro: userData.endereco_bairro,
-                // Assumindo que complemento também venha no objeto userData se disponível
-                endereco_complemento: userData.endereco_complemento
+                cpf: userData.cpf
+                // Endereços agora são salvos na tabela 'enderecos' separadamente
             }]);
         
         if (profileError) {
