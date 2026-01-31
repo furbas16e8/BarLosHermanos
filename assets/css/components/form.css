@@ -1,0 +1,87 @@
+/* assets/css/components/form.css */
+
+/* Input Group Container */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* gap-2 */
+    width: 100%;
+}
+
+.input-label {
+    color: var(--color-white);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+/* Glass Input Wrapper (Input + Icon) */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-radius: var(--radius-xl);
+    
+    /* Glass Effect */
+    background: var(--color-white-5);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--color-white-10);
+    
+    transition: all 0.3s ease;
+}
+
+/* Focus State simulates focus-within */
+.input-wrapper:focus-within {
+    border-color: rgba(255, 49, 49, 0.5); /* primary/50 */
+    background: var(--color-white-10);
+}
+
+.input-field {
+    flex: 1;
+    width: 100%;
+    height: 3.5rem; /* h-14 */
+    padding: 0 1rem; /* px-4 */
+    background: transparent;
+    color: var(--color-white);
+    font-size: 1rem; /* text-base */
+    outline: none;
+    font-weight: 400;
+}
+
+.input-field::placeholder {
+    color: var(--color-white-40);
+}
+
+.input-icon {
+    padding-right: 1rem; /* pr-4 */
+    color: var(--color-white-60);
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper:focus-within .input-icon {
+    color: var(--color-primary);
+}
+
+.input-icon--clickable {
+    cursor: pointer;
+}
+
+/* Auth Links (Forgot Password, etc) */
+.auth-link {
+    color: var(--color-primary);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.auth-link:hover {
+    color: var(--color-white);
+}
+
+.auth-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 400;
+}

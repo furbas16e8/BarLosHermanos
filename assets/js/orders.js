@@ -1,61 +1,305 @@
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        primary: "#ff3131", // Global Red
-        "background-light": "#f8f7f5", // Neutral Light
-        "background-dark": "#000000", // Global Black
-        "surface-dark": "#1a130c",
-        "secondary-text": "#cbad90",
-      },
-      fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["Plus Jakarta Sans", "sans-serif"],
-      },
-      borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        "2xl": "1rem",
-        full: "9999px",
+// ============================================
+// CART LOGIC V2 - Isolamento e Expiração
+// ============================================
+// CONSTANTES PRIMEIRO (evitar hoisting issues)
+const CART_STORAGE_KEY = 'bar_los_hermanos_cart_v2';
+const LEGACY_CART_KEY = 'bar-los-hermanos-cart';
+const STORE_CLOSE_HOUR = 23; // Horário de fechamento da loja
+
+// Tailwind config (deve vir depois ou ser movido para arquivo separado)
+if (typeof tailwind !== 'undefined') {
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#ff3131",
+          "background-light": "#f8f7f5",
+          "background-dark": "#000000",
+          "surface-dark": "#1a130c",
+          "secondary-text": "#cbad90",
+        },
+        fontFamily: {
+          display: ["Plus Jakarta Sans", "sans-serif"],
+          body: ["Plus Jakarta Sans", "sans-serif"],
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem",
+          lg: "0.5rem",
+          xl: "0.75rem",
+          "2xl": "1rem",
+          full: "9999px",
+        },
       },
     },
-  },
-};
-
-// --- Cart Logic ---
-
-function getCart() {
-  return JSON.parse(localStorage.getItem("bar-los-hermanos-cart")) || [];
+  };
 }
 
-function saveCart(cart) {
-  localStorage.setItem("bar-los-hermanos-cart", JSON.stringify(cart));
+/**
+ * Obtém o ID do usuário atual logado
+ * @returns {string|null} UUID do usuário ou null se não logado
+ */
+function getCurrentUserId() {
+  // Primeiro tenta o cache global
+  if (window.currentUserId) {
+    return window.currentUserId;
+  }
+  
+  // Tenta obter do localStorage como fallback (útil para recarregamento de página)
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (raw) {
+      const cartData = JSON.parse(raw);
+      if (cartData && cartData.userId) {
+        // Verifica se o carrinho ainda é válido antes de usar o userId
+        const cartDate = new Date(cartData.createdAt);
+        const now = new Date();
+        if (isSameDay(cartDate, now) && isBeforeClosingTime()) {
+          window.currentUserId = cartData.userId;
+          return cartData.userId;
+        }
+      }
+    }
+  } catch (e) {
+    // Ignora erro
+  }
+  
+  return null;
+}
+
+/**
+ * Define o ID do usuário atual (chamado pelo listener de auth)
+ * @param {string|null} userId 
+ */
+function setCurrentUserId(userId) {
+  window.currentUserId = userId;
+}
+
+/**
+ * Verifica se duas datas são do mesmo dia
+ */
+function isSameDay(date1, date2) {
+  return date1.getFullYear() === date2.getFullYear() &&
+         date1.getMonth() === date2.getMonth() &&
+         date1.getDate() === date2.getDate();
+}
+
+/**
+ * Verifica se o horário atual é antes do fechamento da loja (23:00)
+ */
+function isBeforeClosingTime() {
+  const now = new Date();
+  return now.getHours() < STORE_CLOSE_HOUR;
+}
+
+/**
+ * Valida se o carrinho é válido (usuário correto e não expirado)
+ * @param {Object} cartData 
+ * @returns {boolean}
+ */
+function isCartValid(cartData) {
+  // Verificar estrutura mínima
+  if (!cartData || !cartData.userId || !cartData.createdAt || !Array.isArray(cartData.items)) {
+    console.log('[Cart] isCartValid: Estrutura inválida');
+    return false;
+  }
+
+  // Verificar se o carrinho pertence ao usuário logado
+  const currentUserId = getCurrentUserId();
+  console.log('[Cart] isCartValid: Cart userId:', cartData.userId, 'Current userId:', currentUserId);
+  
+  if (cartData.userId !== currentUserId) {
+    console.log('[Cart] Carrinho de outro usuário detectado. Esperado:', currentUserId, 'Encontrado:', cartData.userId);
+    return false;
+  }
+
+  // Verificar se é do mesmo dia
+  const cartDate = new Date(cartData.createdAt);
+  const now = new Date();
+  if (!isSameDay(cartDate, now)) {
+    console.log('[Cart] Carrinho de outro dia detectado. Limpando...');
+    return false;
+  }
+
+  // Verificar se já passou do horário de fechamento
+  if (!isBeforeClosingTime()) {
+    console.log('[Cart] Horário após fechamento (23h). Limpando carrinho...');
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Limpa o carrinho do localStorage
+ */
+function clearCartStorage() {
+  localStorage.removeItem(CART_STORAGE_KEY);
+  console.log('[Cart] Carrinho limpo do localStorage');
+}
+
+/**
+ * Carrega os itens do carrinho (após validação)
+ * @returns {Array} Array de itens ou array vazio
+ */
+function getCart() {
+  const raw = localStorage.getItem(CART_STORAGE_KEY);
+  if (!raw) {
+    console.log('[Cart] getCart: Nenhum carrinho encontrado');
+    return [];
+  }
+
+  try {
+    const cartData = JSON.parse(raw);
+    console.log('[Cart] getCart: Carrinho encontrado, validando...', { userId: cartData.userId });
+    
+    if (!isCartValid(cartData)) {
+      console.log('[Cart] getCart: Carrinho inválido, limpando');
+      clearCartStorage();
+      return [];
+    }
+    console.log('[Cart] getCart: Carrinho válido, items:', cartData.items.length);
+    return cartData.items || [];
+  } catch (e) {
+    console.error('[Cart] Erro ao parsear carrinho:', e);
+    clearCartStorage();
+    return [];
+  }
+}
+
+/**
+ * Salva o carrinho com metadata de usuário e timestamp
+ * @param {Array} items 
+ */
+function saveCart(items) {
+  const currentUserId = getCurrentUserId();
+  
+  console.log('[Cart] saveCart chamado. UserId:', currentUserId, 'Items:', items.length);
+  
+  if (!currentUserId) {
+    console.error('[Cart] Tentativa de salvar carrinho sem usuário logado');
+    return;
+  }
+
+  const cartData = {
+    userId: currentUserId,
+    createdAt: new Date().toISOString(),
+    items: items
+  };
+
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+    console.log('[Cart] Carrinho salvo no localStorage:', CART_STORAGE_KEY);
+  } catch (e) {
+    console.error('[Cart] Erro ao salvar no localStorage:', e);
+  }
+  
   updateCartBadge();
   if (typeof updateNavbarCartCount === "function") updateNavbarCartCount();
 }
 
-function addToCart(name, price, image, removedIngredients = []) {
-  let cart = getCart();
+/**
+ * Migra carrinho legado se possível (mesmo usuário e mesmo dia)
+ */
+function migrateLegacyCart() {
+  const legacyRaw = localStorage.getItem(LEGACY_CART_KEY);
+  if (!legacyRaw) return;
+
+  try {
+    const legacyItems = JSON.parse(legacyRaw);
+    if (Array.isArray(legacyItems) && legacyItems.length > 0) {
+      const currentUserId = getCurrentUserId();
+      if (currentUserId && isBeforeClosingTime()) {
+        // Criar novo formato com dados do usuário atual
+        const cartData = {
+          userId: currentUserId,
+          createdAt: new Date().toISOString(),
+          items: legacyItems
+        };
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+        console.log('[Cart] Carrinho legado migrado com sucesso');
+      }
+    }
+    // Sempre remove o legado após tentativa de migração
+    localStorage.removeItem(LEGACY_CART_KEY);
+  } catch (e) {
+    console.error('[Cart] Erro ao migrar carrinho legado:', e);
+    localStorage.removeItem(LEGACY_CART_KEY);
+  }
+}
+
+// Expor funções globalmente
+window.clearCartStorage = clearCartStorage;
+window.getCurrentUserId = getCurrentUserId;
+window.setCurrentUserId = setCurrentUserId;
+
+async function addToCart(name, price, img_url, removedIngredients = [], extras = []) {
+  console.log('[Cart] addToCart chamado:', { name, price });
   
-  // Normalizar array para comparação (sort)
+  // Verificar se usuário está logado
+  let session = null;
+  if (typeof checkSession === 'function') {
+    try {
+      session = await checkSession();
+      console.log('[Cart] Sessão obtida:', session ? 'SIM' : 'NÃO');
+    } catch (e) {
+      console.error('[Cart] Erro ao verificar sessão:', e);
+    }
+  }
+  
+  if (!session) {
+    console.log('[Cart] Usuário não logado. Redirecionando para login...');
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Garantir que o userId está definido
+  if (session.user && session.user.id) {
+    setCurrentUserId(session.user.id);
+    console.log('[Cart] UserId definido:', session.user.id);
+  } else {
+    console.error('[Cart] Sessão sem userId!');
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  let cart = getCart();
+  console.log('[Cart] Carrinho atual:', cart);
+  
+  // Normalizar arrays para comparação (sort)
   const incomingRemoved = (removedIngredients || []).sort();
+  const incomingExtras = (extras || []).slice().sort((a, b) => a.name.localeCompare(b.name));
   
   let item = cart.find((i) => {
       const existingRemoved = (i.removed || []).sort();
-      return i.name === name && JSON.stringify(existingRemoved) === JSON.stringify(incomingRemoved);
+      const existingExtras = (i.extras || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+      
+      const sameName = i.name === name;
+      const sameRemoved = JSON.stringify(existingRemoved) === JSON.stringify(incomingRemoved);
+      const sameExtras = JSON.stringify(existingExtras) === JSON.stringify(incomingExtras);
+      
+      return sameName && sameRemoved && sameExtras;
   });
 
   if (item) {
     item.quantity++;
   } else {
-    cart.push({ name, price, image, quantity: 1, removed: incomingRemoved });
+    cart.push({ 
+      name, 
+      price, 
+      img_url, 
+      quantity: 1, 
+      removed: incomingRemoved,
+      extras: incomingExtras
+    });
   }
   saveCart(cart);
-  console.log(`${name} adicionado ao carrinho!`);
+  console.log(`[Cart] ${name} adicionado ao carrinho! Total items:`, cart.reduce((a, b) => a + b.quantity, 0));
+  
+  // Feedback visual opcional
+  // alert(`${name} adicionado ao carrinho!`);
 }
-// Exposing globally for module access
+// Exposing globally for module access (agora é async)
 window.addToCart = addToCart;
 
 function updateCartBadge() {
@@ -80,49 +324,58 @@ function updateCartUI() {
   let cart = getCart();
 
   if (cart.length === 0) {
-    if (emptyMsg) emptyMsg.style.display = "flex";
+    if (emptyMsg) emptyMsg.classList.remove("hidden");
     container.innerHTML = "";
-    if (emptyMsg) container.appendChild(emptyMsg);
     if (subtotalEl) subtotalEl.innerText = "R$ 0,00";
     if (totalEl) totalEl.innerText = "R$ 0,00";
     if (checkoutTotalEl) checkoutTotalEl.innerText = "R$ 0,00";
     return;
   }
 
-  if (emptyMsg) emptyMsg.style.display = "none";
+  if (emptyMsg) emptyMsg.classList.add("hidden");
   container.innerHTML = "";
 
   let subtotal = 0;
 
   cart.forEach((item, index) => {
     subtotal += item.price * item.quantity;
+    
+    // Fallback para imagem
+    const imageUrl = item.img_url || item.image || 'assets/img/placeholder_food.png';
+    
     const removedText = (item.removed && item.removed.length > 0) 
-        ? `<div class="mt-1 flex flex-wrap gap-1">
-             ${item.removed.map(ing => `<span class="text-[10px] font-bold text-red-500 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800 uppercase tracking-wide">SEM ${ing}</span>`).join("")}
+        ? `<div class="cart-item__extras">
+             ${item.removed.map(ing => `<span class="cart-item__extra-tag">SEM ${ing}</span>`).join("")}
+           </div>`
+        : "";
+    
+    // Mostrar extras adicionados
+    const extrasText = (item.extras && item.extras.length > 0)
+        ? `<div class="cart-item__extras">
+             ${item.extras.map(ext => `<span class="cart-item__extra-tag cart-item__extra-tag--added">+ ${ext.name}</span>`).join("")}
            </div>`
         : "";
 
     const itemHtml = `
-            <div class="flex items-center gap-4 px-4 py-4 border-b border-gray-200 dark:border-white/5 last:border-0">
-                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-20 shrink-0 shadow-sm" style='background-image: url("${item.image}");'></div>
-                <div class="flex flex-col flex-1 min-w-0">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-base font-bold leading-tight line-clamp-1">${item.name}</h3>
-                            ${removedText}
-                        </div>
-                        <button class="text-gray-400 hover:text-red-500 transition-colors ml-2" onclick="removeFromCart(${index})">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+            <div class="cart-item">
+                <div class="cart-item__image" style="background-image: url('${imageUrl}');"></div>
+                <div class="cart-item__content">
+                    <div class="cart-item__header">
+                        <h3 class="cart-item__name">${item.name}</h3>
+                        <button class="cart-item__remove" onclick="removeFromCart(${index})">
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </div>
-                    <div class="flex items-center justify-between mt-3">
-                        <p class="text-primary font-bold">R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}</p>
-                        <div class="flex items-center bg-gray-100 dark:bg-[#342618] rounded-full p-1 h-8">
-                            <button class="w-7 h-full flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-[#493622] text-gray-600 dark:text-white transition-colors" onclick="changeQuantity(${index}, -1)">
+                    ${removedText}
+                    ${extrasText}
+                    <div class="cart-item__footer">
+                        <span class="cart-item__price">R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
+                        <div class="cart-item__quantity">
+                            <button class="cart-item__qty-btn" onclick="changeQuantity(${index}, -1)">
                                 <span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
                             </button>
-                            <span class="w-6 text-center text-sm font-semibold">${item.quantity}</span>
-                            <button class="w-7 h-full flex items-center justify-center rounded-full bg-white dark:bg-primary shadow-sm text-gray-900 dark:text-white transition-colors" onclick="changeQuantity(${index}, 1)">
+                            <span class="cart-item__qty-value">${item.quantity}</span>
+                            <button class="cart-item__qty-btn cart-item__qty-btn--add" onclick="changeQuantity(${index}, 1)">
                                 <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
                             </button>
                         </div>
@@ -301,7 +554,7 @@ function updateFavoritesUI() {
                     </div>
                     <div class="flex items-center justify-between mt-2">
                         <span class="text-primary font-bold text-lg">R$ ${parseFloat(item.price).toFixed(2).replace(".", ",")}</span>
-                        <button class="bg-primary text-white p-2 rounded-xl flex items-center justify-center hover:scale-95 transition-all" onclick="addToCart('${item.name}', ${item.price}, '${item.image}')">
+                        <button class="bg-primary text-white p-2 rounded-xl flex items-center justify-center hover:scale-95 transition-all" onclick="addToCart('${item.name}', ${item.price}, '${item.img_url}')">
                             <span class="material-symbols-outlined">add_shopping_cart</span>
                         </button>
                     </div>
@@ -315,9 +568,24 @@ function updateFavoritesUI() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Verificar sessão antes de carregar carrinho
+  if (typeof checkSession === 'function') {
+    const session = await checkSession();
+    if (session && session.user) {
+      setCurrentUserId(session.user.id);
+      // Tenta migrar carrinho legado se existir
+      migrateLegacyCart();
+    } else {
+      // Sem usuário logado, limpa referência
+      setCurrentUserId(null);
+    }
+  }
+  
+  // Atualiza UI do carrinho (vai validar e limpar se necessário)
   updateCartBadge();
   updateCartUI();
+  
   // Load favorites from DB instead of local storage
   if (window.supabaseClient) {
     loadFavorites();

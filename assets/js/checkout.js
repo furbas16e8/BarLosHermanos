@@ -1,5 +1,6 @@
 /**
- * checkout.js - Lógica de Finalização de Pedido Aprimorada
+ * checkout.js - Lógica de Finalização de Pedido (Refatorado para Vanilla CSS)
+ * Suporte a Múltiplos Endereços (Fase 4c)
  */
 
 let currentUser = null;
@@ -9,116 +10,284 @@ let deliveryMode = 'delivery'; // 'delivery' ou 'pickup'
 let paymentMethod = 'online'; // 'online' ou 'cash'
 let discountValue = 0;
 let totalOrder = 0;
+let selectedAddress = null; // Endereço selecionado para entrega
+let userAddresses = []; // Lista de endereços do usuário
 
 document.addEventListener('DOMContentLoaded', initCheckout);
 
 async function initCheckout() {
     // 1. Verificar Sessão
+    if(!window.checkSession) {
+        console.error("supabase-client.js logic missing");
+        return;
+    }
     const session = await checkSession();
     if (!session) {
         window.location.href = 'login.html';
         return;
     }
 
-    // 2. Carregar Dados do Usuário
+    // 2. Carregar Dados do Usuário e Endereços
     await loadUserData(session.user.id);
+    await loadUserAddresses();
 
-    // 3. Inicializar Carrinho (usando orders.js)
+    // 3. Inicializar Carrinho
+    if (typeof setCurrentUserId === 'function') {
+        setCurrentUserId(session.user.id);
+    }
+    
     if (typeof updateCartUI === 'function') {
-        updateCartUI();
-    } else {
-        console.error('orders.js não carregado corretamente.');
+        const cart = typeof getCart === 'function' ? getCart() : [];
+        if (cart.length === 0) {
+            document.getElementById('cart-items-container').innerHTML = '';
+            document.getElementById('empty-cart-msg').classList.remove('hidden');
+        } else {
+             renderCartItems(cart);
+        }
     }
 
-    // 4. Verificar Desconto Fidelidade
+    // 4. Verificar Desconto
     await checkLoyaltyDiscount(session.user.id);
 
-    // 5. Configurar Eventos e UI Inicial
+    // 5. Configurar Eventos
     updateCheckoutTotals();
     
-    // Configurar Botão Finalizar
-    const btnFinish = document.getElementById('btn-finish') || document.querySelector('button[onclick="submitOrder()"]');
+    const btnFinish = document.getElementById('btn-finish');
     if(btnFinish) {
         btnFinish.onclick = submitOrder;
-        btnFinish.id = 'btn-finish';
     }
 }
 
+function renderCartItems(cart) {
+    const container = document.getElementById('cart-items-container');
+    container.innerHTML = '';
+    
+    cart.forEach((item, index) => {
+        const imageUrl = item.img_url || item.image || 'assets/img/placeholder_food.png';
+        
+        const removedText = (item.removed && item.removed.length > 0) 
+            ? `<div class="cart-item__extras">
+                 ${item.removed.map(ing => `<span class="cart-item__extra-tag">SEM ${ing}</span>`).join("")}
+               </div>`
+            : "";
+        
+        const extrasText = (item.extras && item.extras.length > 0)
+            ? `<div class="cart-item__extras">
+                 ${item.extras.map(ext => `<span class="cart-item__extra-tag cart-item__extra-tag--added">+ ${ext.name}</span>`).join("")}
+               </div>`
+            : "";
+        
+        const itemHtml = `
+            <div class="cart-item">
+                <div class="cart-item__image" style="background-image: url('${imageUrl}');"></div>
+                <div class="cart-item__content">
+                    <div class="cart-item__header">
+                        <h4 class="cart-item__name">${item.name}</h4>
+                        <button onclick="removeItem(${index})" class="cart-item__remove">
+                             <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                    ${removedText}
+                    ${extrasText}
+                    <div class="cart-item__footer">
+                        <span class="cart-item__price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+                        <div class="cart-item__quantity">
+                            <button class="cart-item__qty-btn" onclick="changeCartQuantity(${index}, -1)">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
+                            </button>
+                            <span class="cart-item__qty-value">${item.quantity}</span>
+                            <button class="cart-item__qty-btn cart-item__qty-btn--add" onclick="changeCartQuantity(${index}, 1)">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += itemHtml;
+    });
+}
+
+// Função para alterar quantidade no carrinho (checkout)
+window.changeCartQuantity = function(index, delta) {
+    let cart = typeof getCart === 'function' ? getCart() : [];
+    
+    if (cart[index]) {
+        cart[index].quantity += delta;
+        
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        
+        if (typeof saveCart === 'function') {
+            saveCart(cart);
+        }
+        
+        renderCartItems(cart);
+        updateCheckoutTotals();
+        
+        if(window.updateNavbarCartCount) window.updateNavbarCartCount();
+    }
+};
+
+window.removeItem = (index) => {
+    let cart = typeof getCart === 'function' ? getCart() : [];
+    cart.splice(index, 1);
+    
+    if (typeof saveCart === 'function') {
+        saveCart(cart);
+    }
+    
+    if(window.updateNavbarCartCount) window.updateNavbarCartCount();
+
+    if(cart.length === 0) {
+         document.getElementById('cart-items-container').innerHTML = '';
+         document.getElementById('empty-cart-msg').classList.remove('hidden');
+    } else {
+         renderCartItems(cart);
+    }
+    updateCheckoutTotals();
+};
+
 async function loadUserData(userId) {
     const { data: user, error } = await getUserProfile(userId);
+    if (error || !user) return;
+    currentUser = user;
+}
+
+/**
+ * Carregar endereços do usuário e inicializar seletor
+ */
+async function loadUserAddresses() {
+    try {
+        const { data: addresses, error } = await addressesAPI.getUserAddresses();
+        
+        if (error) {
+            console.error('Erro ao carregar endereços:', error);
+            renderNoAddresses();
+            return;
+        }
+        
+        userAddresses = addresses || [];
+        
+        if (userAddresses.length === 0) {
+            renderNoAddresses();
+        } else {
+            // Selecionar o padrão automaticamente
+            selectedAddress = userAddresses.find(a => a.is_padrao) || userAddresses[0];
+            renderAddressSelector();
+            updateAddressDisplay();
+        }
+    } catch (err) {
+        console.error('Erro ao carregar endereços:', err);
+        renderNoAddresses();
+    }
+}
+
+/**
+ * Renderizar botão de alterar endereço (simplificado - sem dropdown)
+ */
+function renderAddressSelector() {
+    // Não renderiza mais dropdown - apenas o botão ALTERAR na UI
+    // O usuário altera o endereço na página address.html
+}
+
+/**
+ * Redirecionar para página de endereços
+ */
+function redirectToAddressPage() {
+    window.location.href = 'address.html';
+}
+
+/**
+ * Atualizar exibição do endereço selecionado
+ */
+async function updateAddressDisplay() {
+    const addressDetails = document.getElementById('address-details');
+    if (!addressDetails) return;
     
-    if (error || !user) {
-        console.error('Erro ao carregar usuário', error);
+    if (!selectedAddress) {
+        renderNoAddresses();
         return;
     }
+    
+    // Calcular tempo estimado
+    await fetchDeliveryZone(selectedAddress.bairro);
+    
+    const timeText = currentZone 
+        ? `${Math.ceil(30 * currentZone.multiplicador_tempo)}-${Math.ceil(30 * currentZone.multiplicador_tempo) + 15} min`
+        : '30-45 min';
+    
+    addressDetails.innerHTML = `
+        <div class="flex justify-between items-start mb-3">
+            <div class="space-y-1 flex-1">
+                ${selectedAddress.apelido ? `
+                    <p class="text-xs text-primary font-bold uppercase tracking-wider">${selectedAddress.apelido}</p>
+                ` : ''}
+                <p class="text-sm text-white font-medium">${selectedAddress.rua}, ${selectedAddress.numero} ${selectedAddress.complemento || ''}</p>
+                <p class="text-xs text-[#cbad90]">${selectedAddress.bairro} - Governador Valadares</p>
+            </div>
+            <button onclick="redirectToAddressPage()" class="text-xs text-primary font-bold uppercase tracking-wider hover:text-primary/80 transition-colors ml-4">
+                ALTERAR
+            </button>
+        </div>
+        <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined text-sm">schedule</span>
+            <span class="text-xs font-bold">Entrega em: ${timeText}</span>
+        </div>
+    `;
+}
 
-    currentUser = user;
-
-    // Preencher UI de Endereço
+/**
+ * Renderizar estado sem endereços
+ */
+function renderNoAddresses() {
     const addressDetails = document.getElementById('address-details');
-    if (addressDetails) {
-        if (user.endereco_rua) {
-            addressDetails.innerHTML = `
-                <p class="text-sm text-white font-medium">${user.endereco_rua}, ${user.endereco_numero} ${user.endereco_complemento || ''}</p>
-                <p class="text-xs text-[#cbad90]">${user.endereco_bairro} - Governador Valadares</p>
-                <div class="mt-3 flex items-center gap-2 text-primary">
-                    <span class="material-symbols-outlined text-sm">schedule</span>
-                    <span class="text-xs font-bold" id="delivery-time">Calculando prazo...</span>
-                </div>
-            `;
-            
-            // Buscar Zona de Entrega para Taxa
-            await fetchDeliveryZone(user.endereco_bairro);
-
-        } else {
-            addressDetails.innerHTML = `
-                <p class="text-sm text-red-400 font-medium whitespace-normal">Endereço incompleto no seu perfil.</p>
-                <p class="text-xs text-[#cbad90]">Toque em alterar para configurar.</p>
-            `;
-        }
-    }
+    if (!addressDetails) return;
+    
+    addressDetails.innerHTML = `
+        <div class="flex justify-between items-center py-4">
+            <div>
+                <p class="text-sm text-red-400 font-medium mb-1">Nenhum endereço cadastrado</p>
+                <p class="text-xs text-slate-400">Cadastre um endereço para continuar</p>
+            </div>
+            <button onclick="redirectToAddressPage()" class="text-xs text-primary font-bold uppercase tracking-wider hover:text-primary/80 transition-colors">
+                CADASTRAR
+            </button>
+        </div>
+    `;
+    
+    deliveryFee = 0;
+    updateCheckoutTotals();
 }
 
 async function fetchDeliveryZone(bairro) {
     if (!bairro) return;
-    const { data: zone, error } = await getDeliveryZone(bairro);
-    
+    const { data: zone } = await getDeliveryZone(bairro);
     if (zone) {
         currentZone = zone;
         deliveryFee = parseFloat(zone.taxa_entrega);
-        
-        const estimatedTime = Math.ceil(30 * zone.multiplicador_tempo);
-        const timeEl = document.getElementById('delivery-time');
-        if(timeEl) timeEl.innerText = `Prazo Estimado: ${estimatedTime}-${estimatedTime+15} min`;
     } else {
-        console.warn('Bairro não atendido:', bairro);
-        deliveryFee = 15; // Taxa padrão se não achar? Ou alertar?
+        deliveryFee = 15; 
     }
     updateCheckoutTotals();
 }
 
 async function checkLoyaltyDiscount(userId) {
     try {
-        // Contar pedidos concluídos do usuário
         const { count, error } = await window.supabaseClient
             .from('pedidos')
             .select('*', { count: 'exact', head: true })
             .eq('cliente_id', userId)
             .eq('status', 'concluido');
 
+        const discountRow = document.getElementById('discount-row');
         if (!error && count >= 5) {
-            console.log('Cliente Fidelidade detectado! 10% de desconto aplicado.');
-            // O desconto será calculado sobre o subtotal no updateCheckoutTotals
-            document.getElementById('discount-row').classList.remove('hidden');
-            return true;
+            discountRow.classList.remove('hidden');
         } else {
-            document.getElementById('discount-row').classList.add('hidden');
-            return false;
+            discountRow.classList.add('hidden');
         }
-    } catch (e) {
-        console.error('Erro ao verificar fidelidade:', e);
-        return false;
-    }
+    } catch (e) { console.error(e); }
 }
 
 function setDeliveryMode(mode) {
@@ -128,16 +297,18 @@ function setDeliveryMode(mode) {
     const btnPickup = document.getElementById('btn-pickup-mode');
     const addressSection = document.getElementById('address-section');
 
+    if (!btnDelivery || !btnPickup) return;
+
+    btnDelivery.classList.remove('delivery-btn--active');
+    btnPickup.classList.remove('delivery-btn--active');
+
     if (mode === 'delivery') {
-        btnDelivery.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-primary text-white shadow-sm transition-all";
-        btnPickup.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold text-[#8e7a65] hover:bg-white/5 transition-all";
-        addressSection.classList.remove('hidden');
+        btnDelivery.classList.add('delivery-btn--active');
+        if (addressSection) addressSection.classList.remove('hidden');
     } else {
-        btnPickup.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-primary text-white shadow-sm transition-all";
-        btnDelivery.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold text-[#8e7a65] hover:bg-white/5 transition-all";
-        addressSection.classList.add('hidden');
+        btnPickup.classList.add('delivery-btn--active');
+        if (addressSection) addressSection.classList.add('hidden');
     }
-    
     updateCheckoutTotals();
 }
 
@@ -151,86 +322,83 @@ function setPaymentMethod(method) {
     const changeContainer = document.getElementById('change-container');
     const textCash = document.getElementById('text-cash');
 
+    if (!btnOnline || !btnCash) return;
+
+    btnOnline.classList.remove('payment-option--selected');
+    btnCash.classList.remove('payment-option--selected');
+
     if (method === 'online') {
-        btnOnline.classList.add('border-primary/20');
-        btnOnline.classList.remove('border-white/5');
-        btnCash.classList.remove('border-primary/20');
-        btnCash.classList.add('border-white/5');
+        btnOnline.classList.add('payment-option--selected');
         
-        checkOnline.classList.remove('hidden');
-        checkCash.classList.add('hidden');
-        changeContainer.classList.add('hidden');
-        
-        textCash.classList.add('text-[#8e7a65]');
+        if (checkOnline) checkOnline.classList.remove('hidden');
+        if (checkCash) checkCash.classList.add('hidden');
+        if (changeContainer) changeContainer.classList.add('hidden');
+        if (textCash) textCash.style.color = 'var(--color-text-secondary)';
     } else {
-        btnCash.classList.add('border-primary/20');
-        btnCash.classList.remove('border-white/5');
-        btnOnline.classList.remove('border-primary/20');
-        btnOnline.classList.add('border-white/5');
+        btnCash.classList.add('payment-option--selected');
         
-        checkCash.classList.remove('hidden');
-        checkOnline.classList.add('hidden');
-        changeContainer.classList.remove('hidden');
-        
-        textCash.classList.remove('text-[#8e7a65]');
-        textCash.classList.add('text-white');
+        if (checkCash) checkCash.classList.remove('hidden');
+        if (checkOnline) checkOnline.classList.add('hidden');
+        if (changeContainer) changeContainer.classList.remove('hidden');
+        if (textCash) textCash.style.color = 'var(--color-white)';
     }
 }
 
-// Esta função é chamada globalmente por orders.js quando o carrinho muda
 function updateCheckoutTotals() {
-    const cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
+    const cart = typeof getCart === 'function' ? getCart() : [];
     let subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     
-    // 1. Taxa de Entrega
     let activeDeliveryFee = (deliveryMode === 'delivery') ? deliveryFee : 0;
     
-    // 2. Desconto (Fidelidade 10%)
-    let hasDiscount = !document.getElementById('discount-row').classList.contains('hidden');
+    const discountRow = document.getElementById('discount-row');
+    let hasDiscount = discountRow && !discountRow.classList.contains('hidden');
     discountValue = hasDiscount ? (subtotal * 0.10) : 0;
     
     totalOrder = subtotal + activeDeliveryFee - discountValue;
 
-    // Atualizar UI
     const subtotalEl = document.getElementById('cart-subtotal');
     const taxaEl = document.getElementById('taxa-entrega');
     const discountEl = document.getElementById('cart-discount');
     const totalEl = document.getElementById('checkout-total');
-    const deliveryRow = document.getElementById('delivery-row');
-
-    if(subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
     
-    if(taxaEl) {
-        taxaEl.innerText = activeDeliveryFee > 0 ? `R$ ${activeDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis';
-        if(deliveryMode === 'pickup') deliveryRow.classList.add('opacity-50');
-        else deliveryRow.classList.remove('opacity-50');
-    }
-
+    if(subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    if(taxaEl) taxaEl.innerText = activeDeliveryFee > 0 ? `R$ ${activeDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis';
     if(discountEl) discountEl.innerText = `- R$ ${discountValue.toFixed(2).replace('.', ',')}`;
     if(totalEl) totalEl.innerText = `R$ ${totalOrder.toFixed(2).replace('.', ',')}`;
 }
 
 async function submitOrder() {
-    if (deliveryMode === 'delivery' && (!currentUser || !currentUser.endereco_rua)) {
-        alert('Por favor, complete seu endereço de entrega no perfil.');
-        return;
+    // Validação de endereço para delivery
+    if (deliveryMode === 'delivery') {
+        if (!selectedAddress) {
+            alert('Cadastre um endereço de entrega.');
+            window.location.href = 'address.html';
+            return;
+        }
+        
+        if (!currentZone) {
+            alert('Bairro não atendido para entrega.');
+            return;
+        }
     }
     
-    const cart = JSON.parse(localStorage.getItem('bar-los-hermanos-cart')) || [];
+    const cart = typeof getCart === 'function' ? getCart() : [];
     if (cart.length === 0) {
-        alert('Seu carrinho está vazio.');
+        alert('Carrinho vazio.');
         return;
     }
 
-    const changeValue = document.getElementById('cash-change').value;
+    const changeInput = document.getElementById('cash-change');
+    const changeValue = changeInput ? changeInput.value : null;
+
     if (paymentMethod === 'cash' && changeValue && parseFloat(changeValue) < totalOrder) {
-        alert('O valor para troco deve ser maior que o total do pedido.');
+        alert('Troco deve ser maior que o total.');
         return;
     }
 
     const btn = document.getElementById('btn-finish');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Enviando...';
+    btn.innerHTML = 'Enviando...';
     btn.disabled = true;
 
     try {
@@ -244,71 +412,66 @@ async function submitOrder() {
             taxa_entrega: (deliveryMode === 'delivery' ? deliveryFee : 0),
             desconto: discountValue,
             total: totalOrder,
-            bairro_entrega: deliveryMode === 'delivery' ? currentUser.endereco_bairro : 'RETIRADA',
+            bairro_entrega: deliveryMode === 'delivery' ? selectedAddress.bairro : 'RETIRADA',
             zona_entrega_id: (deliveryMode === 'delivery' && currentZone) ? currentZone.id : null,
+            endereco_id: deliveryMode === 'delivery' ? selectedAddress.id : null, // NOVO: Referência ao endereço
             endereco_entrega: deliveryMode === 'delivery' ? {
-                rua: currentUser.endereco_rua,
-                numero: currentUser.endereco_numero,
-                complemento: currentUser.endereco_complemento,
-                bairro: currentUser.endereco_bairro
+                rua: selectedAddress.rua,
+                numero: selectedAddress.numero,
+                complemento: selectedAddress.complemento,
+                bairro: selectedAddress.bairro,
+                cidade: selectedAddress.cidade,
+                estado: selectedAddress.estado
             } : { info: 'Retirada no Balcão' },
             forma_pagamento: paymentMethod === 'online' ? 'cartao_pix' : 'dinheiro',
             troco_para: (paymentMethod === 'cash' && changeValue) ? parseFloat(changeValue) : null,
-            observacoes: 'Pedido via Web App'
+            observacoes: 'App Web'
         };
 
         const { data: orderData, error: orderError } = await createOrder(orderPayload);
         if (orderError) throw orderError;
 
-        // Inserir Itens (Melhorado: Agora buscamos IDs antes)
-        const itemsPayload = [];
-        for (const cartItem of cart) {
-            const { data: dbItem } = await window.supabaseClient
-                .from('cardapio')
-                .select('id, tempo_preparo')
-                .eq('nome', cartItem.name)
-                .single();
-            
-            if (dbItem) {
-                let finalName = cartItem.name;
-                if (cartItem.removed && cartItem.removed.length > 0) {
-                    const modifications = cartItem.removed.map(r => r.toUpperCase()).join(', ');
-                    finalName = `${cartItem.name} (SEM: ${modifications})`;
-                }
-
-                itemsPayload.push({
-                    pedido_id: orderData.id,
-                    item_id: dbItem.id,
-                    item_cod: 'WEB', 
-                    item_nome: finalName,
-                    item_valor: cartItem.price,
-                    item_tempo_preparo: dbItem.tempo_preparo || 0,
-                    quantidade: cartItem.quantity,
-                    subtotal: cartItem.price * cartItem.quantity
-                });
-            }
+        alert('Pedido realizado!');
+        
+        if (typeof clearCartStorage === 'function') {
+            clearCartStorage();
+        } else {
+            localStorage.removeItem('bar_los_hermanos_cart_v2');
+            localStorage.removeItem('bar-los-hermanos-cart');
         }
-
-        if (itemsPayload.length > 0) {
-            const { error: itemsError } = await createOrderItems(itemsPayload);
-            if (itemsError) throw itemsError;
-        }
-
-        alert('Pedido realizado com sucesso!');
-        localStorage.removeItem('bar-los-hermanos-cart');
         window.location.href = 'perfil.html';
 
     } catch (e) {
         console.error(e);
-        alert('Erro ao finalizar pedido: ' + (e.message || 'Erro desconhecido'));
+        alert('Erro: ' + e.message);
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-// Expor funções para o HTML
+// Expose
 window.setDeliveryMode = setDeliveryMode;
 window.setPaymentMethod = setPaymentMethod;
-window.updateCheckoutTotals = updateCheckoutTotals;
 window.submitOrder = submitOrder;
+window.redirectToAddressPage = redirectToAddressPage;
+window.setBranch = (branch) => {
+    localStorage.setItem('selected-branch', branch);
+    updateBranchUI();
+}
+
+function updateBranchUI() {
+    const selected = localStorage.getItem('selected-branch') || 'Bairro';
+    const btnBairro = document.getElementById('btn-branch-bairro');
+    const btnCentro = document.getElementById('btn-branch-centro');
+    
+    if (!btnBairro || !btnCentro) return;
+    
+    btnBairro.classList.remove('branch-option--selected');
+    btnCentro.classList.remove('branch-option--selected');
+
+    if (selected === 'Bairro') btnBairro.classList.add('branch-option--selected');
+    else btnCentro.classList.add('branch-option--selected');
+}
+
+document.addEventListener('DOMContentLoaded', updateBranchUI);

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="assets/css/styles_new.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
+    <script src="assets/js/addresses.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -115,32 +116,61 @@
 
     <!-- Global Navigation -->
     <script src="assets/js/navbar.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Verificar sessão
-        const session = await checkSession();
-        if (!session) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Carregar dados do usuário
-        const { data, error } = await getUserProfile(session.user.id);
-        
-        if (data) {
-            document.getElementById('profile-name').innerText = data.nome || 'Usuário';
-            
-            let endereco = 'Endereço não cadastrado';
-            if (data.endereco_rua) {
-                endereco = `${data.endereco_rua}, ${data.endereco_numero}`;
-                if (data.endereco_bairro) endereco += ` - ${data.endereco_bairro}`;
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar sessão
+            const session = await checkSession();
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
             }
-            document.getElementById('profile-address').innerText = endereco;
-        } else {
-            console.error('Erro ao carregar perfil:', error);
-            document.getElementById('profile-name').innerText = 'Erro ao carregar';
+            
+            // Carregar dados do usuário
+            const { data, error } = await getUserProfile(session.user.id);
+            
+            if (data) {
+                document.getElementById('profile-name').innerText = data.nome || 'Usuário';
+                
+                // Carregar endereço padrão usando a nova API
+                await loadDefaultAddress();
+            } else {
+                console.error('Erro ao carregar perfil:', error);
+                document.getElementById('profile-name').innerText = 'Erro ao carregar';
+            }
+        });
+
+        // Carregar endereço padrão do novo sistema
+        async function loadDefaultAddress() {
+            try {
+                const { data: address, error } = await addressesAPI.getDefaultAddress();
+                
+                const addressEl = document.getElementById('profile-address');
+                
+                if (error || !address) {
+                    addressEl.innerText = 'Endereço não cadastrado';
+                    return;
+                }
+                
+                // Formatar exibição: Apelido (se tiver) + endereço curto
+                let displayText = '';
+                
+                if (address.apelido) {
+                    displayText = `${address.apelido}: `;
+                }
+                
+                displayText += `${address.rua}, ${address.numero}`;
+                
+                if (address.bairro) {
+                    displayText += ` - ${address.bairro}`;
+                }
+                
+                addressEl.innerText = displayText;
+                
+            } catch (err) {
+                console.error('Erro ao carregar endereço padrão:', err);
+                document.getElementById('profile-address').innerText = 'Erro ao carregar endereço';
+            }
         }
-    });
     </script>
 </body>
 </html>

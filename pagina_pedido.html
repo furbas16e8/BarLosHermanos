@@ -1,221 +1,120 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="dark" lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Bar Los Hermanos - Detalhes do Pedido</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Material Symbols -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Phosphor Icons -->
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bar Los Hermanos | Detalhes</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="assets/css/styles_new.css" />
-    <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#ff3131",
-              "background-light": "#f8f7f5",
-              "background-dark": "#000000",
-              "surface-dark": "#1a130c",
-            },
-            fontFamily: {
-              display: ["Plus Jakarta Sans", "sans-serif"],
-              title: ["Bebas Neue", "cursive"],
-              body: ["Poppins", "sans-serif"],
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              "2xl": "1rem",
-              "3xl": "1.5rem",
-              full: "9999px",
-            },
-          },
-        },
-      };
-    </script>
-  </head>
-  <body
-    class="font-display bg-background-dark text-white min-h-screen relative flex flex-col"
-  >
-    <main class="flex-1 pb-48 relative">
-      <div class="relative w-full h-[420px]">
-        <div
-          class="absolute inset-0 bg-cover bg-center"
-          style="
-            background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuCnWdzeBM8n7grZP1A7hHvjXqk2vMWoZipIYpwhDE_Jvh0H2ON5jbxISFJ60B2GMJ9bDKaHY3jbhwKmuEPIPwuCCDlBLqHh2axvmkDTGwRJJ43Xk6f1BZtMsOBm_ByICVqc6r2G__xfxidZqN0gHHCgkSM5qa-1wwlgTf-CM7QSC7Kz9gI1OaOe_umW-P4yzc9irsO_YFLqeZBUavZ8VUZd3J3os6zAk3MhN23lKdDf9J7XvwmFHlgrQUm-dVWl6rzmWSx-iqDvctAx&quot;);
-          "
-        ></div>
-        <div
-          class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-black/30"
-        ></div>
-        <div
-          class="absolute top-0 left-0 right-0 p-6 pt-12 flex justify-between items-center z-10"
-        >
-          <button
-            class="glass-panel w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all"
-            onclick="history.back()"
-          >
-            <span class="material-symbols-outlined text-white">arrow_back</span>
-          </button>
-          <button
-            class="glass-panel w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all group"
-            data-favorite-name="Hermanos Signature"
-            onclick="
-              toggleFavorite(
-                'Hermanos Signature',
-                42.5,
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuCnWdzeBM8n7grZP1A7hHvjXqk2vMWoZipIYpwhDE_Jvh0H2ON5jbxISFJ60B2GMJ9bDKaHY3jbhwKmuEPIPwuCCDlBLqHh2axvmkDTGwRJJ43Xk6f1BZtMsOBm_ByICVqc6r2G__xfxidZqN0gHHCgkSM5qa-1wwlgTf-CM7QSC7Kz9gI1OaOe_umW-P4yzc9irsO_YFLqeZBUavZ8VUZd3J3os6zAk3MhN23lKdDf9J7XvwmFHlgrQUm-dVWl6rzmWSx-iqDvctAx',
-              )
-            "
-          >
-            <span
-              class="material-symbols-outlined text-white group-hover:text-primary transition-colors"
-              >favorite</span
-            >
-          </button>
-        </div>
-        <div
-          class="absolute bottom-10 left-0 right-0 flex justify-center gap-2"
-        >
-          <div
-            class="w-6 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(255,49,49,0.5)]"
-          ></div>
-          <div class="w-1.5 h-1.5 rounded-full bg-white/30"></div>
-          <div class="w-1.5 h-1.5 rounded-full bg-white/30"></div>
-        </div>
-      </div>
-
-      <div class="px-6 -mt-6 relative z-10">
-        <div class="flex justify-between items-end mb-2">
-          <div>
-            <h1
-              class="text-3xl font-extrabold tracking-tight leading-tight mb-1"
-            >
-              Carregando...
-            </h1>
-            <div class="flex items-center gap-2 text-white/60 text-sm">
-              <span
-                class="material-symbols-outlined text-primary text-lg"
-                style="font-variation-settings: &quot;FILL&quot; 1"
-                >star</span
-              >
-              <span class="text-white font-semibold">--</span>
-              <span>(-- avaliações)</span>
-              <span class="w-1 h-1 rounded-full bg-white/30 mx-1"></span>
-              <span>-- min</span>
-            </div>
-          </div>
-          <div class="text-right pb-1">
-            <span
-              class="block text-3xl font-bold text-primary tracking-tight"
-            ></span>
-          </div>
-        </div>
-
-        <p class="text-white/70 text-base leading-relaxed mt-4 mb-8">...</p>
-
-        <div class="mb-8">
-          <h3 class="text-lg font-bold mb-4">Ingredientes</h3>
-                <div id="ingredients-container" class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                    <!-- Ingredientes serão injetados aqui via JS -->
-                </div>
-        </div>
-
-        <div class="mb-8">
-          <h3 class="text-lg font-bold mb-4">Acompanhamentos Extra</h3>
-          <div class="space-y-3">
-            <label
-              class="flex items-center justify-between glass-input rounded-xl p-4 cursor-pointer checkbox-wrapper group active:scale-[0.99] transition-transform"
-            >
-              <div class="flex items-center gap-3">
-                <input class="hidden" type="checkbox" />
-                <div
-                  class="w-5 h-5 rounded-md border border-white/20 flex items-center justify-center transition-colors"
-                >
-                  <span
-                    class="material-symbols-outlined text-white text-sm opacity-0 transition-opacity"
-                    >check</span
-                  >
-                </div>
-                <span class="font-medium text-white/90">Extra Queijo</span>
-              </div>
-              <span class="font-semibold text-primary">+R$ 4,50</span>
-            </label>
-            <label
-              class="flex items-center justify-between glass-input rounded-xl p-4 cursor-pointer checkbox-wrapper group active:scale-[0.99] transition-transform"
-            >
-              <div class="flex items-center gap-3">
-                <input class="hidden" type="checkbox" />
-                <div
-                  class="w-5 h-5 rounded-md border border-white/20 flex items-center justify-center transition-colors"
-                >
-                  <span
-                    class="material-symbols-outlined text-white text-sm opacity-0 transition-opacity"
-                    >check</span
-                  >
-                </div>
-                <span class="font-medium text-white/90">Ovo Frito</span>
-              </div>
-              <span class="font-semibold text-primary">+R$ 3,00</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="mb-8">
-          <h3 class="text-lg font-bold mb-4">Observações</h3>
-          <div class="relative group">
-            <textarea
-              class="w-full bg-transparent glass-input rounded-xl border-none p-4 text-white placeholder:text-white/30 focus:ring-1 focus:ring-primary/50 resize-none transition-all"
-              placeholder="ex: Sem cebola, molho à parte..."
-              rows="3"
-            ></textarea>
-            <span
-              class="material-symbols-outlined absolute right-4 bottom-4 text-white/20"
-              >edit_note</span
-            >
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <div
-      class="fixed bottom-[90px] left-0 right-0 px-6 z-30 pointer-events-none"
-    >
-      <button
-        id="btn-add-cart"
-        class="w-full pointer-events-auto h-16 bg-primary rounded-2xl shadow-lg shadow-primary/30 flex items-center justify-between px-6 hover:bg-red-700 active:scale-[0.98] transition-all"
-      >
-        <span class="text-white font-extrabold text-lg"
-          >Adicionar ao Carrinho</span
-        >
-        <span id="btn-price-display" class="text-white/90 font-bold text-lg"
-          >...</span
-        >
-      </button>
-    </div>
-
-    <!-- Global Navigation -->
-    <script src="assets/js/navbar.js"></script>
-    <!-- Cart Logic -->
-    <!-- Cart Logic -->
-    <script src="assets/js/orders.js"></script>
+    
+    <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
-    <script src="assets/js/details-view.js"></script>
-  </body>
+    <script src="assets/js/orders.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="font-display">
+
+    <!-- Top Hero Section -->
+    <div class="product-hero">
+        <div class="product-hero__bg"></div>
+        <div class="product-hero__overlay"></div>
+        
+        <div class="product-hero__nav">
+            <button class="product-hero__btn" onclick="history.back()">
+                <span class="material-symbols-outlined icon-white">arrow_back</span>
+            </button>
+            <button id="btn-favorite" class="product-hero__btn">
+                <span class="material-symbols-outlined icon-white icon-transition">favorite</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="product-content">
+        <!-- Title & Price -->
+        <div class="product-header">
+            <div>
+                <h1 id="product-title" class="product-title">Carregando...</h1>
+                <div class="product-meta">
+                    <span class="material-symbols-outlined product-meta__icon">star</span>
+                    <span class="product-meta__rating">5.0</span>
+                    <span class="product-meta__label">(Avaliações)</span>
+                </div>
+            </div>
+            <div id="product-price-top" class="product-price">...</div>
+        </div>
+
+        <p id="product-desc" class="product-desc">...</p>
+
+        <!-- Ingredients List -->
+        <div class="section-spacing">
+            <h3 class="section-title">Ingredientes</h3>
+            <div id="ingredients-container" class="ingredients-scroll no-scrollbar">
+                <!-- JS Injects Here -->
+            </div>
+        </div>
+
+        <!-- Extra Toppings -->
+        <div class="section-spacing">
+            <h3 class="section-title">Acompanhamentos Extra</h3>
+            <div class="toppings-list">
+                <!-- Extra Queijo -->
+                <label class="checkbox-card" onclick="toggleExtra('queijo', 4.50)">
+                    <div class="checkbox-card__left">
+                        <input class="checkbox-input" type="checkbox" id="extra-queijo" data-name="queijo" data-price="4.50" />
+                        <div class="checkbox-visual">
+                            <span class="material-symbols-outlined checkbox-icon">check</span>
+                        </div>
+                        <span class="checkbox-label">Extra Queijo</span>
+                    </div>
+                    <span class="checkbox-price" data-extra-price="4.50">+R$ 4,50</span>
+                </label>
+                
+                <!-- Ovo Frito -->
+                <label class="checkbox-card" onclick="toggleExtra('ovo', 3.00)">
+                    <div class="checkbox-card__left">
+                        <input class="checkbox-input" type="checkbox" id="extra-ovo" data-name="ovo" data-price="3.00" />
+                        <div class="checkbox-visual">
+                            <span class="material-symbols-outlined checkbox-icon">check</span>
+                        </div>
+                        <span class="checkbox-label">Ovo Frito</span>
+                    </div>
+                    <span class="checkbox-price" data-extra-price="3.00">+R$ 3,00</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="section-spacing">
+            <h3 class="section-title">Observações</h3>
+            <div class="input-group">
+                <div class="input-wrapper input-wrapper--textarea">
+                    <textarea
+                        class="input-field input-field--textarea"
+                        placeholder="Ex: Sem cebola, molho à parte..."
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+        <button id="btn-add-cart" class="bottom-bar__btn">
+            <span class="bottom-bar__btn-text">Adicionar ao Carrinho</span>
+            <span id="btn-price-display" class="bottom-bar__btn-price">...</span>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="assets/js/dom-helpers.js"></script>
+    <script type="module" src="assets/js/details-view.js"></script>
+    <script type="module" src="assets/js/navbar.js"></script>
+</body>
 </html>

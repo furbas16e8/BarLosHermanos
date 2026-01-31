@@ -1,0 +1,20 @@
+/* assets/css/main.css */
+
+/* 1. Base */
+@import 'base/variables.css';
+@import 'base/reset.css';
+
+/* 2. Utils */
+@import 'utils/utilities.css';
+
+/* 3. Components */
+@import 'components/card.css';
+@import 'components/category-nav.css';
+@import 'components/navbar.css';
+@import 'components/form.css';
+@import 'components/button.css';
+
+/* 4. Pages */
+@import 'orders.css';
+@import 'pages/product.css';
+@import 'pages/cart.css';

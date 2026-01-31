@@ -1,0 +1,40 @@
+/* assets/css/base/variables.css */
+:root {
+  /* --- Cores (Clone Exato Tailwind Config) --- */
+  --color-primary: #ff3131; /* text-primary, bg-primary */
+  --color-bg-light: #f8f7f5; /* bg-background-light */
+  --color-bg-dark: #000000; /* bg-background-dark (Body Background) */
+  --color-surface-dark: #1a130c; /* bg-surface-dark (Cards, Navbar) */
+  --color-text-secondary: #cbad90; /* text-secondary-text */
+  --color-white: #ffffff;
+  --color-white-5: rgba(255, 255, 255, 0.05); /* border-white/5, input bg */
+  --color-white-10: rgba(255, 255, 255, 0.1); /* border-white/10 */
+  --color-white-20: rgba(255, 255, 255, 0.2);
+  --color-white-40: rgba(255, 255, 255, 0.4); /* placeholder */
+  --color-white-50: rgba(255, 255, 255, 0.5); /* icons inactive */
+  --color-white-60: rgba(255, 255, 255, 0.6);
+  --color-black-60: rgba(0, 0, 0, 0.6); /* Backdrop */
+
+  /* --- Fontes --- */
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-title-alt:
+    "Bebas Neue", cursive; /* Usado na landing, bom ter mapeado */
+
+  /* --- Espaçamentos & Layout --- */
+  --spacing-container: 1.25rem; /* px-5 (20px) */
+  --header-height: 80px;
+  --navbar-height: 84px;
+
+  /* --- Raios de Borda --- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem; /* rounded-lg */
+  --radius-lg: 0.75rem; /* rounded-xl */
+  --radius-xl: 1rem; /* rounded-2xl */
+  --radius-full: 9999px; /* rounded-full */
+
+  /* --- Sombras --- */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(255, 49, 49, 0.25); /* shadow-primary/25 approx */
+  --shadow-glow: 0 0 20px rgba(242, 127, 13, 0.3);
+}

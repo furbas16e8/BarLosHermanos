@@ -66,8 +66,10 @@ async function logoutUser() {
     const { error } = await _supabase.auth.signOut();
     if (!error) {
         // Limpar dados locais sensíveis e carrinho
-        localStorage.removeItem('bar-los-hermanos-cart');
-        localStorage.removeItem('bar-los-hermanos-favs'); // Limpar cache de favs também
+        localStorage.removeItem('bar_los_hermanos_cart_v2'); // Nova chave v2
+        localStorage.removeItem('bar-los-hermanos-cart');    // Chave legada
+        localStorage.removeItem('bar-los-hermanos-favs');    // Limpar cache de favs também
+        window.currentUserId = null; // Limpar referência global
         window.location.href = 'login.html';
     }
     return { error };
@@ -164,3 +166,68 @@ async function createOrderItems(itemsPayload) {
         .select();
     return { data, error };
 }
+
+// ============================================
+// AUTH STATE LISTENER - Isolamento do Carrinho
+// ============================================
+
+// Listener global para mudanças de estado de autenticação
+_supabase.auth.onAuthStateChange((event, session) => {
+    console.log('[Auth] Evento:', event);
+    
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session && session.user) {
+            const userId = session.user.id;
+            console.log('[Auth] Usuário logado:', userId);
+            
+            // Define o userId global para uso no carrinho
+            if (typeof setCurrentUserId === 'function') {
+                setCurrentUserId(userId);
+            } else {
+                window.currentUserId = userId;
+            }
+            
+            // Tenta migrar carrinho legado se existir
+            if (typeof migrateLegacyCart === 'function') {
+                migrateLegacyCart();
+            }
+            
+            // Valida e recarrega o carrinho
+            if (typeof updateCartUI === 'function') {
+                updateCartUI();
+            }
+            if (typeof updateCartBadge === 'function') {
+                updateCartBadge();
+            }
+        }
+    }
+    
+    if (event === 'SIGNED_OUT') {
+        console.log('[Auth] Usuário deslogado');
+        
+        // Limpa referência global
+        window.currentUserId = null;
+        
+        // Limpa carrinho do localStorage
+        localStorage.removeItem('bar_los_hermanos_cart_v2');
+        localStorage.removeItem('bar-los-hermanos-cart'); // Legado
+        
+        // Atualiza UI do carrinho
+        if (typeof updateCartUI === 'function') {
+            updateCartUI();
+        }
+        if (typeof updateCartBadge === 'function') {
+            updateCartBadge();
+        }
+    }
+    
+    if (event === 'USER_UPDATED') {
+        // Atualiza userId se necessário
+        if (session && session.user) {
+            window.currentUserId = session.user.id;
+            if (typeof setCurrentUserId === 'function') {
+                setCurrentUserId(session.user.id);
+            }
+        }
+    }
+});
