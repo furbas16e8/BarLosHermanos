@@ -131,6 +131,23 @@ Scripts executados no SQL Editor:
 5. Configurar RLS (Row Level Security)
 6. Criar função `buscar_ou_criar_usuario()`
 
+### FASE 1.5: Alteração em order_items (Pós-implementação)
+
+**Data:** 31/01/2026  
+**Motivação:** Facilitar verificação de pedidos sem necessidade de JOIN
+
+```sql
+-- Adicionar coluna nome_cliente para denormalização
+ALTER TABLE public.order_items 
+ADD COLUMN IF NOT EXISTS nome_cliente VARCHAR(100);
+
+-- Comentário para documentação
+COMMENT ON COLUMN public.order_items.nome_cliente IS 
+'Nome do cliente que fez o pedido (denormalizado para facilitar consultas)';
+```
+
+**Benefício:** Ao consultar os itens de um pedido, o nome do cliente já está disponível diretamente na tabela `order_items`, sem necessidade de JOIN com a tabela `orders`.
+
 ### FASE 2: Backend JavaScript
 
 **Arquivo criado:** `assets/js/checkout-guest.js`
@@ -349,15 +366,24 @@ const itensPayload = pedidoData.itens.map(item => ({
 }));
 ```
 
-**Correção:**
+**Correção (com nome_cliente adicionado):**
 ```javascript
 const itensPayload = pedidoData.itens.map(item => {
     // Normaliza nomes dos campos (suporta inglês e português)
     const nome = item.nome || item.name || 'Produto';
+    const preco = item.preco || item.price || 0;
+    const qtd = item.quantidade || item.quantity || 1;
     
     return {
+        order_id: order.id,
+        nome_cliente: pedidoData.nome, // ✅ Denormalizado para facilitar consultas
         produto_nome: nome,
-        // ...
+        produto_categoria: item.categoria || item.category || null,
+        quantidade: qtd,
+        preco_unitario: preco,
+        total_item: preco * qtd,
+        observacoes: item.observacoes || null,
+        extras: item.extras || []
     };
 });
 ```
@@ -557,6 +583,8 @@ index.html
 | Arquivo | Descrição |
 |---------|-----------|
 | `assets/js/checkout-guest.js` | Lógica completa do checkout simplificado |
+| `db/setup_guest_checkout_v3.sql` | **ARQUIVO PRINCIPAL** - Todas as queries SQL consolidadas (tabelas, RLS, funções, consultas) |
+| `db/alter_order_items_add_cliente.sql` | Script SQL para adicionar coluna nome_cliente em order_items |
 
 ### Arquivos Modificados
 | Arquivo | Alterações |
@@ -566,6 +594,7 @@ index.html
 | `assets/js/navbar.js` | Simplificada para 3 itens |
 | `assets/js/orders-view.js` | Removido redirecionamento para login |
 | `index.html` | Links atualizados para `orders.html` |
+| `assets/js/checkout-guest.js` | Adicionado campo nome_cliente no payload de order_items |
 
 ---
 

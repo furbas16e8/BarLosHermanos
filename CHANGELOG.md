@@ -7,6 +7,89 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-01-31
+
+### Added
+
+- **Guest Checkout v3.0 - Cadastro Simplificado**: Implementação completa de checkout sem necessidade de login prévio.
+  - Nova tabela `users` com identificação por telefone (DDD + número) como chave única
+  - Nova tabela `adress` para armazenar 1 endereço por usuário
+  - Nova tabela `orders` com estrutura otimizada para pedidos sem autenticação
+  - Nova tabela `order_items` com campo `nome_cliente` denormalizado para facilitar consultas
+  - Arquivo SQL consolidado `db/setup_guest_checkout_v3.sql` com todas as queries
+  - Script de alteração `db/alter_order_items_add_cliente.sql` para adicionar campo de nome
+
+- **Fluxo Diferenciado de Entrega**:
+  - **Delivery**: Solicita telefone, nome e endereço completo (rua, número, complemento, bairro)
+  - **Retirada**: Solicita apenas telefone e nome (endereço não necessário)
+  - Toggle de seleção no carrinho com atualização dinâmica de taxa de entrega
+
+- **Nova Página de Carrinho (`shopping.html`)**:
+  - Seleção de tipo de entrega (Delivery/Retirada) com toggle visual
+  - Seleção de forma de pagamento (Pix/Cartão/Dinheiro) com cards interativos
+  - Campo de troco condicional (apenas para pagamento em dinheiro)
+  - Área de "Seus Dados" que aparece após preenchimento no modal
+  - Botão dinâmico: "Endereço de Entrega" → "Finalizar Pedido"
+
+- **Modal de Cadastro Rápido**:
+  - Campos de telefone separados (DDD + número)
+  - Aceita números com 8 ou 9 dígitos (adiciona '9' automaticamente quando necessário)
+  - Busca automática de usuário por telefone (preenche dados se já cadastrado)
+  - Mensagem contextual para primeira vez vs. usuário recorrente
+  - Campos de endereço condicionais (apenas para delivery)
+  - Select de bairros carregado dinamicamente do banco (`zonas_entrega`)
+
+- **Sistema de Estado Persistente**:
+  - Estado do checkout salvo em `localStorage` (`bar-los-hermanos-checkout-state`)
+  - Recuperação automática de dados ao recarregar página
+  - Sincronização entre página do carrinho e modal
+
+- **Documentação Completa**:
+  - Plano de implementação detalhado (`plans/implementation-plan-v3.md`)
+  - Documentação técnica completa (`docs/implementacao-cadastro-simplificado-v3.md`)
+  - Queries SQL documentadas e organizadas na pasta `db/`
+
+### Changed
+
+- **Navbar Simplificada**: Reduzida de 4 para 3 itens (Início, Cardápio, Carrinho)
+  - Removidos: Favoritos e Perfil (não necessários sem autenticação)
+  - Ícones atualizados: `home`, `restaurant_menu`, `shopping_cart`
+
+- **Remoção de Login Obrigatório**:
+  - Links da landing page (`index.html`) direcionam para `orders.html` (não `login.html`)
+  - Função `addToCart()` em `orders.js` não verifica mais sessão ativa
+  - Função `saveCart()` aceita usuário 'guest' sem necessidade de autenticação
+  - Página `orders.html` acessível sem redirecionamento para login
+
+- **Módulo de Checkout (`assets/js/checkout-guest.js`)**:
+  - Nova lógica de carregamento de carrinho (suporta formatos novo e legado)
+  - Normalização de campos (name→nome, price→preco, quantity→quantidade)
+  - Integração com tabelas `users`, `adress`, `orders`, `order_items`
+  - Cálculo dinâmico de taxa de entrega por bairro
+
+### Fixed
+
+- **Bug**: Redirecionamento forçado para `login.html` ao adicionar item ao carrinho
+  - Solução: Removida verificação de sessão em `addToCart()`
+
+- **Bug**: Carrinho não persistia sem usuário logado
+  - Solução: Modificada `saveCart()` para usar userId 'guest' e salvar em múltiplas chaves do localStorage
+
+- **Bug**: Erro 42703 - Coluna `taxa` inexistente em `zonas_entrega`
+  - Solução: Corrigido nome da coluna para `taxa_entrega` em todas as queries
+
+- **Bug**: Erro 23502 - Campo `produto_nome` nulo ao finalizar pedido
+  - Solução: Implementada normalização de campos para compatibilidade com dados legados (inglês→português)
+
+- **Bug**: Telefone aceitava apenas 8 dígitos (adicionava '9' automaticamente)
+  - Solução: Validador modificado para aceitar 8 ou 9 dígitos, adicionando '9' apenas no envio ao banco
+
+- **Bug**: Valores do carrinho não apareciam no modal de checkout
+  - Solução: Corrigida função `carregarCarrinho()` para ler de ambas as chaves do localStorage
+
+- **Bug**: Bairros não carregavam no select do modal
+  - Solução: Corrigida query do Supabase e implementado preenchimento dinâmico do select
+
 ## [1.3.0] - 2026-01-31
 
 ### Added

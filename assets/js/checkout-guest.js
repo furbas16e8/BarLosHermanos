@@ -502,6 +502,7 @@ async function criarPedido(pedidoData) {
                 
                 return {
                     order_id: order.id,
+                    nome_cliente: pedidoData.nome, // Denormalizado para facilitar consultas
                     produto_id: item.id || null,
                     produto_cod: item.cod || null,
                     produto_nome: nome,
