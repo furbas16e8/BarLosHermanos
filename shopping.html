@@ -15,8 +15,7 @@
     <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
-    <script src="assets/js/addresses.js"></script>
-    <script src="assets/js/checkout.js"></script>
+    <script src="assets/js/orders.js"></script>
 </head>
 <body class="checkout-layout">
     <!-- Header -->
@@ -30,47 +29,6 @@
 
     <!-- Content Scroller -->
     <main class="cart-container no-scrollbar">
-        <!-- Branch Info (Substitui o seletor de filiais) -->
-        <div class="branch-info-section">
-            <h2 class="section-label">Local do Pedido</h2>
-            <div class="branch-info-box">
-                <span class="material-symbols-outlined branch-info__icon">store</span>
-                <div class="branch-info__content">
-                    <p class="branch-info__name">Você está pedindo no <strong>Los Hermanos Grã Duquesa</strong></p>
-                    <p class="branch-info__address">Rua Suíça, 22</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delivery Mode -->
-        <div class="delivery-section">
-            <div class="delivery-switch">
-                <button id="btn-delivery-mode" onclick="setDeliveryMode('delivery')" class="delivery-btn delivery-btn--active">
-                    <span class="material-symbols-outlined">delivery_dining</span>
-                    Entrega
-                </button>
-                <button id="btn-pickup-mode" onclick="setDeliveryMode('pickup')" class="delivery-btn">
-                    <span class="material-symbols-outlined">storefront</span>
-                    Retirada
-                </button>
-            </div>
-        </div>
-
-        <!-- Address -->
-        <div id="address-section" class="address-card">
-            <div class="address-header">
-                <div class="address-title-group">
-                    <span class="material-symbols-outlined address-title-group__icon">location_on</span>
-                    <h3 class="address-title-group__text">Endereço de Entrega</h3>
-                </div>
-                <button class="address-change-btn" onclick="window.location.href='perfil.html'">Alterar</button>
-            </div>
-            <div id="address-details" class="address-details">
-                <!-- JS injeta aqui -->
-                <p class="address-loading">Carregando...</p>
-            </div>
-        </div>
-
         <!-- Items -->
         <div class="cart-items-section">
             <h2 class="section-label">Seus Itens</h2>
@@ -85,35 +43,78 @@
             </div>
         </div>
 
-        <!-- Payment -->
-        <div class="payment-section">
+        <!-- Tipo de Entrega -->
+        <div class="cart-section">
+            <h2 class="section-label">Tipo de Entrega</h2>
+            <div class="delivery-toggle" id="delivery-toggle">
+                <button type="button" class="delivery-option delivery-option--active" data-value="entrega" onclick="selecionarTipoEntrega('entrega')">
+                    <span class="material-symbols-outlined">delivery_dining</span>
+                    <span>Delivery</span>
+                </button>
+                <button type="button" class="delivery-option" data-value="retirada" onclick="selecionarTipoEntrega('retirada')">
+                    <span class="material-symbols-outlined">storefront</span>
+                    <span>Retirada</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Forma de Pagamento -->
+        <div class="cart-section">
             <h2 class="section-label">Forma de Pagamento</h2>
-            <div class="payment-list">
-                <button onclick="setPaymentMethod('online')" id="pay-online" class="payment-option payment-option--selected">
-                    <div class="payment-option__left">
-                        <span class="material-symbols-outlined payment-option__icon payment-option__icon--primary">credit_card</span>
-                        <span class="payment-option__text">Cartão ou Pix</span>
+            <div class="payment-options">
+                <label class="payment-card">
+                    <input type="radio" name="forma-pagamento-cart" value="pix" checked onchange="atualizarFormaPagamento('pix')">
+                    <div class="payment-card__content">
+                        <span class="material-symbols-outlined">qr_code</span>
+                        <span>Pix</span>
                     </div>
-                    <span class="material-symbols-outlined payment-option__check" id="check-online">check_circle</span>
-                </button>
-
-                <button onclick="setPaymentMethod('cash')" id="pay-cash" class="payment-option">
-                    <div class="payment-option__left">
-                        <span class="material-symbols-outlined payment-option__icon payment-option__icon--cash">payments</span>
-                        <span class="payment-option__text payment-option__text--cash" id="text-cash">Dinheiro (na entrega)</span>
+                </label>
+                <label class="payment-card">
+                    <input type="radio" name="forma-pagamento-cart" value="cartao" onchange="atualizarFormaPagamento('cartao')">
+                    <div class="payment-card__content">
+                        <span class="material-symbols-outlined">credit_card</span>
+                        <span>Cartão</span>
                     </div>
-                    <span class="material-symbols-outlined payment-option__check hidden" id="check-cash">check_circle</span>
-                </button>
-
-                <div id="change-container" class="change-container hidden">
-                    <div class="change-input-wrapper">
-                        <label class="section-label change-label">Troco para quanto?</label>
-                        <div class="change-input-group">
-                            <span class="change-input__prefix">R$</span>
-                            <input type="number" id="cash-change" placeholder="Ex: 50,00" class="change-input">
-                        </div>
+                </label>
+                <label class="payment-card">
+                    <input type="radio" name="forma-pagamento-cart" value="dinheiro" onchange="atualizarFormaPagamento('dinheiro')">
+                    <div class="payment-card__content">
+                        <span class="material-symbols-outlined">payments</span>
+                        <span>Dinheiro</span>
                     </div>
+                </label>
+            </div>
+            
+            <!-- Troco (só aparece se dinheiro) -->
+            <div id="cart-troco-container" class="cart-field" style="display: none; margin-top: 12px;">
+                <label class="cart-field__label">Troco para quanto?</label>
+                <div class="cart-input-prefix">
+                    <span>R$</span>
+                    <input type="number" id="cart-troco" class="cart-input" placeholder="0,00" step="0.01" onchange="atualizarTroco(this.value)">
                 </div>
+            </div>
+        </div>
+
+        <!-- Dados do Cliente (aparece após preenchimento) -->
+        <div id="cart-dados-cliente" class="cart-section cart-dados-cliente" style="display: none;">
+            <h2 class="section-label">Seus Dados</h2>
+            <div class="cart-dados-card">
+                <div class="cart-dados-row">
+                    <span class="material-symbols-outlined">smartphone</span>
+                    <span id="cart-dados-telefone"></span>
+                </div>
+                <div class="cart-dados-row">
+                    <span class="material-symbols-outlined">person</span>
+                    <span id="cart-dados-nome"></span>
+                </div>
+                <div id="cart-dados-endereco-row" class="cart-dados-row">
+                    <span class="material-symbols-outlined">location_on</span>
+                    <span id="cart-dados-endereco"></span>
+                </div>
+                <button class="cart-btn-editar" onclick="abrirCheckoutModal()">
+                    <span class="material-symbols-outlined">edit</span>
+                    Editar
+                </button>
             </div>
         </div>
 
@@ -122,11 +123,6 @@
             <div class="totals-row">
                 <span class="totals-row__label">Subtotal</span>
                 <span class="totals-row__value" id="cart-subtotal">R$ 0,00</span>
-            </div>
-            
-            <div class="totals-row hidden" id="discount-row">
-                <span class="totals-row__label totals-row__label--highlight">Desconto Fidelidade (10%)</span>
-                <span class="totals-row__value totals-row__value--discount" id="cart-discount">- R$ 0,00</span>
             </div>
 
             <div class="totals-row" id="delivery-row">
@@ -150,14 +146,727 @@
 
     <!-- Checkout Bar (Fixed) -->
     <div class="checkout-bar">
-        <button id="btn-finish" class="btn-finish">
-            <span class="btn-finish__text">Finalizar Pedido</span>
-            <span class="material-symbols-outlined btn-finish__icon">check_circle</span>
+        <button id="btn-finish" class="btn-finish" onclick="abrirCheckoutModal()">
+            <span class="btn-finish__text" id="btn-finish-text">Endereço de Entrega</span>
+            <span class="material-symbols-outlined btn-finish__icon">arrow_forward</span>
         </button>
     </div>
 
+    <!-- ========================================== -->
+    <!-- MODAL DE CADASTRO RÁPIDO -->
+    <!-- ========================================== -->
+    <div id="checkout-modal" class="checkout-modal" style="display: none;">
+        <div class="checkout-modal__overlay">
+            <div class="checkout-modal__content">
+                <!-- Header -->
+                <div class="checkout-modal__header">
+                    <h2 class="checkout-modal__title" id="modal-titulo">📱 Identificação</h2>
+                    <button id="checkout-fechar" class="checkout-modal__close">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="checkout-modal__body">
+                    <!-- Telefone -->
+                    <div class="checkout-field-group">
+                        <label class="checkout-label">
+                            <span class="material-symbols-outlined checkout-label__icon">smartphone</span>
+                            WhatsApp para contato
+                        </label>
+                        <div class="checkout-telefone-row">
+                            <div class="checkout-field checkout-field--ddd">
+                                <label class="checkout-field__sublabel">DDD</label>
+                                <input type="text" id="checkout-ddd" class="checkout-input checkout-input--ddd" placeholder="11" maxlength="2">
+                            </div>
+                            <div class="checkout-field checkout-field--numero">
+                                <label class="checkout-field__sublabel">Número</label>
+                                <input type="text" id="checkout-numero" class="checkout-input checkout-input--numero" placeholder="987654321">
+                            </div>
+                        </div>
+                        <div id="checkout-buscando" class="checkout-busca-status" style="display: none;">
+                            <span class="checkout-spinner"></span> Buscando...
+                        </div>
+                    </div>
+
+                    <!-- Mensagem Primeira Vez -->
+                    <div id="checkout-msg-primeira-vez" class="checkout-msg checkout-msg--info" style="display: none;">
+                        <span class="material-symbols-outlined">info</span>
+                        <p>Primeira vez? Preencha seus dados. Nas próximas, só o número do celular basta!</p>
+                    </div>
+
+                    <!-- Mensagem Encontrado -->
+                    <div id="checkout-msg-encontrado" class="checkout-msg checkout-msg--success" style="display: none;">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <p>Encontramos você! Verifique se os dados estão corretos.</p>
+                    </div>
+
+                    <!-- Nome (sempre necessário) -->
+                    <div class="checkout-field-group">
+                        <label class="checkout-label">👤 Nome completo</label>
+                        <input type="text" id="checkout-nome" class="checkout-input" placeholder="Seu nome completo">
+                    </div>
+
+                    <!-- Endereço (só aparece se for entrega) -->
+                    <div id="checkout-campos-endereco">
+                        <div class="checkout-divider">
+                            <span>Endereço de Entrega</span>
+                        </div>
+
+                        <div id="checkout-aviso-endereco" class="checkout-aviso checkout-aviso--warning">
+                            <span class="material-symbols-outlined">warning</span>
+                            <span>⚠️ Verifique se o endereço está completo!</span>
+                        </div>
+
+                        <div class="checkout-field-group">
+                            <label class="checkout-label">📍 Rua / Avenida</label>
+                            <input type="text" id="checkout-rua" class="checkout-input" placeholder="Nome da rua">
+                        </div>
+
+                        <div class="checkout-field-row">
+                            <div class="checkout-field checkout-field--numero">
+                                <label class="checkout-label">Número</label>
+                                <input type="text" id="checkout-numero-endereco" class="checkout-input" placeholder="123">
+                            </div>
+                            <div class="checkout-field checkout-field--complemento">
+                                <label class="checkout-label">Complemento (opcional)</label>
+                                <input type="text" id="checkout-complemento" class="checkout-input" placeholder="Apto, bloco...">
+                            </div>
+                        </div>
+
+                        <div class="checkout-field-group">
+                            <label class="checkout-label">Bairro</label>
+                            <select id="checkout-bairro" class="checkout-select">
+                                <option value="">Selecione o bairro</option>
+                                <!-- Preenchido via JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Observações -->
+                    <div class="checkout-field-group">
+                        <label class="checkout-label">📝 Observações (opcional)</label>
+                        <textarea id="checkout-observacoes" class="checkout-textarea" rows="2" placeholder="Alguma observação para o pedido?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="checkout-modal__footer">
+                    <button id="checkout-ver-resumo" class="checkout-btn checkout-btn--primario" style="flex: 1;">
+                        Ver Resumo do Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Styles do Modal (inline para não precisar criar novo CSS) -->
+    <style>
+        /* ==========================================
+           MODAL DE CHECKOUT
+           ========================================== */
+        .checkout-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .checkout-modal__overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .checkout-modal__content {
+            background: #1a1a1a;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .checkout-modal__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .checkout-modal__title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.5rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .checkout-modal__close {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .checkout-modal__close:hover {
+            background: #333;
+        }
+
+        .checkout-modal__body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .checkout-modal__footer {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        /* ==========================================
+           FORMULÁRIO
+           ========================================== */
+        .checkout-field-group {
+            margin-bottom: 20px;
+        }
+
+        .checkout-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+
+        .checkout-label__icon {
+            color: #ff3131;
+        }
+
+        .checkout-input,
+        .checkout-select,
+        .checkout-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .checkout-input:focus,
+        .checkout-select:focus,
+        .checkout-textarea:focus {
+            outline: none;
+            border-color: #ff3131;
+        }
+
+        .checkout-input::placeholder {
+            color: #666;
+        }
+
+        .checkout-telefone-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .checkout-field--ddd {
+            flex: 0 0 80px;
+        }
+
+        .checkout-field--numero {
+            flex: 1;
+        }
+
+        .checkout-field__sublabel {
+            display: block;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .checkout-field-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .checkout-field--complemento {
+            flex: 2;
+        }
+
+        /* ==========================================
+           RADIO BUTTONS
+           ========================================== */
+        .checkout-radio-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .checkout-radio {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .checkout-radio input {
+            display: none;
+        }
+
+        .checkout-radio__box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .checkout-radio input:checked + .checkout-radio__box {
+            border-color: #ff3131;
+            background: rgba(255, 49, 49, 0.1);
+        }
+
+        .checkout-radio__box .material-symbols-outlined {
+            font-size: 1.5rem;
+            color: #888;
+        }
+
+        .checkout-radio input:checked + .checkout-radio__box .material-symbols-outlined {
+            color: #ff3131;
+        }
+
+        /* ==========================================
+           MENSAGENS
+           ========================================== */
+        .checkout-msg {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .checkout-msg--info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            color: #93c5fd;
+        }
+
+        .checkout-msg--success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #86efac;
+        }
+
+        .checkout-msg p {
+            margin: 0;
+        }
+
+        .checkout-aviso {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+
+        .checkout-aviso--warning {
+            background: rgba(234, 179, 8, 0.2);
+            border: 1px solid rgba(234, 179, 8, 0.5);
+            color: #fde047;
+        }
+
+        /* ==========================================
+           BUSCA STATUS
+           ========================================== */
+        .checkout-busca-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .checkout-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #444;
+            border-top-color: #ff3131;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ==========================================
+           INPUT COM PREFIXO
+           ========================================== */
+        .checkout-input-prefix {
+            display: flex;
+            align-items: center;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding-left: 16px;
+        }
+
+        .checkout-input-prefix .checkout-input {
+            border: none;
+            background: transparent;
+        }
+
+        .checkout-prefix {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* ==========================================
+           RESUMO
+           ========================================== */
+        .checkout-resumo {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .checkout-resumo__titulo {
+            font-size: 1rem;
+            color: #fff;
+            margin: 0 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #444;
+        }
+
+        .checkout-resumo__linha {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .checkout-resumo__linha--total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #444;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* ==========================================
+           BOTÕES
+           ========================================== */
+        .checkout-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkout-btn--primario {
+            background: #ff3131;
+            color: #fff;
+        }
+
+        .checkout-btn--primario:hover {
+            background: #e62e2e;
+        }
+
+        .checkout-btn--primario:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .checkout-btn--secundario {
+            background: #444;
+            color: #fff;
+        }
+
+        .checkout-btn--secundario:hover {
+            background: #555;
+        }
+
+        /* ==========================================
+           DIVIDER NO MODAL
+           ========================================== */
+        .checkout-divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0 16px 0;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .checkout-divider::before,
+        .checkout-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #444;
+        }
+
+        .checkout-divider span {
+            padding: 0 12px;
+        }
+
+        /* ==========================================
+           SEÇÕES DO CARRINHO
+           ========================================== */
+        .cart-section {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .cart-section:last-of-type {
+            border-bottom: none;
+        }
+
+        /* Toggle de Entrega */
+        .delivery-toggle {
+            display: flex;
+            gap: 12px;
+        }
+
+        .delivery-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delivery-option .material-symbols-outlined {
+            font-size: 1.5rem;
+        }
+
+        .delivery-option--active {
+            border-color: #ff3131;
+            background: rgba(255, 49, 49, 0.1);
+        }
+
+        .delivery-option--active .material-symbols-outlined {
+            color: #ff3131;
+        }
+
+        /* Opções de Pagamento */
+        .payment-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .payment-card {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .payment-card input {
+            display: none;
+        }
+
+        .payment-card__content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .payment-card input:checked + .payment-card__content {
+            border-color: #ff3131;
+            background: rgba(255, 49, 49, 0.1);
+        }
+
+        .payment-card__content .material-symbols-outlined {
+            font-size: 1.5rem;
+            color: #888;
+        }
+
+        .payment-card input:checked + .payment-card__content .material-symbols-outlined {
+            color: #ff3131;
+        }
+
+        /* Campo de input no carrinho */
+        .cart-field {
+            margin-top: 12px;
+        }
+
+        .cart-field__label {
+            display: block;
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 6px;
+        }
+
+        .cart-input-prefix {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+
+        .cart-input-prefix span {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .cart-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* Dados do Cliente */
+        .cart-dados-cliente {
+            background: rgba(255, 49, 49, 0.05);
+        }
+
+        .cart-dados-card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .cart-dados-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+            font-size: 0.9rem;
+        }
+
+        .cart-dados-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .cart-dados-row .material-symbols-outlined {
+            color: #ff3131;
+            font-size: 1.2rem;
+        }
+
+        .cart-btn-editar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid #ff3131;
+            border-radius: 8px;
+            color: #ff3131;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cart-btn-editar:hover {
+            background: rgba(255, 49, 49, 0.1);
+        }
+
+        /* ==========================================
+           SCROLLBAR CUSTOMIZADA
+           ========================================== */
+        .checkout-modal__body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .checkout-modal__body::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .checkout-modal__body::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        .checkout-modal__body::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+
+    <!-- Script para carregar valores do carrinho na página -->
+    <script>
+        // Estas funções são definidas no checkout-guest.js
+        // Este script apenas garante que a página carregue corretamente
+        document.addEventListener('DOMContentLoaded', function() {
+            // O checkout-guest.js já inicializa tudo automaticamente
+            console.log('[Cart Page] Inicializando...');
+        });
+    </script>
+
+    <!-- Scripts -->
+    <script src="assets/js/checkout-guest.js"></script>
+
     <!-- Global Navigation -->
     <script type="module" src="assets/js/navbar.js"></script>
-    <script src="assets/js/orders.js"></script>
 </body>
 </html>

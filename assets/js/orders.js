@@ -93,25 +93,20 @@ function isBeforeClosingTime() {
 }
 
 /**
- * Valida se o carrinho é válido (usuário correto e não expirado)
+ * Valida se o carrinho é válido (VERSÃO SIMPLIFICADA - sem auth)
  * @param {Object} cartData 
  * @returns {boolean}
  */
 function isCartValid(cartData) {
   // Verificar estrutura mínima
-  if (!cartData || !cartData.userId || !cartData.createdAt || !Array.isArray(cartData.items)) {
+  if (!cartData || !cartData.createdAt || !Array.isArray(cartData.items)) {
     console.log('[Cart] isCartValid: Estrutura inválida');
     return false;
   }
 
-  // Verificar se o carrinho pertence ao usuário logado
-  const currentUserId = getCurrentUserId();
-  console.log('[Cart] isCartValid: Cart userId:', cartData.userId, 'Current userId:', currentUserId);
-  
-  if (cartData.userId !== currentUserId) {
-    console.log('[Cart] Carrinho de outro usuário detectado. Esperado:', currentUserId, 'Encontrado:', cartData.userId);
-    return false;
-  }
+  // VERSÃO SIMPLIFICADA: Aceita carrinhos de guest ou sem userId
+  // Não valida mais se o userId bate (já que não temos mais login obrigatório)
+  console.log('[Cart] isCartValid: Cart userId:', cartData.userId);
 
   // Verificar se é do mesmo dia
   const cartDate = new Date(cartData.createdAt);
@@ -131,65 +126,79 @@ function isCartValid(cartData) {
 }
 
 /**
- * Limpa o carrinho do localStorage
+ * Limpa o carrinho do localStorage (VERSÃO SIMPLIFICADA)
  */
 function clearCartStorage() {
   localStorage.removeItem(CART_STORAGE_KEY);
+  localStorage.removeItem(LEGACY_CART_KEY);
   console.log('[Cart] Carrinho limpo do localStorage');
 }
 
 /**
- * Carrega os itens do carrinho (após validação)
+ * Carrega os itens do carrinho (VERSÃO SIMPLIFICADA)
  * @returns {Array} Array de itens ou array vazio
  */
 function getCart() {
+  // Tenta chave nova primeiro
   const raw = localStorage.getItem(CART_STORAGE_KEY);
-  if (!raw) {
-    console.log('[Cart] getCart: Nenhum carrinho encontrado');
-    return [];
-  }
-
-  try {
-    const cartData = JSON.parse(raw);
-    console.log('[Cart] getCart: Carrinho encontrado, validando...', { userId: cartData.userId });
-    
-    if (!isCartValid(cartData)) {
-      console.log('[Cart] getCart: Carrinho inválido, limpando');
+  
+  if (raw) {
+    try {
+      const cartData = JSON.parse(raw);
+      console.log('[Cart] getCart: Carrinho encontrado (novo formato)', { userId: cartData.userId });
+      
+      if (!isCartValid(cartData)) {
+        console.log('[Cart] getCart: Carrinho inválido, limpando');
+        clearCartStorage();
+        return [];
+      }
+      console.log('[Cart] getCart: Carrinho válido, items:', cartData.items.length);
+      return cartData.items || [];
+    } catch (e) {
+      console.error('[Cart] Erro ao parsear carrinho:', e);
       clearCartStorage();
       return [];
     }
-    console.log('[Cart] getCart: Carrinho válido, items:', cartData.items.length);
-    return cartData.items || [];
-  } catch (e) {
-    console.error('[Cart] Erro ao parsear carrinho:', e);
-    clearCartStorage();
-    return [];
   }
+  
+  // Fallback: tenta chave legada
+  const legacyRaw = localStorage.getItem(LEGACY_CART_KEY);
+  if (legacyRaw) {
+    try {
+      const legacyItems = JSON.parse(legacyRaw);
+      if (Array.isArray(legacyItems)) {
+        console.log('[Cart] getCart: Carrinho encontrado (formato legado), items:', legacyItems.length);
+        return legacyItems;
+      }
+    } catch (e) {
+      console.error('[Cart] Erro ao parsear carrinho legado:', e);
+    }
+  }
+  
+  console.log('[Cart] getCart: Nenhum carrinho encontrado');
+  return [];
 }
 
 /**
- * Salva o carrinho com metadata de usuário e timestamp
+ * Salva o carrinho no localStorage (VERSÃO SIMPLIFICADA - sem auth)
  * @param {Array} items 
  */
 function saveCart(items) {
-  const currentUserId = getCurrentUserId();
+  console.log('[Cart] saveCart chamado. Items:', items.length);
   
-  console.log('[Cart] saveCart chamado. UserId:', currentUserId, 'Items:', items.length);
-  
-  if (!currentUserId) {
-    console.error('[Cart] Tentativa de salvar carrinho sem usuário logado');
-    return;
-  }
-
+  // VERSÃO SIMPLIFICADA: Sem vinculação a usuário
+  // Usa formato simples array ou formato antigo compatível
   const cartData = {
-    userId: currentUserId,
+    userId: 'guest', // Marcador para identificar formato novo
     createdAt: new Date().toISOString(),
     items: items
   };
 
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
-    console.log('[Cart] Carrinho salvo no localStorage:', CART_STORAGE_KEY);
+    // Também salva na chave legada para compatibilidade com checkout-guest.js
+    localStorage.setItem(LEGACY_CART_KEY, JSON.stringify(items));
+    console.log('[Cart] Carrinho salvo no localStorage');
   } catch (e) {
     console.error('[Cart] Erro ao salvar no localStorage:', e);
   }
@@ -236,32 +245,8 @@ window.setCurrentUserId = setCurrentUserId;
 async function addToCart(name, price, img_url, removedIngredients = [], extras = []) {
   console.log('[Cart] addToCart chamado:', { name, price });
   
-  // Verificar se usuário está logado
-  let session = null;
-  if (typeof checkSession === 'function') {
-    try {
-      session = await checkSession();
-      console.log('[Cart] Sessão obtida:', session ? 'SIM' : 'NÃO');
-    } catch (e) {
-      console.error('[Cart] Erro ao verificar sessão:', e);
-    }
-  }
-  
-  if (!session) {
-    console.log('[Cart] Usuário não logado. Redirecionando para login...');
-    window.location.href = 'login.html';
-    return;
-  }
-  
-  // Garantir que o userId está definido
-  if (session.user && session.user.id) {
-    setCurrentUserId(session.user.id);
-    console.log('[Cart] UserId definido:', session.user.id);
-  } else {
-    console.error('[Cart] Sessão sem userId!');
-    window.location.href = 'login.html';
-    return;
-  }
+  // VERSÃO SIMPLIFICADA: Sem verificação de login
+  // O cadastro será feito apenas no checkout
   
   let cart = getCart();
   console.log('[Cart] Carrinho atual:', cart);
@@ -444,11 +429,10 @@ async function loadFavorites() {
 }
 
 async function toggleFavorite(name, price, image) {
-  const session = await checkSession();
-  if (!session) {
-    window.location.href = "login.html";
-    return;
-  }
+  // VERSÃO SIMPLIFICADA: Favoritos desabilitados sem cadastro
+  // Como não temos mais login obrigatório, favoritos ficam para uma v2
+  alert('💡 Faça um pedido primeiro! O sistema de favoritos estará disponível em breve.');
+  return;
 
   // Verificar se já é favorito
   const existingIndex = currentUserFavs.findIndex((f) => f.name === name);

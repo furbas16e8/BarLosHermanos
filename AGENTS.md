@@ -1,7 +1,8 @@
 # Documentação para Agentes de IA (`AGENTS.md`)
 
 > **Atualizado em:** 31/01/2026  
-> **Versão da Documentação:** 2.0
+> **Versão da Documentação:** 2.1  
+> **Versão do Projeto:** 1.3.0
 
 Este documento destina-se a orientar agentes de codificação de IA sobre a estrutura, arquitetura e convenções do projeto **Bar Los Hermanos**.
 
@@ -14,8 +15,9 @@ O **Bar Los Hermanos** é uma aplicação web **estática (Client-Side)** constr
 ### 1.1 Funcionalidades Principais
 
 - **Cardápio Digital Interativo:** Navegação por categorias (Comidas, Drinks, Cervejas, etc.)
-- **Carrinho de Compras:** Adição de itens, cálculo de total e gestão de pedidos
+- **Carrinho de Compras:** Adição de itens, cálculo de total e gestão de pedidos com isolamento por usuário
 - **Autenticação de Clientes:** Cadastro e login via Supabase Auth
+- **Sistema de Múltiplos Endereços:** Gerenciamento de até 3 endereços por usuário (com endereço padrão)
 - **Sistema de Favoritos:** Clientes logados podem salvar itens preferidos
 - **Checkout Completo:** Finalização com cálculo de taxa de entrega por bairro, cupom de desconto (fidelidade), pagamento online ou em dinheiro
 - **Delivery e Retirada:** Modalidades de entrega com zonas configuráveis
@@ -43,6 +45,7 @@ O **Bar Los Hermanos** é uma aplicação web **estática (Client-Side)** constr
 | `cadastro.html` | Cadastro de novos clientes |
 | `perfil.html` | Perfil do usuário e histórico de pedidos |
 | `favoritos.html` | Lista de itens favoritos do cliente |
+| `address.html` | Gerenciamento de múltiplos endereços de entrega |
 | `historia.html` | Página institucional sobre o bar |
 
 ---
@@ -72,10 +75,11 @@ O **Bar Los Hermanos** é uma aplicação web **estática (Client-Side)** constr
 │   │   ├── dom-helpers.js        # Utilitários DOM (el, $, $$)
 │   │   ├── navbar.js             # Navbar global inferior
 │   │   ├── menu-service.js       # Serviço de dados do cardápio
-│   │   ├── orders.js             # Lógica do Carrinho (LocalStorage)
+│   │   ├── orders.js             # Lógica do Carrinho (LocalStorage) V2
 │   │   ├── orders-view.js        # Renderização do cardápio
 │   │   ├── details-view.js       # Página de detalhes do produto
 │   │   ├── checkout.js           # Fluxo de finalização
+│   │   ├── addresses.js          # API de gerenciamento de endereços
 │   │   └── gallery.js            # Galeria de fotos da Home
 │   │
 │   ├── img/             # Imagens otimizadas
@@ -86,13 +90,15 @@ O **Bar Los Hermanos** é uma aplicação web **estática (Client-Side)** constr
 │   └── video/           # Vídeos de background (Hero)
 │
 ├── db/                  # [DEV] Scripts SQL e Schema
+│   ├── migrations/      # Scripts de migração do banco
 │   ├── schema_tables.sql         # DDL das tabelas
 │   ├── setup_delivery.sql        # Setup de zonas de entrega
 │   └── *.sql                     # Queries exploratórias
 │
 ├── docs/                # [DEV] Documentação detalhada
 │   ├── doc_tables.md             # Documentação do schema
-│   └── doc_menu.md               # Documentação do cardápio
+│   ├── doc_menu.md               # Documentação do cardápio
+│   └── doc_*.md                  # Outras documentações
 │
 └── plans/               # [DEV] Planos de implementação
     └── implementation-plan_*.md  # Histórico de planejamentos
@@ -108,25 +114,26 @@ O projeto segue um padrão **MVC Simplificado no Cliente**:
 
 - **Model:** Supabase (PostgreSQL remoto) + LocalStorage (Carrinho local)
 - **View:** Arquivos HTML (Estrutura) + `*-view.js` (Renderização Dinâmica via DOM)
-- **Controller:** `orders.js`, `checkout.js` (Regras de Negócio e Event Listeners)
+- **Controller:** `orders.js`, `checkout.js`, `addresses.js` (Regras de Negócio e Event Listeners)
 
 ### 3.2 Gerenciamento de Estado
 
 | Estado | Persistência | Local/Chave |
 |--------|--------------|-------------|
 | Sessão do Usuário | Supabase Auth | Cookies/Local (gerenciado pelo SDK) |
-| Carrinho de Compras | LocalStorage | `bar-los-hermanos-cart` |
-| Favoritos (cache) | Memória + Supabase | `currentUserFavs` (variável) |
+| Carrinho de Compras | LocalStorage | `bar_los_hermanos_cart_v2` |
+| Favoritos | Supabase (persistente) + Memória (cache) | `currentUserFavs` (variável) |
 | Perfil do Usuário | Supabase | Tabela `clientes` |
+| Endereços | Supabase | Tabela `enderecos` |
 
 ### 3.3 Comunicação entre Módulos
 
 A arquitetura não usa um state manager formal. A comunicação ocorre via:
 
-1. **Funções globais no `window`**: `window.updateNavbarCartCount`, `window.toggleFavorite`
-2. **Eventos customizados**: Não utilizados extensivamente
-3. **LocalStorage**: Sincronização de estado do carrinho entre páginas
-4. **Callbacks**: Passagem de funções entre módulos
+1. **Funções globais no `window`:** `window.updateNavbarCartCount`, `window.toggleFavorite`, `window.addressesAPI`
+2. **Eventos customizados:** Não utilizados extensivamente
+3. **LocalStorage:** Sincronização de estado do carrinho entre páginas
+4. **Callbacks:** Passagem de funções entre módulos
 
 ### 3.4 Banco de Dados (Supabase)
 
@@ -136,6 +143,7 @@ A arquitetura não usa um state manager formal. A comunicação ocorre via:
 |--------|-----------|
 | `cardapio` | Itens do menu com códigos SKU automáticos |
 | `clientes` | Perfil dos usuários (vinculado ao Auth) |
+| `enderecos` | Endereços de entrega (1:N com clientes) |
 | `pedidos` | Cabeçalho das transações de compra |
 | `itens_pedido` | Linhas de itens de cada pedido (snapshot) |
 | `zonas_entrega` | Configuração de bairros, taxas e tempo |
@@ -145,6 +153,7 @@ A arquitetura não usa um state manager formal. A comunicação ocorre via:
 - Leitura pública para `cardapio`
 - Escrita em `pedidos` apenas para usuários autenticados (dono do recurso)
 - Triggers automáticos para geração de SKU (`cod`)
+- Trigger para garantir apenas um endereço padrão por cliente
 
 ---
 
@@ -157,7 +166,7 @@ A arquitetura não usa um state manager formal. A comunicação ocorre via:
 - Compatibilidade com scripts tradicionais via exposição no `window`
 
 ```javascript
-// Exportação
+// Exportação (ES Modules)
 export const el = (tag, props, children) => { ... };
 
 // Importação
@@ -166,6 +175,11 @@ import { el, $, $$ } from './dom-helpers.js';
 // Exposição global (quando necessário)
 window.updateNavbarCartCount = function() { ... };
 ```
+
+**APIs globais expostas:**
+- `window.supabaseClient` - Cliente Supabase inicializado
+- `window.addressesAPI` - API de endereços (CRUD completo)
+- `window.addToCart`, `window.getCart`, `window.saveCart` - Funções do carrinho
 
 **Async/Await:** Obrigatório para chamadas ao Supabase:
 ```javascript
@@ -184,25 +198,30 @@ const card = el('div', { class: 'card' }, [
     el('p', {}, 'Descrição')
 ]);
 
-// ❌ Evitar
+// ❌ Evitar (exceto para conteúdo dinâmico simples)
 container.innerHTML = `<div class="card"><h3>Título</h3>...</div>`;
+```
+
+**Logging:** Usar prefixos nos consoles para facilitar debug:
+```javascript
+console.log('[Cart] Mensagem do carrinho');
+console.log('[Auth] Evento:', event);
 ```
 
 ### 4.2 CSS
 
 **Arquitetura:**
 - **Mobile-First:** Media queries para telas maiores (`min-width`)
-- **CSS Variables:** Definidas em `:root` para consistência
+- **CSS Variables:** Definidas em `:root` para consistência (ver `assets/css/base/variables.css`)
 - **BEM (Block Element Modifier):** Convenção de nomenclatura
 
 ```css
 /* Variáveis */
 :root {
-    --bg-color: #000000;
-    --accent-color: #ff3131;
-    --text-color: #ffffff;
-    --font-title: "Bebas Neue", cursive;
-    --font-body: "Poppins", sans-serif;
+    --color-primary: #ff3131;
+    --color-bg-dark: #000000;
+    --color-surface-dark: #1a130c;
+    --font-display: "Plus Jakarta Sans", sans-serif;
 }
 
 /* BEM */
@@ -281,10 +300,16 @@ Cadastro cria registro em duas tabelas:
 
 ```
 pagina_pedido.html → orders.js (addToCart)
-    → Atualiza LocalStorage (bar-los-hermanos-cart)
+    → Verifica sessão (redireciona para login se não logado)
+    → Atualiza LocalStorage (bar_los_hermanos_cart_v2)
     → Atualiza Badge na Navbar
     → Redireciona para shopping.html
 ```
+
+**Isolamento do Carrinho (V2):**
+- Carrinho é vinculado ao `userId` do usuário logado
+- Expira ao final do dia (após 23:00 ou mudança de dia)
+- Limpado automaticamente no logout
 
 ### 6.3 Checkout
 
@@ -292,16 +317,27 @@ pagina_pedido.html → orders.js (addToCart)
 shopping.html → checkout.js
     1. Verifica sessão
     2. Carrega dados do usuário
-    3. Busca zona de entrega pelo bairro
-    4. Calcula totais (subtotal + taxa - desconto)
-    5. submitOrder() → cria registro em `pedidos`
-    6. Cria registros em `itens_pedido`
-    7. Limpa carrinho → Redireciona para perfil.html
+    3. Carrega endereços do usuário (addresses.js)
+    4. Busca zona de entrega pelo bairro
+    5. Calcula totais (subtotal + taxa - desconto)
+    6. submitOrder() → cria registro em `pedidos`
+    7. Cria registros em `itens_pedido`
+    8. Limpa carrinho → Redireciona para perfil.html
+```
+
+### 6.4 Gerenciamento de Endereços
+
+```
+address.html → addresses.js
+    1. Lista endereços do usuário (máximo 3 na UI)
+    2. Permite criar, editar, excluir
+    3. Define endereço padrão (trigger atualiza outros)
+    4. Integração automática no checkout
 ```
 
 ---
 
-## 7. Dicas para Desenvolvimento
+## 7. Desenvolvimento
 
 ### 7.1 Adicionar Nova Página
 
@@ -325,11 +361,30 @@ shopping.html → checkout.js
 
 - Usar `debug-connection.html` para testar conexão com Supabase
 - Console do navegador mostra logs de erros das chamadas
-- Dados do carrinho disponíveis em `localStorage.getItem('bar-los-hermanos-cart')`
+- Dados do carrinho disponíveis em `localStorage.getItem('bar_los_hermanos_cart_v2')`
+
+### 7.4 Chaves de LocalStorage
+
+| Chave | Propósito | Formato |
+|-------|-----------|---------|
+| `bar_los_hermanos_cart_v2` | Carrinho V2 com isolamento | `{ userId, createdAt, items[] }` |
+| `bar-los-hermanos-cart` | Carrinho legado (migrado) | `items[]` |
 
 ---
 
-## 8. Referências
+## 8. Limites e Regras de Negócio
+
+| Funcionalidade | Limite/Regra |
+|----------------|--------------|
+| Endereços por usuário | Máximo 3 na UI (ilimitado no banco) |
+| Expiração do carrinho | Fim do dia (23:00) ou troca de usuário |
+| Desconto fidelidade | Após 5 pedidos concluídos (10% off) |
+| Modos de entrega | Delivery / Retirada |
+| Formas de pagamento | Cartão/Pix / Dinheiro |
+
+---
+
+## 9. Referências
 
 - [Supabase JS Client Docs](https://supabase.com/docs/reference/javascript/installing)
 - [Material Symbols](https://fonts.google.com/icons)
