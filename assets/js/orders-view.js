@@ -49,38 +49,15 @@ async function getItemsByCategory(category) {
 // --- UI LOGIC ---
 
 async function loadUserProfile() {
-    if (!window.checkSession) return;
-    const session = await checkSession();
-    if (!session) {
-        window.location.href = 'login.html';
-        return;
-    }
-
-    const { data: user } = await getUserProfile(session.user.id);
+    // Versão simplificada - sem redirecionamento para login
+    // Mostra mensagem genérica de boas-vindas
+    const nameEl = $('#header-name');
+    const addrEl = $('#header-address');
+    const greetingEl = $('.user-greeting');
     
-    if (user) {
-        const nameEl = $('#header-name');
-        const addrEl = $('#header-address');
-        
-        if (nameEl) nameEl.innerText = user.nome || 'Cliente';
-        
-        // Buscar endereço padrão da nova tabela 'enderecos'
-        if (addrEl && window.addressesAPI) {
-            try {
-                const { data: address } = await window.addressesAPI.getDefaultAddress();
-                if (address) {
-                    addrEl.innerText = window.addressesAPI.formatAddressShort(address);
-                } else {
-                    addrEl.innerText = 'Sem endereço';
-                }
-            } catch (e) {
-                console.error('Erro ao carregar endereço:', e);
-                addrEl.innerText = 'Sem endereço';
-            }
-        } else if (addrEl) {
-            addrEl.innerText = 'Sem endereço';
-        }
-    }
+    if (greetingEl) greetingEl.innerText = 'Bem-vindo ao';
+    if (nameEl) nameEl.innerText = 'Los Hermanos';
+    if (addrEl) addrEl.innerText = 'Grã Duquesa';
 }
 
 async function loadFeatured() {
