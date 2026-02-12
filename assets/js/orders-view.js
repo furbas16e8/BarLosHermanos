@@ -3,14 +3,57 @@ import { el, $, $$ } from './dom-helpers.js';
 
 // orders-view.js - Lógica de Visualização do Dashboard (Refatorado)
 
-// Configuration
+// Configuração
 const CATEGORY_ORDER = [
     'entradas', 'jantinhas', 'porcoes', 'especiais', 'burguers', 
     'fritas', 'batatas', 'caldos', 'coxinhas', 'escondidinhos', 'bebidas'
 ];
 
+// Cache de insumos inativos (carregado uma vez por sessão)
+let _insumosInativos = null;
+
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+}
+
+// --- FILTRAGEM POR INSUMOS ---
+
+/**
+ * Carrega lista de nomes de insumos inativos do Supabase
+ * Cacheia o resultado para evitar múltiplas chamadas
+ */
+async function getInsumosInativos() {
+    if (_insumosInativos !== null) return _insumosInativos;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('insumos')
+            .select('nome')
+            .eq('ativo', false);
+        if (error) throw error;
+        _insumosInativos = (data || []).map(i => i.nome);
+        console.log('[Menu] Insumos inativos:', _insumosInativos);
+    } catch (err) {
+        console.error('[Menu] Erro ao carregar insumos:', err);
+        _insumosInativos = [];
+    }
+    return _insumosInativos;
+}
+
+/**
+ * Filtra pratos removendo os que possuem insumos inativos
+ * Respeita override_insumo: se true, prato permanece visível
+ */
+async function filterByInsumos(pratos) {
+    const inativos = await getInsumosInativos();
+    if (inativos.length === 0) return pratos;
+
+    return pratos.filter(prato => {
+        // Se tem override, sempre visível
+        if (prato.override_insumo) return true;
+        // Verifica se algum insumo do prato está inativo
+        const chaves = prato.insumos_chave || [];
+        return !chaves.some(nome => inativos.includes(nome));
+    });
 }
 
 // --- DATA SERVICES (Supabase Wrapper) ---
@@ -24,7 +67,7 @@ async function getFeaturedItems() {
         .eq('destaque', true) 
         .limit(5);
     if (error) console.error('Erro featured:', error);
-    return data || [];
+    return await filterByInsumos(data || []);
 }
 
 async function getAllItems() {
@@ -33,7 +76,7 @@ async function getAllItems() {
         .from('cardapio')
         .select('*')
         .eq('ativo', true);
-    return data || [];
+    return await filterByInsumos(data || []);
 }
 
 async function getItemsByCategory(category) {
@@ -43,7 +86,7 @@ async function getItemsByCategory(category) {
         .select('*')
         .eq('ativo', true)
         .eq('categoria', category);
-    return data || [];
+    return await filterByInsumos(data || []);
 }
 
 // --- UI LOGIC ---

@@ -7,30 +7,33 @@ O projeto combina uma landing page moderna com funcionalidades de cardápio digi
 ## 🚀 Funcionalidades
 
 - **Cardápio Digital Interativo:** Navegação por categorias (Comidas, Drinks, Cervejas).
+- **Personalização de Pedidos:** Remoção de ingredientes e adição de extras com cálculo em tempo real.
 - **Carrinho de Compras:** Adição de itens, cálculo de total e gestão de pedidos.
-- **Integração com Backend:** Dados dinâmicos carregados via **Supabase**.
-- **Autenticação de Clientes:** Cadastro e Login para realizar pedidos.
+- **Checkout Simplificado:** Pedido via telefone, sem login prévio (Guest Checkout).
+- **Sistema de Entrega:** Taxa calculada dinamicamente por bairro.
+- **Painel Administrativo:** Gestão de pratos, bebidas e insumos com controle de disponibilidade.
 - **Galeria e Eventos:** Exibição de fotos do ambiente e agenda de shows.
-- **Design Responsivo:** Otimizado para funcionar perfeitamente em celulares e desktops.
+- **Design Responsivo:** Otimizado para celulares e desktops.
 
 ## 🛠️ Tecnologias Utilizadas
 
 O projeto foi construído com a filosofia "Keep It Simple", utilizando tecnologias web nativas sem a complexidade de frameworks SPA.
 
-- **Frontend:** HTML5, CSS3 (Vanilla + Variáveis), JavaScript (ES6+).
+- **Frontend:** HTML5, CSS3 (Vanilla + Variáveis CSS), JavaScript (ES6+).
 - **Backend (BaaS):** [Supabase](https://supabase.com/) (PostgreSQL, Auth, Realtime).
-- **Estilização:** CSS puro com arquitetura baseada em variáveis e design responsivo.
-- **Assets:** Ícones FontAwesome e Fontes Google (Bebas Neue & Poppins).
+- **Estilização:** CSS puro com arquitetura BEM e design responsivo mobile-first.
+- **Ícones:** Material Symbols (Google), FontAwesome 6, Phosphor Icons.
+- **Fontes:** Bebas Neue, Poppins, Plus Jakarta Sans (Google Fonts).
 
 ## 📂 Estrutura do Projeto
 
 ```bash
 /
 ├── assets/              # Recursos estáticos
-│   ├── css/             # Estilos (style.css principal e modularização em andamento)
-│   ├── img/             # Imagens (otimizadas, formato webp/jpeg/png)
-│   └── js/              # Lógica da aplicação (Modular)
-└── *.html               # Páginas da aplicação (index, login, perfil, etc.)
+│   ├── css/             # Estilos (base, components, pages, utils)
+│   ├── img/             # Imagens otimizadas
+│   └── js/              # Lógica da aplicação (12 módulos)
+└── *.html               # Páginas da aplicação
 ```
 
 ## 🔐 Configuração do Backend

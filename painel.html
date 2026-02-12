@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bar Los Hermanos | Painel Admin</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-client.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/base/variables.css">
+    <link rel="stylesheet" href="assets/css/base/reset.css">
+    <link rel="stylesheet" href="assets/css/pages/painel.css">
+</head>
+<body>
+    <div class="painel">
+
+        <!-- Mobile -->
+        <button class="sidebar-toggle" id="sidebar-toggle">&#9776;</button>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__logo">
+                <h1 class="sidebar__logo-title">Los <span>Hermanos</span></h1>
+                <p class="sidebar__logo-sub">Painel Administrativo</p>
+            </div>
+
+            <nav class="sidebar__nav">
+                <span class="sidebar__section-label">Gestão</span>
+                <button class="sidebar__item sidebar__item--active" data-section="produtos" data-title="Produtos">
+                    Produtos
+                </button>
+                <button class="sidebar__item" data-section="metricas" data-title="Métricas">
+                    Métricas
+                </button>
+
+                <span class="sidebar__section-label">Sistema</span>
+                <button class="sidebar__item" data-section="configuracoes" data-title="Configurações">
+                    Configurações
+                </button>
+            </nav>
+
+            <div class="sidebar__footer">
+                Bar Los Hermanos &copy; 2026
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+            <header class="main__header">
+                <h2 class="main__title" id="main-title">Produtos</h2>
+            </header>
+
+            <!-- Loading -->
+            <div class="loading-state" id="painel-loading">
+                <div class="spinner"></div>
+                Carregando dados...
+            </div>
+
+            <div id="painel-content" style="display: none;">
+
+                <!-- SEÇÃO: PRODUTOS -->
+                <div class="section section--active" id="section-produtos">
+                    <div class="main__content">
+
+                        <!-- Stats -->
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <div class="stat-card__label">Pratos Ativos</div>
+                                <div class="stat-card__value stat-card__value--green" id="stat-ativos">—</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card__label">Inativos</div>
+                                <div class="stat-card__value stat-card__value--red" id="stat-inativos">—</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card__label">Overrides</div>
+                                <div class="stat-card__value stat-card__value--blue" id="stat-overrides">—</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card__label">Insumos</div>
+                                <div class="stat-card__value stat-card__value--amber" id="stat-insumos">—</div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tabs: Pratos / Insumos / Bebidas -->
+                        <div class="subtabs">
+                            <button class="subtab subtab--active" data-subtab="pratos">Pratos</button>
+                            <button class="subtab" data-subtab="insumos">Insumos</button>
+                            <button class="subtab" data-subtab="bebidas">Bebidas</button>
+                        </div>
+
+                        <!-- Sub-tab: Pratos -->
+                        <div class="subtab-content subtab-content--active" id="subtab-pratos">
+                            <div class="category-pills no-scrollbar" id="pratos-categories"></div>
+                            <div class="products-controls">
+                                <input type="text" class="products-search" id="products-search" placeholder="Buscar prato...">
+                            </div>
+                            <div id="cardapio-container"></div>
+                        </div>
+
+                        <!-- Sub-tab: Insumos (grid 4 colunas) -->
+                        <div class="subtab-content" id="subtab-insumos">
+                            <div class="insumos-columns" id="insumos-container">
+                                <!-- JS renderiza 4 colunas (carnes, pescados, queijos, vegetais) -->
+                            </div>
+                            <div id="affected-dishes" class="affected-panel"></div>
+                        </div>
+
+                        <!-- Sub-tab: Bebidas -->
+                        <div class="subtab-content" id="subtab-bebidas">
+                            <div class="products-controls">
+                                <input type="text" class="products-search" id="bebidas-search" placeholder="Buscar bebida...">
+                            </div>
+                            <div id="bebidas-container"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: MÉTRICAS (placeholder) -->
+                <div class="section" id="section-metricas">
+                    <div class="main__content">
+                        <div class="placeholder-section">
+                            <div class="placeholder-section__text">Métricas</div>
+                            <div class="placeholder-section__sub">Em breve — Pedidos, faturamento e análises</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: CONFIGURAÇÕES (placeholder) -->
+                <div class="section" id="section-configuracoes">
+                    <div class="main__content">
+                        <div class="placeholder-section">
+                            <div class="placeholder-section__text">Configurações</div>
+                            <div class="placeholder-section__sub">Em breve — Zonas de entrega, horários e autenticação</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/painel.js"></script>
+</body>
+</html>

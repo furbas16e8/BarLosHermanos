@@ -7,6 +7,50 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-02-12
+
+### Added
+
+- **Painel Administrativo (`painel.html`)**: Interface completa para gestão do cardápio com layout sidebar + main content.
+  - Sidebar fixa com navegação entre seções (Produtos, Métricas, Configurações)
+  - Sidebar responsiva com toggle hamburger em mobile
+  - 3 sub-tabs na seção Produtos: **Pratos**, **Insumos** e **Bebidas**
+
+- **Gestão de Pratos (Sub-tab Pratos)**:
+  - Cards visuais com imagem, nome, preço e badge de status colorido (Ativo/Desativado/Insumo/Override)
+  - Clique contextual: ativar, desativar, aplicar override ou remover override
+  - Filtro por categoria via pills horizontais (geradas dinamicamente dos dados)
+  - Busca por nome em tempo real com debounce
+
+- **Gestão de Bebidas (Sub-tab Bebidas)**:
+  - Aba independente com cards visuais e busca própria
+  - Separação de bebidas da lista de pratos para gestão diferenciada
+
+- **Gestão de Insumos (Sub-tab Insumos)**:
+  - Grid de 4 colunas por categoria: Carnes, Pescados, Queijos, Vegetais
+  - Sub-grid de 2 cards por linha em cada coluna
+  - Cards clicáveis para toggle ativo/inativo com indicador visual (dot verde/vermelho)
+  - Painel de pratos afetados por insumos inativos
+
+- **Sistema de Insumos (Backend)**:
+  - Nova tabela `insumos` no Supabase com categorias e flag `ativo`
+  - Novas colunas `insumos_chave` (JSONB) e `override_insumo` (boolean) na tabela `cardapio`
+  - Script SQL consolidado `db/setup_insumos.sql` com schema, dados iniciais e verificações
+
+- **Filtro de Insumos no Frontend Público (`orders-view.js`)**:
+  - Função `getInsumosInativos()` com cache de nomes inativos
+  - Função `filterByInsumos()` remove automaticamente pratos com insumos indisponíveis
+  - Respeita flag `override_insumo` para manter pratos forçados como disponíveis
+  - Filtro aplicado em `getFeaturedItems()`, `getAllItems()` e `getItemsByCategory()`
+
+- **CSS do Painel (`assets/css/pages/painel.css`)**:
+  - Estilos para sidebar, sub-tabs, category pills, cards de produto, cards de insumo
+  - Layout responsivo (sidebar collapsa em mobile, grids adaptam)
+
+### Changed
+
+- **Separação de Bebidas**: Bebidas removidas da aba Pratos e movidas para aba própria no painel
+
 ## [2.0.0] - 2026-01-31
 
 ### Added
