@@ -438,152 +438,157 @@ footer {
   font-size: 1.2rem;
 }
 
-/* --- SEÇÃO DE EVENTOS (AGENDA) --- */
+/* --- SEÇÃO DE EVENTOS (DINÂMICA) --- */
 .events-section {
   background-color: var(--bg-color);
-  /* Mantém consistência com o tema */
   padding-bottom: 5rem;
 }
 
-.events-container {
+/* Tabs de semanas */
+.events-tabs {
   display: flex;
-  gap: 2rem;
-  align-items: stretch;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
   flex-wrap: wrap;
 }
 
-/* Container da Grade de Shows */
-.events-grid {
-  flex: 2;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  min-width: 300px;
+.events-tab {
+  padding: 0.6rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  background: transparent;
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-/* Card do Evento Individual */
-.event-card {
+.events-tab:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.events-tab--active {
+  background-color: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
+
+/* Grid de cards de evento */
+.events-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card do evento — Novo design com foto 3:4 */
+.event-card-new {
   background-color: #081211;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border-radius: 12px;
+  overflow: hidden;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-.event-card:hover {
+.event-card-new:hover {
   transform: translateY(-5px);
   border-color: var(--accent-color);
 }
 
-/* Cabeçalho do Card (Data e Valor) */
-.event-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.event-card-new__image {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background-color: #0a0a0c;
 }
 
-.event-date {
-  color: var(--accent-color);
+.event-card-new__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-.event-price {
-  color: #888;
+.event-card-new:hover .event-card-new__image img {
+  transform: scale(1.05);
 }
 
-/* Título e Horário */
-.event-title {
+.event-card-new__info {
+  padding: 1rem 1.2rem 1.2rem;
+}
+
+.event-card-new__name {
   font-family: var(--font-title);
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: #fff;
-  margin-bottom: 0.2rem;
-  line-height: 1;
+  line-height: 1.1;
+  margin-bottom: 0.3rem;
 }
 
-.event-artist {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--accent-color);
-  margin-bottom: 0.2rem;
-}
-
-.event-location {
+.event-card-new__desc {
   font-size: 0.85rem;
   color: #aaa;
-  margin-bottom: 1rem;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
+
+.event-card-new__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.event-card-new__time {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-.event-time {
-  color: #ccc;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Botão de Ação */
-.btn-event {
-  align-self: flex-start;
-  border: 1px solid var(--accent-color);
-  color: var(--accent-color);
-  padding: 0.5rem 1.2rem;
-  border-radius: 50px;
+.event-card-new__date {
   font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  transition: 0.3s;
-}
-
-.btn-event:hover {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-}
-
-/* Imagem Lateral Decorativa */
-.events-image {
-  flex: 1;
-  min-width: 300px;
-  display: flex;
-}
-
-.events-image img {
-  width: 100%;
-  height: 550px;
-  /* Tamanho Fixo */
-  object-fit: cover;
-  /* Responsivo e Cortado */
-  border-radius: 10px;
-  box-shadow: 10px 10px 0px var(--accent-color);
-  transition: transform 0.3s ease;
-}
-
-.events-image img:hover {
-  transform: translateY(-5px) scale(1.02);
+  color: #888;
 }
 
 /* Mobile Responsive */
 @media (max-width: 900px) {
-  .events-container {
-    flex-direction: column;
+  .events-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
   }
 
-  .events-image {
-    display: none;
-    /* Ocultar imagem em telas pequenas */
+  .event-card-new__name {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .events-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
-  .events-grid {
-    grid-template-columns: 1fr;
+  .event-card-new__info {
+    padding: 0.75rem;
+  }
+
+  .event-card-new__name {
+    font-size: 1rem;
+  }
+
+  .event-card-new__desc {
+    font-size: 0.75rem;
+  }
+
+  .events-tab {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
   }
 }
 

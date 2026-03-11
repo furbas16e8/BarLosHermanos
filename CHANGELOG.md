@@ -7,6 +7,50 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-03-11
+
+### Added
+
+- **Seção Agenda no Painel Administrativo (`painel.html`)**:
+  - Calendário semanal com timeline de horas (16h–23h) e visão mensal alternável
+  - Eventos exibidos como blocos flutuantes na timeline com miniatura da atração (3:4)
+  - CRUD completo de eventos: criar, editar e excluir com campos de data, horário de início/término e descrição
+  - Botão "Agenda" na sidebar do painel com integração ao sistema de navegação existente
+  - 4 modais: Evento, Galeria de Atrações, Nova Atração e Eventos do Dia
+
+- **Galeria de Atrações com Upload e Recorte**:
+  - Catálogo de artistas/bandas reutilizável para evitar uploads repetidos
+  - Upload de imagem com recorte em ratio fixo 3:4 via Cropper.js (CDN)
+  - Conversão automática para WebP e upload direto ao Supabase Storage (bucket `atracoes`)
+  - Busca por nome na galeria para seleção rápida
+
+- **Time Picker Customizado**:
+  - Seletor visual de hora (16h–23h) e minutos (00, 15, 30, 45) por clique
+  - Campos de horário de início e término lado a lado no modal
+
+- **Eventos Dinâmicos na Landing Page (`index.html`)**:
+  - Novo módulo `assets/js/eventos-home.js` para renderização dinâmica
+  - Tabs por semana (semana atual + próximas 3 semanas) com navegação
+  - Cards de evento com foto da atração (ratio 3:4), nome, descrição, horário e data
+  - Substituição completa do conteúdo estático de eventos por dados do Supabase
+
+- **Banco de Dados — Schema de Agenda**:
+  - Nova tabela `atracoes` (id, nome, foto_url)
+  - Nova tabela `eventos` (id, atracao_id, data, horario, horario_fim, descricao, ativo)
+  - Índice `idx_eventos_data` para consultas por intervalo de data
+  - Políticas RLS com roles `anon` e `authenticated` explícitos
+  - Políticas de Storage para bucket `atracoes` (SELECT, INSERT, UPDATE, DELETE)
+  - Script consolidado `db/setup_agenda.sql`
+
+### Changed
+
+- **Landing Page — Seção de Eventos**: Conteúdo estático hardcoded substituído por renderização dinâmica via Supabase com tabs de semanas e cards com foto
+- **CSS de Eventos (`assets/css/style.css`)**: Estilos antigos (`.event-card`, `.events-grid`, `.events-image`) substituídos por novos (`.events-tabs`, `.event-card-new` com foto 3:4)
+
+### Fixed
+
+- **RLS**: Erro "new row violates row-level security policy" ao cadastrar atrações — corrigido adicionando `TO anon, authenticated` nas políticas e criando políticas de Storage para `storage.objects`
+
 ## [2.1.0] - 2026-02-12
 
 ### Added

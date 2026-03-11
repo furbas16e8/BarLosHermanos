@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCategoryPills();
     render();
     setupSearch();
+
+    // Inicializa listeners dos modais da agenda
+    if (typeof window.setupAgendaListeners === 'function') {
+        window.setupAgendaListeners();
+    }
+
     console.log('[Painel] Pronto.');
 });
 
@@ -75,6 +81,11 @@ function setupSidebar() {
 
             document.getElementById('main-title').textContent = item.dataset.title || section;
             closeMobileSidebar();
+
+            // Inicializa a agenda quando a seção é ativada
+            if (section === 'agenda' && typeof window.initAgenda === 'function') {
+                window.initAgenda();
+            }
         });
     });
 }

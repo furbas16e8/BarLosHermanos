@@ -1,7 +1,7 @@
 # Documentação para Agentes de IA (`AGENTS.md`)
 
-> **Atualizado em:** 12/02/2026
-> **Versão da Documentação:** 5.0
+> **Atualizado em:** 11/03/2026
+> **Versão da Documentação:** 6.0
 > **Versão do Projeto:** 2.1.0
 > **Nível de Complexidade:** Médio
 > **Tempo estimado para setup inicial:** ~5 minutos (Live Server + Supabase já configurado)
@@ -23,6 +23,7 @@ O sistema permite aos clientes navegar pelo cardápio digital, customizar pedido
 - **Carrinho de Compras:** Adição de itens, cálculo de total, expiração automática (23:00) e persistência via LocalStorage
 - **Checkout Simplificado (Guest Checkout v3):** Cadastro no momento do pedido via telefone, sem necessidade de login prévio
 - **Sistema de Entrega:** Taxa calculada dinamicamente por bairro via tabela `zonas_entrega`
+- **Painel Administrativo:** Gestão de pratos, bebidas e insumos com controle de disponibilidade
 - **Design Responsivo:** Mobile-first, otimizado para celulares e desktops
 - **Landing Page Institucional:** Hero com vídeo background, galeria de eventos e informações do bar
 
@@ -72,49 +73,45 @@ O sistema permite aos clientes navegar pelo cardápio digital, customizar pedido
 │   │   │   └── variables.css    # Variáveis CSS (cores, fontes, espaçamentos, raios, sombras)
 │   │   │
 │   │   ├── components/  # Componentes reutilizáveis (convenção BEM)
-│   │   │   ├── button.css       # Estilos de botões
-│   │   │   ├── card.css         # Estilos de cards de produto
-│   │   │   ├── category-nav.css # Navegação de categorias horizontal
-│   │   │   ├── form.css         # Estilos de formulários e inputs
-│   │   │   └── navbar.css       # Barra de navegação inferior (bottom-nav)
+│   │   │   ├── button.css       # Estilos de botões (~1KB)
+│   │   │   ├── card.css         # Estilos de cards de produto (~3.5KB)
+│   │   │   ├── category-nav.css # Navegação de categorias horizontal (~1.7KB)
+│   │   │   ├── form.css         # Estilos de formulários e inputs (~1.8KB)
+│   │   │   └── navbar.css       # Barra de navegação inferior (bottom-nav) (~1.8KB)
 │   │   │
 │   │   ├── pages/       # Estilos específicos de páginas
 │   │   │   ├── cart.css         # Carrinho de compras e checkout (~15KB)
-│   │   │   ├── painel.css       # Painel admin: sidebar, cards, pills, insumos grid
-│   │   │   └── product.css      # Página de detalhes do produto
+│   │   │   ├── painel.css       # Painel admin: sidebar, cards, pills, insumos grid (~14KB)
+│   │   │   └── product.css      # Página de detalhes do produto (~9KB)
 │   │   │
 │   │   ├── utils/       # Utilitários CSS
 │   │   │   └── utilities.css    # Classes utilitárias (flex, grid, spacing)
 │   │   │
 │   │   ├── style.css        # Estilos da landing page (index.html) - ARQUIVO PRINCIPAL (~15KB)
 │   │   ├── main.css         # Importador de estilos do dashboard/app
-│   │   ├── orders.css       # Estilos adicionais do carrinho/checkout
-│   │   └── styles_new.css   # Estilos auxiliares
+│   │   ├── orders.css       # Estilos adicionais do carrinho/checkout (~3KB)
+│   │   └── styles_new.css   # Estilos auxiliares (~2KB)
 │   │
 │   ├── js/              # Lógica Client-side (12 módulos)
-│   │   ├── supabase-client.js    # Cliente Supabase singleton + Auth helpers + Auth State Listener (230 linhas)
-│   │   ├── dom-helpers.js        # Utilitários DOM: el(), $(), $$() (54 linhas)
-│   │   ├── navbar.js             # Navbar global inferior simplificada (3 itens) (124 linhas)
-│   │   ├── menu-service.js       # Serviço de dados do cardápio (fetch do Supabase)
-│   │   ├── orders.js             # Lógica do Carrinho (LocalStorage V2) + Favoritos (578 linhas)
-│   │   ├── orders-view.js        # Renderização do dashboard/cardápio + filtro de insumos (265 linhas)
-│   │   ├── details-view.js       # Página de detalhes do produto + ingredientes + extras (240 linhas)
-│   │   ├── painel.js             # Painel admin: sidebar, sub-tabs (Pratos/Insumos/Bebidas), cards, CRUD Supabase
-│   │   ├── checkout-guest.js     # Fluxo de checkout simplificado Guest v3 (1204 linhas - MAIOR MÓDULO)
-│   │   ├── checkout.js           # Checkout legado (não usado no fluxo atual)
-│   │   ├── addresses.js          # API de gerenciamento de endereços (legada)
-│   │   └── gallery.js            # Galeria de fotos da Home
+│   │   ├── supabase-client.js    # Cliente Supabase singleton + Auth helpers + Auth State Listener (205 linhas)
+│   │   ├── dom-helpers.js        # Utilitários DOM: el(), $(), $$() (48 linhas)
+│   │   ├── navbar.js             # Navbar global inferior simplificada (3 itens) (108 linhas)
+│   │   ├── menu-service.js       # Serviço de dados do cardápio - fetch do Supabase (92 linhas)
+│   │   ├── orders.js             # Lógica do Carrinho (LocalStorage V2) + Favoritos (527 linhas)
+│   │   ├── orders-view.js        # Renderização do dashboard/cardápio + filtro de insumos (271 linhas)
+│   │   ├── details-view.js       # Página de detalhes do produto + ingredientes + extras (214 linhas)
+│   │   ├── painel.js             # Painel admin: sidebar, sub-tabs (Pratos/Insumos/Bebidas), cards, CRUD Supabase (427 linhas)
+│   │   ├── checkout-guest.js     # Fluxo de checkout simplificado Guest v3 (1152 linhas - MAIOR MÓDULO)
+│   │   ├── checkout.js           # Checkout legado (não usado no fluxo atual) (435 linhas)
+│   │   ├── addresses.js          # API de gerenciamento de endereços (legada) (401 linhas)
+│   │   └── gallery.js            # Galeria de fotos da Home com shuffle aleatório (37 linhas)
 │   │
 │   ├── identidade_visual/  # Arquivo(s) de identidade visual do bar
 │   ├── img/                 # Imagens otimizadas
 │   │   ├── events/          # Fotos de eventos/artistas
-│   │   └── sobre/           # Fotos do ambiente/história
+│   │   └── sobre/           # Fotos do ambiente/história (image_1.jpeg a image_9.jpeg)
 │   ├── menu/                # PDFs do cardápio físico
 │   └── video/               # Vídeos de background (Hero) - 3 arquivos
-│
-├── context-temp/        # [DEV] Sessões de trabalho (não versionado)
-│   ├── last-session.json      # Contexto da última sessão
-│   └── current_session.json   # Sessão ativa (milestones)
 │
 ├── db/                  # [DEV] Scripts SQL e Schema (não versionado)
 │   ├── migrations/            # Scripts de migração incrementais
@@ -182,6 +179,8 @@ graph TB
             DV["details-view.js<br>Produto + Extras"]
             OJ["orders.js<br>Carrinho + Favoritos"]
             CG["checkout-guest.js<br>Checkout Modal"]
+            PN["painel.js<br>Admin CRUD"]
+            GL["gallery.js<br>Galeria Shuffle"]
         end
     end
 
@@ -206,6 +205,7 @@ graph TB
     NB --> DH
     OV --> DH
     DV --> DH
+    PN --> SC
 ```
 
 ### 3.3 Gerenciamento de Estado
@@ -327,7 +327,7 @@ erDiagram
 
 ## 4. Módulos JavaScript — Referência Detalhada
 
-### 4.1 `supabase-client.js` (230 linhas)
+### 4.1 `supabase-client.js` (205 linhas)
 
 **Propósito:** Cliente singleton do Supabase + funções helpers de autenticação e API.
 
@@ -340,6 +340,7 @@ erDiagram
 | `getUserProfile`                 | `getUserProfile(userId)`                | Busca perfil na tabela `clientes`          |
 | `getFavorites`                   | `getFavorites(userId)`                  | Lista favoritos com JOIN em `cardapio`     |
 | `addFavorite` / `removeFavorite` | `(userId, itemId)`                      | CRUD de favoritos                          |
+| `getItemIdByName`                | `getItemIdByName(name)`                 | Busca ID do item por nome                  |
 | `getDeliveryZone`                | `getDeliveryZone(bairro)`               | Busca zona específica (ILIKE)              |
 | `getDeliveryZones`               | `getDeliveryZones()`                    | Lista todas zonas ativas                   |
 | `createOrder`                    | `createOrder(orderPayload)`             | Insere pedido na tabela `pedidos` (legado) |
@@ -347,7 +348,7 @@ erDiagram
 
 **Importante:** Inclui um `Auth State Listener` (`onAuthStateChange`) que gerencia isolamento de carrinho por usuário, migração de carrinho legado e limpeza ao logout.
 
-### 4.2 `dom-helpers.js` (54 linhas)
+### 4.2 `dom-helpers.js` (48 linhas)
 
 **Propósito:** Utilitários de criação segura de elementos DOM (padrão "jQuery light").
 
@@ -362,7 +363,7 @@ export const $$ = (selector, context = document) => [...context.querySelectorAll
 
 **Capacidades do `el()`:** Atributos HTML, event listeners (`on*`), classes CSS, dataset, estilos inline, filhos (Node ou texto).
 
-### 4.3 `navbar.js` (124 linhas)
+### 4.3 `navbar.js` (108 linhas)
 
 **Propósito:** Barra de navegação inferior simplificada (3 itens, sem login).
 
@@ -371,7 +372,32 @@ export const $$ = (selector, context = document) => [...context.querySelectorAll
 - **`highlightActiveLink()`** — Mapeia caminho da URL para o item ativo da navbar
 - **Ícones:** Material Symbols: `home`, `restaurant_menu`, `shopping_cart`
 
-### 4.4 `orders.js` (578 linhas)
+**Mapeamento de rotas (`activeMapping`):**
+
+| Caminho              | Nav Item       |
+| -------------------- | -------------- |
+| `index.html`, `''`   | `nav-home`     |
+| `historia.html`      | `nav-home`     |
+| `orders.html`        | `nav-cardapio` |
+| `pagina_pedido.html` | `nav-cardapio` |
+| `shopping.html`      | `nav-cart`     |
+
+### 4.4 `menu-service.js` (92 linhas)
+
+**Propósito:** Serviço de dados do cardápio. Busca itens do Supabase com filtros aplicados. Usa ES Modules.
+
+| Função               | Descrição                                                  |
+| -------------------- | ---------------------------------------------------------- |
+| `getFeaturedItems()` | Busca itens com `destaque=true`, `ativo=true`, com imagem  |
+| `getItemsByCategory(category)` | Busca itens por categoria, ativos e com imagem  |
+| `getItemById(id)`    | Busca item específico por ID (retorna `.single()`)         |
+| `getPopularItems()`  | Busca até 10 itens ativos com imagem (populares)           |
+| `getAllItems()`       | Busca todos os itens ativos com imagem                     |
+
+> [!NOTE]
+> O `menu-service.js` faz `import { supabase } from './supabase-client.js'` mas como `supabase-client.js` expõe o cliente via `window.supabaseClient` e não como export nomeado, este import pode não funcionar corretamente. A funcionalidade real de busca no cardápio é feita diretamente em `orders-view.js` via `window.supabaseClient`.
+
+### 4.5 `orders.js` (527 linhas)
 
 **Propósito:** Lógica completa do carrinho de compras (V2) + sistema de favoritos.
 
@@ -395,7 +421,7 @@ export const $$ = (selector, context = document) => [...context.querySelectorAll
 | `toggleFavorite(name, price, image)`                          | Adiciona/remove favorito no Supabase                           |
 | `updateFavoritesUI()`                                         | Renderiza lista de favoritos                                   |
 
-### 4.5 `orders-view.js` (265 linhas)
+### 4.6 `orders-view.js` (271 linhas)
 
 **Propósito:** Renderização do dashboard do cardápio + filtro de insumos. Usa ES Modules.
 
@@ -407,30 +433,7 @@ export const $$ = (selector, context = document) => [...context.querySelectorAll
 
 **Funções:** `getFeaturedItems()`, `getAllItems()`, `getItemsByCategory()`, `loadFeatured()`, `loadPopular()`, `renderGridItems()`, `filterByCategory()`, `renderCategoryList()`.
 
-### 4.8 `painel.js` (Painel Administrativo)
-
-**Propósito:** Lógica completa do painel admin. Sidebar + 3 sub-tabs + CRUD via Supabase.
-
-**Sub-tabs:**
-
-| Sub-tab     | Conteúdo                                                            |
-| ----------- | ------------------------------------------------------------------- |
-| **Pratos**  | Cards visuais com imagem/nome/preço/badge, filtro por pills e busca |
-| **Insumos** | Grid de 4 colunas (Carnes/Pescados/Queijos/Vegetais), 2 cards/linha |
-| **Bebidas** | Cards visuais semelhantes a Pratos, com busca independente          |
-
-**Lógica de status dos pratos:**
-
-| Status     | Condição                             | Ação ao clicar  |
-| ---------- | ------------------------------------ | --------------- |
-| Ativo      | `ativo=true`, insumos OK             | Desativa        |
-| Desativado | `ativo=false`                        | Reativa         |
-| Insumo     | `ativo=true`, insumo inativo         | Ativa override  |
-| Override   | `ativo=true`, `override_insumo=true` | Remove override |
-
-**Funções principais:** `loadData()`, `renderPratos()`, `renderInsumos()`, `renderBebidas()`, `renderStats()`, `renderCategoryPills()`, `toggleInsumo()`, `togglePrato()`, `overridePrato()`, `removeOverride()`.
-
-### 4.6 `details-view.js` (240 linhas)
+### 4.7 `details-view.js` (214 linhas)
 
 **Propósito:** Página de detalhes do produto com ingredientes removíveis e extras.
 
@@ -439,7 +442,7 @@ export const $$ = (selector, context = document) => [...context.querySelectorAll
 - **Cálculo de preço:** `calculateTotalPrice()` = `basePrice` + soma dos extras selecionados
 - **`renderIngredients()`:** Gera botões interativos para cada ingrediente com toggle visual
 
-### 4.7 `checkout-guest.js` (1204 linhas — MAIOR MÓDULO)
+### 4.8 `checkout-guest.js` (1152 linhas — MAIOR MÓDULO)
 
 **Propósito:** Fluxo completo de checkout simplificado (Guest Checkout v3).
 
@@ -465,6 +468,49 @@ window.checkoutStateGlobal = {
 3. **API Supabase:** `buscarUsuarioPorTelefone()`, `salvarUsuario()`, `salvarEndereco()`, `criarPedido()`
 4. **Controle do Modal:** `initCheckoutModal()`, `abrirCheckoutModal()`, `fecharCheckoutModal()`, `setupEventListeners()`
 5. **Submissão:** `submitOrder()` — orquestra todo o fluxo de salvamento
+
+### 4.9 `painel.js` (427 linhas)
+
+**Propósito:** Lógica completa do painel admin. Sidebar + 3 sub-tabs + CRUD via Supabase.
+
+**Sub-tabs:**
+
+| Sub-tab     | Conteúdo                                                            |
+| ----------- | ------------------------------------------------------------------- |
+| **Pratos**  | Cards visuais com imagem/nome/preço/badge, filtro por pills e busca |
+| **Insumos** | Grid de 4 colunas (Carnes/Pescados/Queijos/Vegetais), 2 cards/linha |
+| **Bebidas** | Cards visuais semelhantes a Pratos, com busca independente          |
+
+**Lógica de status dos pratos:**
+
+| Status     | Condição                             | Ação ao clicar  |
+| ---------- | ------------------------------------ | --------------- |
+| Ativo      | `ativo=true`, insumos OK             | Desativa        |
+| Desativado | `ativo=false`                        | Reativa         |
+| Insumo     | `ativo=true`, insumo inativo         | Ativa override  |
+| Override   | `ativo=true`, `override_insumo=true` | Remove override |
+
+**Funções principais:** `loadData()`, `renderPratos()`, `renderInsumos()`, `renderBebidas()`, `renderStats()`, `renderCategoryPills()`, `toggleInsumo()`, `togglePrato()`, `overridePrato()`, `removeOverride()`.
+
+### 4.10 `gallery.js` (37 linhas)
+
+**Propósito:** Galeria de fotos randomizada na landing page (`index.html`).
+
+- **Lógica:** Embaralha índices de 1 a `totalImages` (9) via Fisher-Yates shuffle
+- **Exibição:** Seleciona 5 imagens aleatórias e injeta no container `#about-gallery-grid`
+- **Padrão de nome:** `assets/img/sobre/image_{N}.jpeg`
+- **Fallback:** `img.onerror` esconde imagens não encontradas
+
+> [!TIP]
+> Para adicionar novas fotos à galeria, salve-as como `image_10.jpeg`, `image_11.jpeg`, etc., na pasta `assets/img/sobre/` e atualize a constante `totalImages` no arquivo.
+
+### 4.11 `checkout.js` (435 linhas — LEGADO)
+
+**Propósito:** Módulo de checkout legado, usado no fluxo anterior com autenticação obrigatória. **Não é utilizado no fluxo atual** (Guest Checkout v3). Mantido para compatibilidade retroativa.
+
+### 4.12 `addresses.js` (401 linhas — LEGADO)
+
+**Propósito:** API completa de gerenciamento de endereços para o sistema de múltiplos endereços (v1.3.0). **Não é utilizado no fluxo atual** (substituído pelo campo único de endereço no checkout-guest.js).
 
 ---
 
@@ -550,22 +596,36 @@ console.log("[Auth] Estado:", session);
 **Convenção BEM:**
 
 ```css
-.cart-item {
-} /* Block */
-.cart-item__image {
-} /* Element */
-.cart-item__qty-btn--add {
-} /* Modifier */
+.cart-item {} /* Block */
+.cart-item__image {} /* Element */
+.cart-item__qty-btn--add {} /* Modifier */
 ```
 
-**Organização dos arquivos CSS:**
+**Organização dos arquivos CSS (via `main.css`):**
 
-- `style.css` — Landing page (index.html) — **15KB, arquivo principal**
-- `main.css` — Importador de estilos base do app
-- `base/` → `reset.css`, `variables.css`
-- `components/` → `button.css`, `card.css`, `category-nav.css`, `form.css`, `navbar.css`
-- `pages/` → `cart.css` (~15KB), `product.css` (~9KB)
-- `utils/` → `utilities.css`
+```css
+/* 1. Base */
+@import 'base/variables.css';
+@import 'base/reset.css';
+
+/* 2. Utils */
+@import 'utils/utilities.css';
+
+/* 3. Components */
+@import 'components/card.css';
+@import 'components/category-nav.css';
+@import 'components/navbar.css';
+@import 'components/form.css';
+@import 'components/button.css';
+
+/* 4. Pages */
+@import 'orders.css';
+@import 'pages/product.css';
+@import 'pages/cart.css';
+```
+
+> [!IMPORTANT]
+> O `style.css` (landing page) e o `pages/painel.css` (painel admin) são importados diretamente nos respectivos HTMLs e **não** fazem parte do `main.css`.
 
 ### 5.3 HTML
 
@@ -694,6 +754,24 @@ Ao carregar qualquer página:
     → updateCartBadge()
 ```
 
+### 7.4 Fluxo do Painel Administrativo
+
+```mermaid
+flowchart TD
+    A["🔧 painel.html<br>Painel Admin"] --> B["📊 loadData()<br>Busca cardápio + insumos"]
+    B --> C{"Sub-tab ativa?"}
+    C -->|Pratos| D["🍽️ renderPratos()<br>Cards com status badge"]
+    C -->|Insumos| E["🥩 renderInsumos()<br>Grid 4 colunas"]
+    C -->|Bebidas| F["🍺 renderBebidas()<br>Cards com busca"]
+    D --> G{"Ação no card?"}
+    G -->|Ativo → Desativar| H["togglePrato(id, false)"]
+    G -->|Desativado → Reativar| I["togglePrato(id, true)"]
+    G -->|Insumo → Override| J["overridePrato(id)"]
+    G -->|Override → Remover| K["removeOverride(id)"]
+    E --> L{"Toggle insumo"}
+    L --> M["toggleInsumo(id, !ativo)<br>Atualiza status + rerenderiza pratos afetados"]
+```
+
 ---
 
 ## 8. Regras de Negócio
@@ -711,6 +789,7 @@ Ao carregar qualquer página:
 | Taxa de entrega       | Calculada por bairro (coluna `taxa_entrega`)                            |
 | SKU de produtos       | Gerado automaticamente por trigger no PostgreSQL                        |
 | Ingredientes          | Personalizáveis (remoção) via JSONB na tabela `cardapio`                |
+| Galeria de fotos      | 5 fotos aleatórias de um pool de 9 (Fisher-Yates shuffle)              |
 
 ---
 
@@ -729,14 +808,19 @@ Ao carregar qualquer página:
 2. Adicionar ícone em `orders-view.js` → ícones no `renderCategoryList()`
 3. Adicionar à ordenação `CATEGORY_ORDER` se necessário
 
-### 9.3 Debug e Troubleshooting
+### 9.3 Adicionar Fotos à Galeria
+
+1. Salvar imagem como `image_{N}.jpeg` em `assets/img/sobre/`
+2. Atualizar constante `totalImages` em `assets/js/gallery.js`
+
+### 9.4 Debug e Troubleshooting
 
 - Usar `debug-connection.html` para testar conexão com Supabase
 - Console do navegador mostra logs prefixados (`[Cart]`, `[Checkout]`, `[Auth]`)
 - Dados do carrinho: `localStorage.getItem('bar_los_hermanos_cart_v2')`
 - Estado do checkout: `localStorage.getItem('bar-los-hermanos-checkout-state')`
 
-### 9.4 Chaves de LocalStorage
+### 9.5 Chaves de LocalStorage
 
 | Chave                             | Propósito                         | Formato                                                          |
 | --------------------------------- | --------------------------------- | ---------------------------------------------------------------- |
@@ -746,14 +830,7 @@ Ao carregar qualquer página:
 
 ---
 
-## 10. Contexto de Sessões de Trabalho
-
-O projeto utiliza o diretório `context-temp/` para manter contexto entre sessões de desenvolvimento:
-
-- **`last-session.json`:** Contém título, resumo, decisões, problemas enfrentados, próximos passos e arquivos modificados da última sessão. Consultar antes de iniciar trabalho para continuidade.
-- **`current_session.json`:** Sessão ativa, com milestones registrados durante o trabalho.
-
-### 10.1 Próximos Passos Planejados (da última sessão)
+## 10. Próximos Passos Planejados
 
 | Prioridade | Tarefa                                                                             |
 | ---------- | ---------------------------------------------------------------------------------- |

@@ -14,6 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-client.js"></script>
 
+    <!-- Cropper.js (recorte de imagens) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+
     <!-- Styles -->
     <link rel="stylesheet" href="assets/css/base/variables.css">
     <link rel="stylesheet" href="assets/css/base/reset.css">
@@ -37,6 +40,9 @@
                 <span class="sidebar__section-label">Gestão</span>
                 <button class="sidebar__item sidebar__item--active" data-section="produtos" data-title="Produtos">
                     Produtos
+                </button>
+                <button class="sidebar__item" data-section="agenda" data-title="Agenda">
+                    Agenda
                 </button>
                 <button class="sidebar__item" data-section="metricas" data-title="Métricas">
                     Métricas
@@ -126,6 +132,13 @@
                     </div>
                 </div>
 
+                <!-- SEÇÃO: AGENDA -->
+                <div class="section" id="section-agenda">
+                    <div class="main__content">
+                        <div id="agenda-calendar"></div>
+                    </div>
+                </div>
+
                 <!-- SEÇÃO: MÉTRICAS (placeholder) -->
                 <div class="section" id="section-metricas">
                     <div class="main__content">
@@ -150,6 +163,88 @@
         </main>
     </div>
 
+    <!-- Modal: Evento (Criar/Editar) -->
+    <div class="modal-overlay" id="modal-evento">
+        <div class="modal-box modal-box--evento">
+            <button class="modal-box__close modal-evento__close">&times;</button>
+            <h3 class="modal-evento__title">Novo Evento</h3>
+
+            <div class="modal-evento__form">
+                <!-- Preview/Seleção da atração -->
+                <div id="atracao-preview"></div>
+
+                <input type="hidden" id="evento-data">
+
+                <div class="modal-evento__fields modal-evento__fields--2col">
+                    <label class="modal-campo time-input-wrap">
+                        <span>Início</span>
+                        <input type="text" id="evento-horario" readonly placeholder="Clique">
+                    </label>
+                    <label class="modal-campo time-input-wrap">
+                        <span>Término</span>
+                        <input type="text" id="evento-horario-fim" readonly placeholder="Clique">
+                    </label>
+                    <label class="modal-campo modal-campo--full">
+                        <span>Descrição</span>
+                        <textarea id="evento-descricao" maxlength="150" rows="2" placeholder="Ex: Sertanejo ao vivo com entrada gratuita"></textarea>
+                        <span class="modal-campo__counter" id="desc-counter">0/150</span>
+                    </label>
+                </div>
+
+                <div class="modal-evento__actions">
+                    <button class="btn-painel btn-painel--primary" id="btn-save-evento">Salvar Evento</button>
+                    <button class="btn-painel btn-painel--danger" id="btn-delete-evento" style="display:none;">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Galeria de Atrações -->
+    <div class="modal-overlay" id="modal-galeria">
+        <div class="modal-box modal-box--galeria">
+            <button class="modal-box__close modal-galeria__close">&times;</button>
+            <h3 class="modal-galeria__title">Selecionar Atração</h3>
+            <input type="text" id="galeria-search" class="galeria__search" placeholder="Buscar por nome...">
+            <div class="galeria__grid" id="galeria-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Nova Atração (Upload + Crop) -->
+    <div class="modal-overlay" id="modal-nova-atracao">
+        <div class="modal-box modal-box--nova-atracao">
+            <button class="modal-box__close modal-nova-atracao__close">&times;</button>
+            <h3>Nova Atração</h3>
+
+            <label class="modal-campo">
+                <span>Nome do Artista / Banda</span>
+                <input type="text" id="nova-atracao-nome" placeholder="Ex: Banda Fulana">
+            </label>
+
+            <label class="modal-campo">
+                <span>Foto (será recortada em 3:4)</span>
+                <input type="file" id="nova-atracao-foto" accept="image/jpeg,image/png,image/webp">
+            </label>
+
+            <div id="crop-container" class="crop-container">
+                <p class="crop__placeholder">Selecione uma foto</p>
+            </div>
+
+            <button class="btn-painel btn-painel--primary" id="btn-save-atracao">Salvar Atração</button>
+        </div>
+    </div>
+
+    <!-- Modal: Dia com Múltiplos Eventos -->
+    <div class="modal-overlay" id="modal-day-events">
+        <div class="modal-box modal-box--day-events">
+            <button class="modal-box__close day-events__close">&times;</button>
+            <h3 class="day-events__title"></h3>
+            <div class="day-events__list"></div>
+        </div>
+    </div>
+
+    <!-- Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script src="assets/js/painel.js"></script>
+    <script src="assets/js/agenda.js"></script>
 </body>
 </html>
