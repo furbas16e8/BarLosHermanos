@@ -90,7 +90,6 @@
         </div>
     </div>
 
-
     <section id="menu" class="menu-redesign">
         <div class="menu-layout-grid">
 
@@ -240,6 +239,21 @@
             </div>
     </section>
 
+    <section id="events" class="events-section">
+        <div class="section-title">
+            <span>Música & Diversão</span>
+            <h2>Próximos Eventos</h2>
+        </div>
+
+        <div class="events-tabs" id="events-tabs">
+            <!-- Tabs geradas dinamicamente via eventos-home.js -->
+        </div>
+
+        <div class="events-cards-grid" id="events-cards-grid">
+            <!-- Cards gerados dinamicamente via eventos-home.js -->
+        </div>
+    </section>
+    
     <section id="about">
         <div class="about-container">
             <div class="about-text-center">
@@ -258,20 +272,7 @@
     </section>
 
 
-    <section id="events" class="events-section">
-        <div class="section-title">
-            <span>Música & Diversão</span>
-            <h2>Próximos Eventos</h2>
-        </div>
 
-        <div class="events-tabs" id="events-tabs">
-            <!-- Tabs geradas dinamicamente via eventos-home.js -->
-        </div>
-
-        <div class="events-cards-grid" id="events-cards-grid">
-            <!-- Cards gerados dinamicamente via eventos-home.js -->
-        </div>
-    </section>
 
     <section id="reservation" class="reservation">
         <div class="section-title">
@@ -346,6 +347,31 @@
             if (slides.length > 0) {
                 setInterval(nextSlide, slideInterval);
             }
+
+            // Cabeçalho Dinâmico (Mobile)
+            const header = document.querySelector('header');
+            const hero = document.querySelector('.hero-slider');
+            
+            function handleScroll() {
+                if (window.innerWidth <= 768) {
+                    const scrollThreshold = hero.offsetHeight * 0.5;
+                    if (window.scrollY > scrollThreshold) {
+                        header.classList.remove('header-hidden');
+                    } else {
+                        header.classList.add('header-hidden');
+                    }
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+            }
+
+            // Inicializa estado no mobile
+            if (window.innerWidth <= 768) {
+                header.classList.add('header-hidden');
+            }
+
+            window.addEventListener('scroll', handleScroll);
+            window.addEventListener('resize', handleScroll);
 
             // Sequência de teclas "ADMIN" para acesso escondido
             let typedKeys = "";

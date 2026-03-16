@@ -138,65 +138,52 @@ function getWeekLabel(start, end, today) {
 
 async function loadAndRenderEventos() {
     const eventos = await fetchEventosProximos();
-    const weeks = groupByWeek(eventos);
 
     const tabsContainer = document.getElementById('events-tabs');
     const cardsContainer = document.getElementById('events-cards-grid');
 
-    if (!tabsContainer || !cardsContainer) return;
+    if (!cardsContainer) return;
 
-    if (weeks.length === 0) {
+    if (eventos.length === 0) {
         // Sem eventos: esconde a seção inteira
         const section = document.getElementById('events');
         if (section) section.style.display = 'none';
         return;
     }
 
-    // Renderiza tabs
-    renderTabs(tabsContainer, weeks);
+    // Remove container de tabs se existir (não será mais usado)
+    if (tabsContainer) tabsContainer.style.display = 'none';
 
-    // Renderiza cards da primeira semana
-    renderCards(cardsContainer, weeks[0].eventos);
+    // Renderiza todos os eventos em sequência
+    renderCards(cardsContainer, eventos);
 }
 
 /**
- * Renderiza tabs de semanas
- */
-function renderTabs(container, weeks) {
-    container.innerHTML = '';
-
-    weeks.forEach((week, index) => {
-        const tab = document.createElement('button');
-        tab.className = `events-tab${index === 0 ? ' events-tab--active' : ''}`;
-        tab.textContent = week.label;
-        tab.dataset.weekIndex = index;
-
-        tab.addEventListener('click', () => {
-            // Atualiza tab ativa
-            container.querySelectorAll('.events-tab').forEach(t =>
-                t.classList.remove('events-tab--active')
-            );
-            tab.classList.add('events-tab--active');
-
-            // Renderiza cards da semana selecionada
-            const cardsContainer = document.getElementById('events-cards-grid');
-            renderCards(cardsContainer, week.eventos);
-        });
-
-        container.appendChild(tab);
-    });
-}
-
-/**
- * Renderiza cards de eventos
+ * Renderiza cards de eventos + card "Ver Tudo" se necessário
  */
 function renderCards(container, eventos) {
     container.innerHTML = '';
 
+    // Renderiza cada evento
     eventos.forEach(evento => {
         const card = createEventCard(evento);
         container.appendChild(card);
     });
+
+    // Se houver mais de 5 eventos, adiciona o card "Ver Tudo"
+    if (eventos.length > 5) {
+        const moreCard = document.createElement('div');
+        moreCard.className = 'event-card-more';
+        moreCard.innerHTML = `
+            <i class="fas fa-arrow-right"></i>
+            <span>Ver Agenda Completa</span>
+        `;
+        moreCard.addEventListener('click', () => {
+             // Redireciona ou abre modal com a agenda (podemos usar o link do painel se for público ou só uma âncora)
+             window.open('https://www.instagram.com/barloshermanosgv', '_blank');
+        });
+        container.appendChild(moreCard);
+    }
 }
 
 /**
