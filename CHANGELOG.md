@@ -7,6 +7,37 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-03-16
+
+### Added
+
+- **Acesso Administrativo Seguro**:
+  - Implementação de autenticação via PIN (`222026`) para o painel administrativo.
+  - Sessão administrativa com expiração automática às 04:00 AM.
+  - Método de acesso discreto via sequência de teclas "ADMIN" na página inicial.
+- **Carrossel de Eventos Dinâmico (`index.html`)**:
+  - Redesign da seção de próximos eventos para um formato de carrossel horizontal contínuo.
+  - Card "Ver Agenda Completa" exibido automaticamente quando houver mais de 5 eventos.
+  - Remoção do sistema de abas por semana para simplificar a interface.
+- **Cabeçalho Dinâmico (Mobile)**:
+  - Cabeçalho superior inicia oculto no mobile e aparece suavemente após scroll de 50% do vídeo inicial.
+
+### Changed
+
+- **Destaque de Agenda (`painel.css`)**: Horários na visão semanal agora têm maior contraste e fonte maior para melhor legibilidade.
+- **Sidebar do Painel**: Logotipo agora é um link funcional para a página inicial.
+- **Layout Mobile**: Otimização da área do vídeo hero através da remoção de paddings e fixação do header.
+
+### Removed
+
+- Ícone de cadeado e link direto para autenticação no rodapé da página inicial.
+
+### Fixed
+
+- **Layout Mobile**: Correção do espaço preto acima do vídeo inicial no mobile.
+- **Conflito de Navbar**: Removida a barra de navegação inferior indesejada no rodapé da home.
+- **Scroll do Header**: Corrigido posicionamento do cabeçalho de `relative` para `fixed` nas media queries mobile.
+
 ## [2.2.0] - 2026-03-11
 
 ### Added
