@@ -90,24 +90,6 @@
         </div>
     </div>
 
-    <section id="about">
-        <div class="about-container">
-            <div class="about-text-center">
-                <span>Nossa Essência</span>
-                <h3>TRADIÇÃO E SABOR EM GV</h3>
-                <p>Aqui a tradição se encontra com novos sabores. Nossa cozinha é famosa pela variedade que agrada a
-                    todos os gostos: desde o nosso inigualável Jiló Especial até o melhor da Comida Mexicana.</p>
-                <p>Drinks clássicos e autorais para brindar os bons momentos.</p>
-
-                <br>
-                <a href="historia.html" class="btn-primary btn-history">Nossa História</a>
-            </div>
-
-            <div class="about-gallery" id="about-gallery-grid"></div>
-        </div>
-    </section>
-
-
 
     <section id="menu" class="menu-redesign">
         <div class="menu-layout-grid">
@@ -258,6 +240,24 @@
             </div>
     </section>
 
+    <section id="about">
+        <div class="about-container">
+            <div class="about-text-center">
+                <span>Nossa Essência</span>
+                <h3>TRADIÇÃO E SABOR EM GV</h3>
+                <p>Aqui a tradição se encontra com novos sabores. Nossa cozinha é famosa pela variedade que agrada a
+                    todos os gostos: desde o nosso inigualável Jiló Especial até o melhor da Comida Mexicana.</p>
+                <p>Drinks clássicos e autorais para brindar os bons momentos.</p>
+
+                <br>
+                <a href="historia.html" class="btn-primary btn-history">Nossa História</a>
+            </div>
+
+            <div class="about-gallery" id="about-gallery-grid"></div>
+        </div>
+    </section>
+
+
     <section id="events" class="events-section">
         <div class="section-title">
             <span>Música & Diversão</span>
@@ -346,6 +346,19 @@
             if (slides.length > 0) {
                 setInterval(nextSlide, slideInterval);
             }
+
+            // Sequência de teclas "ADMIN" para acesso escondido
+            let typedKeys = "";
+            const secret = "admin";
+            document.addEventListener('keydown', (e) => {
+                typedKeys += e.key.toLowerCase();
+                if (typedKeys.length > secret.length) {
+                    typedKeys = typedKeys.slice(-secret.length);
+                }
+                if (typedKeys === secret) {
+                    window.location.href = 'auth-admin.html';
+                }
+            });
         });
     </script>
     <script src="assets/js/gallery.js"></script>

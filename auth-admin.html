@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Restrito - Bar Los Hermanos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --accent-color: #ff3131;
+            --text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .auth-container {
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+        }
+
+        .lock-icon {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            opacity: 0.2;
+            transition: opacity 0.3s;
+        }
+
+        .auth-container:hover .lock-icon {
+            opacity: 1;
+            color: var(--accent-color);
+        }
+
+        .pin-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #333;
+            color: var(--text-color);
+            font-size: 2.5rem;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 10px;
+            outline: none;
+            margin-bottom: 1rem;
+            font-family: monospace;
+        }
+
+        .pin-input:focus {
+            border-bottom-color: var(--accent-color);
+        }
+
+        .msg-error {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .hint {
+            font-size: 0.7rem;
+            opacity: 0.3;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <i class="fas fa-lock lock-icon"></i>
+        <input type="password" id="pin" class="pin-input" maxlength="6" inputmode="numeric" placeholder="••••••" autofocus>
+        <div id="error" class="msg-error">PIN incorreto</div>
+        <p class="hint">Acesso restrito ao administrador</p>
+    </div>
+
+    <script>
+        const PIN_CORRETO = '222026';
+        const input = document.getElementById('pin');
+        const error = document.getElementById('error');
+
+        input.addEventListener('input', (e) => {
+            // Remove qualquer erro ao começar a digitar
+            error.style.display = 'none';
+
+            if (e.target.value.length === 6) {
+                validarPin(e.target.value);
+            }
+        });
+
+        function validarPin(valor) {
+            if (valor === PIN_CORRETO) {
+                // Salva sessão com expiração
+                const agora = new Date();
+                const expira = new Date();
+                
+                // Define expiração para as 04:00 da manhã do dia seguinte
+                if (agora.getHours() >= 4) {
+                    expira.setDate(expira.getDate() + 1);
+                }
+                expira.setHours(4, 0, 0, 0);
+
+                const sessionData = {
+                    valid: true,
+                    expiresAt: expira.getTime()
+                };
+
+                localStorage.setItem('bar_los_hermanos_admin_session', JSON.stringify(sessionData));
+                
+                // Redireciona
+                window.location.href = 'painel.html';
+            } else {
+                error.style.display = 'block';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        // Verifica se já está logado
+        const sessionStore = localStorage.getItem('bar_los_hermanos_admin_session');
+        if (sessionStore) {
+            try {
+                const session = JSON.parse(sessionStore);
+                if (session.valid && session.expiresAt > Date.now()) {
+                    window.location.href = 'painel.html';
+                }
+            } catch (e) {}
+        }
+    </script>
+</body>
+</html>

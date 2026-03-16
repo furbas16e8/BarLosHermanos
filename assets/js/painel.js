@@ -5,6 +5,27 @@
  */
 
 // ============================================================
+// SEGURANÇA - VERIFICAÇÃO DE PIN
+// ============================================================
+(function() {
+    const sessionStore = localStorage.getItem('bar_los_hermanos_admin_session');
+    let authorized = false;
+    
+    if (sessionStore) {
+        try {
+            const session = JSON.parse(sessionStore);
+            if (session.valid && session.expiresAt > Date.now()) {
+                authorized = true;
+            }
+        } catch (e) {}
+    }
+
+    if (!authorized) {
+        window.location.href = 'auth-admin.html';
+    }
+})();
+
+// ============================================================
 // ESTADO GLOBAL
 // ============================================================
 
