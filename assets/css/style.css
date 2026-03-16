@@ -128,7 +128,7 @@ nav a:hover {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding-top: 80px;
+  padding-top: 0; /* Removido padding que causava espaço preto no topo */
 }
 
 .slide video {
@@ -596,7 +596,7 @@ footer {
   header {
     flex-direction: column;
     gap: 1rem;
-    position: relative;
+    position: fixed; /* Forçado fixed para funcionar com a classe header-hidden */
   }
 
   nav ul {
